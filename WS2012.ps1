@@ -1,3 +1,5 @@
+# Outgoing interface on host needs an IP - maybe this would be better with DHCP enabled
+
 Configuration WS2012 {
     param (
     )
@@ -8,6 +10,7 @@ Configuration WS2012 {
     Import-DscResource -ModuleName xActiveDirectory
     Import-DscResource -ModuleName xFailOverCluster
     Import-DscResource -ModuleName xDnsServer
+    Import-DscResource -ModuleName xRemoteDesktopAdmin
 
     Node $AllNodes.NodeName {
         $domainAdministrator = New-Object System.Management.Automation.PSCredential("LAB\Administrator", ("Admin2018!" | ConvertTo-SecureString -AsPlainText -Force))
@@ -26,25 +29,17 @@ Configuration WS2012 {
             IPAddress      = $node.IPAddress
         }
 
-        # Unchecked
-        Firewall "FPS-ICMP4-ERQ-In" {
-            Name        = "FPS-ICMP4-ERQ-In"
-            DisplayName = "File and Printer Sharing (Echo Request - ICMPv4-In)"
-            Description = "Echo request messages are sent as ping requests to other nodes."
-            Direction   = "Inbound"
-            Action      = "Allow"
-            Enabled     = "True"
-            Profile     = "Any"
+        foreach ($firewallRule in @("FPS-ICMP4-ERQ-In", "FPS-ICMP6-ERQ-In", "RemoteDesktop-UserMode-In-TCP", "RemoteDesktop-UserMode-In-UDP")) {
+            Firewall $firewallRule.Replace("-", "") {
+                Name        = $rule
+                Ensure = "Present"
+                Enabled = "True"
+            }    
         }
 
-        Firewall "FPS-ICMP6-ERQ-In" {
-            Name        = "FPS-ICMP6-ERQ-In"
-            DisplayName = "File and Printer Sharing (Echo Request - ICMPv6-In)"
-            Description = "Echo request messages are sent as ping requests to other nodes."
-            Direction   = "Inbound"
-            Action      = "Allow"
-            Enabled     = "True"
-            Profile     = "Any"
+        xRemoteDesktopAdmin "RDP" {
+            Ensure = "Present"
+            UserAuthentication = "NonSecure"
         }
 
         switch -Wildcard ($node.Role) {
@@ -143,15 +138,24 @@ Configuration WS2012 {
         }
     }
 }
-WS2012 -ConfigurationData C:\Lability\Configurations\WS2012.psd1 -OutputPath C:\Lability\Configurations
+WS2012 -ConfigurationData C:\Lability\Lab\WS2012.psd1 -OutputPath C:\Lability\Configurations
 
 # Clean up
-Remove-LabConfiguration -ConfigurationData C:\Lability\Configurations\WS2012.psd1 -ErrorAction:SilentlyContinue -Confirm:$false
+Remove-LabConfiguration -ConfigurationData C:\Lability\Lab\WS2012.psd1 -ErrorAction:SilentlyContinue -Confirm:$false
 Remove-Item C:\Lability\VMVirtualHardDisks\*
 
 # Build
 $administrator = New-Object System.Management.Automation.PSCredential("Administrator", ("Admin2018!" | ConvertTo-SecureString -AsPlainText -Force))
-Start-LabConfiguration -ConfigurationData C:\Lability\Configurations\WS2012.psd1 -IgnorePendingReboot -Credential $administrator
+Start-LabConfiguration -ConfigurationData C:\Lability\Lab\WS2012.psd1 -IgnorePendingReboot -Credential $administrator
 
 # Start
-Start-Lab -ConfigurationData C:\Lability\Configurations\WS2012.psd1
+Start-Lab -ConfigurationData C:\Lability\Lab\WS2012.psd1
+
+# Fix RDP
+if (!(Test-Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP)) {
+    New-Item HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP
+}
+if (!(Test-Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters)) {
+    New-Item HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters
+}
+Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters' -Name "AllowEncryptionOracle" 2 -Type DWord

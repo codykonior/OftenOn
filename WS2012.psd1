@@ -68,8 +68,9 @@
                 @{ Name = "ComputerManagementDsc"; RequiredVersion = "5.2.0.0"; }
                 @{ Name = "NetworkingDsc"; RequiredVersion = "6.1.0.0"; }
                 @{ Name = "xActiveDirectory"; RequiredVersion = "2.21.0.0"; }
-                @{ Name = "xFailOverCluster"; RequiredVersion = "1.10.0.1"; Provider = "FileSystem"; Path = "C:\Git\DscResources\xDscResources\xFailOverCluster"; }
+                @{ Name = "xFailOverCluster"; RequiredVersion = "1.10.0.0"; Provider = "FileSystem"; Path = "C:\xFailoverCluster"; }
                 @{ Name = "xDnsServer"; RequiredVersion = "1.11.0.0"; }
+                @{ Name = "xRemoteDesktopAdmin"; RequiredVersion = "1.1.0.0"; }
             )
 
             Network     = @(
