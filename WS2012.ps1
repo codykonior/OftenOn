@@ -2,10 +2,12 @@ param([switch] $Clean)
 
 <#
 TODO:
-    Clean up use of Network into a hash table
-    Clean up use of LAN names
-    Add a SQL resource
+    Move all Network settings into a hash table
+    Change LAN names
     Set up SQL
+    Set up SQL AG
+    Create SQL accounts
+    Create SecurityPolicyDsc permissions
 #>
 
 Set-StrictMode -Version Latest
