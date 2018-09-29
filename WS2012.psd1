@@ -3,7 +3,7 @@
         @{
             NodeName                          = "*"
             Lability_ProcessorCount           = 2
-            Lability_StartupMemory            = 2GB
+            Lability_StartupMemory            = 4GB
             Lability_Media                    = "Windows Server 2012 Standard Evaluation (Server with a GUI)"
             Lability_HardDiskDrive            = @(
                 @{
@@ -21,8 +21,13 @@
         },
 
         @{
-            NodeName            = "DC1"
-
+            NodeName            = "CHDC1"
+            Lability_Resource   = @(
+                'SQLServer2012',
+                'SQLServer2012SP4',
+                'SQLServer2012SP4GDR',
+                'SQLServer2012SP4GDRHotfix'                
+            )
             # Lability_MACAddress = ""
             Lability_SwitchName = @("LAN_10_0_0", "LAN_10_0_1", "LAN_10_0_2")
             NetworkAdapterName  = @("LAN_10_0_0", "LAN_10_0_1", "LAN_10_0_2")
@@ -32,7 +37,7 @@
         },
 
         @{
-            NodeName            = "C1N1"
+            NodeName            = "SEC1N1"
 
             # Lability_MACAddress = ""
             Lability_SwitchName = @("LAN_10_0_1")
@@ -41,29 +46,59 @@
             GatewayAddress      = "10.0.1.1"
 
             Role                = "FirstClusterNode"
-
+            ClusterIPAddress    = "10.0.1.21/24"
         },
 
         @{
-            NodeName            = "C1N2"
+            NodeName            = "SEC1N2"
 
             # Lability_MACAddress = ""
             Lability_SwitchName = @("LAN_10_0_1")
             NetworkAdapterName  = @("LAN")
             IPAddress           = @("10.0.1.12/24")
             GatewayAddress      = "10.0.1.1"
+
             Role                = "OtherClusterNode"
-        }
+            ClusterIPAddress    = "10.0.1.21/24"
+        },
 
         @{
-            NodeName            = "C1N3"
+            NodeName            = "SEC1N3"
+
+            # Lability_MACAddress = ""
+            Lability_SwitchName = @("LAN_10_0_1")
+            NetworkAdapterName  = @("LAN")
+            IPAddress           = @("10.0.1.13/24")
+            GatewayAddress      = "10.0.1.1"
+
+            Role                = "OtherClusterNode"
+            ClusterIPAddress    = "10.0.1.21/24"
+        },
+
+        @{
+            NodeName            = "DAC1N1"
+
+            # Lability_MACAddress = ""
+            Lability_SwitchName = @("LAN_10_0_2")
+            NetworkAdapterName  = @("LAN")
+            IPAddress           = @("10.0.2.11/24")
+            GatewayAddress      = "10.0.2.1"
+
+            Role                = "OtherClusterNode"
+            ClusterIPAddress    = "10.0.2.21/24"
+        },
+
+        @{
+            NodeName            = "DAC1N2"
 
             # Lability_MACAddress = ""
             Lability_SwitchName = @("LAN_10_0_2")
             NetworkAdapterName  = @("LAN")
             IPAddress           = @("10.0.2.12/24")
             GatewayAddress      = "10.0.2.1"
+
             Role                = "OtherClusterNode"
+            ClusterIPAddress    = "10.0.2.21/24"
         }
 
     )
@@ -78,9 +113,10 @@
                 @{ Name = "NetworkingDsc"; RequiredVersion = "6.1.0.0"; }
                 @{ Name = "xActiveDirectory"; RequiredVersion = "2.21.0.0"; }
                 # The version on PowerShellGallery is too old, we need > 1.10.0.0
-                @{ Name = "xFailOverCluster"; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
+                @{ Name = "xFailOverCluster"; RequiredVersion = "1.10.0.0"; Provider = "FileSystem"; Path = "C:\Git\DscResources\xDscResources\xFailOverCluster"; }
                 @{ Name = "xDnsServer"; RequiredVersion = "1.11.0.0"; }
                 @{ Name = "xRemoteDesktopAdmin"; RequiredVersion = "1.1.0.0"; }
+                @{ Name = "xSmbShare"; RequiredVersion = "2.1.0.0"; }
             )
 
             Network     = @(
@@ -115,6 +151,34 @@
                         # CustomBootStrap = @("Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine -Force -ErrorAction SilentlyContinue;")
                         CustomBootStrap = @("Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306")
                     }
+                }
+            )
+
+            Resource = @(
+                @{
+                    Id = "SQLServer2012"
+                    Filename = "SQLFULL_ENU.ISO"
+                    Uri = "https://download.microsoft.com/download/4/C/7/4C7D40B9-BCF8-4F8A-9E76-06E9B92FE5AE/ENU/SQLFULL_ENU.iso"
+                    Checksum = "C44C1869A7657001250EF8FAD4F636D3"
+                    Expand = $true
+                },
+                @{
+                    Id = "SQLServer2012SP4"
+                    Filename = "SQLServer2012SP4-KB4018073-x64-ENU.exe"
+                    Uri = "https://download.microsoft.com/download/E/A/B/EABF1E75-54F0-42BB-B0EE-58E837B7A17F/SQLServer2012SP4-KB4018073-x64-ENU.exe"
+                    Checksum = "5EFF56819F854866CCBAE26F0D091B63"
+                },
+                @{
+                    Id = "SQLServer2012SP4GDR"
+                    Filename = "SQLServer2012-KB4057116-x64.exe"
+                    Uri = "https://download.microsoft.com/download/F/6/1/F618E667-BA6E-4428-A36A-8B4F5190FCC8/SQLServer2012-KB4057116-x64.exe"
+                    Checksum = "FBD078835E0BDF5815271F848FD8CF58"
+                },
+                @{
+                    Id = "SQLServer2012SP4GDRHotfix"
+                    Filename = "SQLServer2012-KB4091266-x64.exe"
+                    Uri = "http://download.microsoft.com/download/3/D/9/3D95BF50-AED7-44A6-863B-BC7DC7C722CE/SQLServer2012-KB4091266-x64.exe"
+                    Checksum = "54AF3D25BA0254440340E86320441A94"
                 }
             )
         }

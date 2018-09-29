@@ -1,35 +1,33 @@
 param([switch] $Clean)
 
+<#
+TODO:
+    Clean up use of Network into a hash table
+    Clean up use of LAN names
+    Add a SQL resource
+    Set up SQL
+#>
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 <#
+# How to set up WAN routing
 Install-RemoteAccess -VpnType Vpn
 cmd.exe /c 'netsh routing ip nat install'
 cmd.exe /c 'netsh routing ip nat add interface $ExternalInterface'
- 
-$ExternalInterface = 'External'
+ $ExternalInterface = 'External'
 $InternalInterface1 = 'LAN1'
 $InternalInterface2 = 'LAN2'
 $InternalInterface3 = 'LAN3'
 $InternalInterface4 = 'LAN4'
- 
 cmd.exe /c 'netsh routing ip nat set interface $ExternalInterface mode=full'
 cmd.exe /c 'netsh routing ip nat add interface $InternalInterface1'
 cmd.exe /c 'netsh routing ip nat add interface $InternalInterface2'
 cmd.exe /c 'netsh routing ip nat add interface $InternalInterface3'
 cmd.exe /c 'netsh routing ip nat add interface $InternalInterface4'
-
-Add-ClusterResource -Name "Cluster Name" -group "Cluster Group" -ResourceType "Network Name"
-IsCoreResource = 1
-PersistState = 1
-Get-ClusterResource -Name "Cluster Name" | Set-ClusterParameter -Name Name -Value "C1"
-Add a dependency from it to IP
-
-
-&cluster /cluster:C3 /create /node:"C1N1" /ipaddress:10.0.1.100/255.255.255.0
-
 #>
+
 # Outgoing interface on host needs an IP - maybe this would be better with DHCP enabled
 Configuration WS2012 {
     param (
@@ -42,6 +40,7 @@ Configuration WS2012 {
     Import-DscResource -ModuleName xFailOverCluster
     Import-DscResource -ModuleName xDnsServer
     Import-DscResource -ModuleName xRemoteDesktopAdmin
+    Import-DscResource -ModuleName xSmbShare
 
     Node $AllNodes.NodeName {
         $domainAdministrator = New-Object System.Management.Automation.PSCredential("LAB\Administrator", ("Admin2018!" | ConvertTo-SecureString -AsPlainText -Force))
@@ -53,7 +52,25 @@ Configuration WS2012 {
             ConfigurationMode    = "ApplyOnly"
             CertificateID        = $node.Thumbprint
         }
+
+        # Don't cache no-results for 15 minutes, like looking up the cluster name
+        Registry "DisableNegativeCacheTtl" {
+            Ensure = "Present"
+            Key = "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters"
+            ValueName = "MaxNegativeCacheTtl"
+            ValueData = "0"
+            ValueType = "DWord"
+        }
         
+        # So you can rollback snapshots after more than 30 days
+        Registry "DisableMachineAccountPasswordChange" {
+            Ensure = "Present"
+            Key = "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters"
+            ValueName = "DisablePasswordChange"
+            ValueData = "1"
+            ValueType = "DWord"
+        }
+
         if ($node.ContainsKey("Lability_MACAddress")) {
             for ($i = 0; $i -lt @($node.Lability_MACAddress).Count; $i++) {
                 NetAdapterName "RenameNetAdapter$i" {
@@ -117,14 +134,15 @@ Configuration WS2012 {
                 Name = $node.NodeName
             }
 
+            xSmbShare AddResourceShare {
+                Name = "Resources"
+                Path = "C:\Resources"
+                ReadAccess = "Everyone"
+                Ensure = "Present"
+            }
+
             Script SetIPInterfaceForwardingEnabled {
                 GetScript = {
-                    if (Get-NetIPInterface | Where-Object { $_.InterfaceAlias -like "LAN*" -and $_.Forwarding -ne "Enabled" }) {
-                        $result = "Fail"
-                    } else {
-                        $result = "Pass"
-                    }
-                    @{ Result = $result; }
                 }
                 TestScript = {
                     if (Get-NetIPInterface | Where-Object { $_.InterfaceAlias -like "LAN*" -and $_.Forwarding -ne "Enabled" }) {
@@ -184,8 +202,9 @@ Configuration WS2012 {
             xWaitForADDomain "Join" {
                 DomainName           = $node.DomainName
                 DomainUserCredential = $domainAdministrator
-                RetryCount           = 60
-                RetryIntervalSec     = 10
+                # 30 Minutes
+                RetryIntervalSec     = 15
+                RetryCount           = 120
             }
 
             Computer "Name" {
@@ -199,7 +218,7 @@ Configuration WS2012 {
                 xCluster "Cluster" {
                     Name                          = "C1"
                     DomainAdministratorCredential = $domainAdministrator
-                    StaticIPAddress               = "10.0.1.21/24"
+                    StaticIPAddress               = $node.ClusterIPAddress
                     # If RSAT-Clustering is not installed the cluster can not be created
                     DependsOn                     = "[WindowsFeature]FailoverClustering", "[WindowsFeature]RSATClustering", "[Computer]Name"
                 }
@@ -207,16 +226,46 @@ Configuration WS2012 {
             else {
                 xWaitForCluster "Up" {
                     Name             = "C1"
-                    RetryIntervalSec = 10
-                    RetryCount       = 60
                     DependsOn        = "[WindowsFeature]FailoverClustering", "[WindowsFeature]RSATClustering", "[Computer]Name"
+                    # 30 Minutes
+                    RetryIntervalSec = 15
+                    RetryCount       = 120
                 }
 
                 xCluster "Cluster" {
                     Name                          = "C1"
                     DomainAdministratorCredential = $domainAdministrator
-                    StaticIPAddress               = "10.0.2.21/24"
+                    StaticIPAddress               = $node.ClusterIPAddress
                     DependsOn                     = "[xWaitForCluster]Up"
+                }
+
+                Script "ClusterIPAddress" {
+                    GetScript = {
+                    }
+                    TestScript = {
+                        $clusterIPAddress = ($using:node.ClusterIPAddress -split "/")[0]
+                        if (Get-Cluster | Get-ClusterResource | Where-Object { $_.ResourceType -eq "IP Address" } | Get-ClusterParameter -Name Address | Where-Object { $_.Value -eq $clusterIPAddress }) {
+                            $true
+                        } else {
+                            $false
+                        }
+                    }
+                    SetScript = {
+                        $clusterIPAddress = ($using:node.ClusterIPAddress -split "/")[0]
+                        Get-Cluster | Add-ClusterResource -Name "IP Address $clusterIPAddress" -Group "Cluster Group" -ResourceType "IP Address"
+                        $network = Get-Cluster | Get-ClusterNetwork | Where-Object { (([Net.IPAddress] $_.Address).Address -band ([Net.IPAddress] $_.AddressMask).Address) -eq (([Net.IPAddress] $clusterIPAddress).Address -band ([Net.IPAddress] $_.AddressMask).Address)}
+                        Get-Cluster | Get-ClusterResource -Name "IP Address $clusterIPAddress" | Set-ClusterParameter -Multiple @{ Address = $clusterIPAddress; Network = $network.Name; SubnetMask = $network.AddressMask; }
+                        $expression = (Get-Cluster | Get-ClusterResourceDependency -Resource "Cluster Name").DependencyExpression
+                        if ($expression -match "^\((.*)\)$") {
+                            $expression = $Matches[1] + " or [IP Address $clusterIPAddress]"
+                        } else {
+                            $expression = $expression + " or [IP Address $clusterIPAddress]"
+                        }
+                        Get-Cluster | Set-ClusterResourceDependency -Resource "Cluster Name" -Dependency $expression
+                        # Without this, it won't start automatically on first try
+                        (Get-Cluster | Get-ClusterResource -Name "IP Address $clusterIPAddress").PersistentState = 1
+                    }
+                    DependsOn = "[xCluster]Cluster"
                 }
             }
 
