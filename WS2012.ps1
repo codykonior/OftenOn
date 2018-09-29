@@ -51,8 +51,11 @@ Configuration WS2012 {
         LocalConfigurationManager {
             RebootNodeIfNeeded   = $true
             AllowModuleOverwrite = $true
+            # It will retry, just that once EVERYTHING passes it will stop retries
             ConfigurationMode    = "ApplyOnly"
             CertificateID        = $node.Thumbprint
+            # If there's an error (i.e. Cluster is coming up) then quickly retry
+            ConfigurationModeFrequencyMins = 1
         }
 
         # Don't cache no-results for 15 minutes, like looking up the cluster name
