@@ -224,7 +224,7 @@ Configuration WS2012 {
     }
 }
 
-$configurationData = Import-PowerShellDataFile -Path C:\Lability\Lab\WS2012.psd1
+$configurationData = Import-PowerShellDataFile -Path C:\Lability\Configurations\WS2012.psd1
 $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
 $certificate.Import("$env:AllUsersProfile\Lability\Certificates\LabClient.cer")
 $configurationData.AllNodes[0].CertificateFile = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer"
@@ -246,7 +246,7 @@ WS2012 -ConfigurationData $configurationData -OutputPath C:\Lability\Configurati
 
 if ($Clean) {
     # Clean up
-    Remove-LabConfiguration -ConfigurationData C:\Lability\Lab\WS2012.psd1 -ErrorAction:SilentlyContinue -Confirm:$false
+    Remove-LabConfiguration -ConfigurationData C:\Lability\Configurations\WS2012.psd1 -ErrorAction:SilentlyContinue -Confirm:$false
     Remove-Item C:\Lability\VMVirtualHardDisks\*
     $error.Clear()
 }
