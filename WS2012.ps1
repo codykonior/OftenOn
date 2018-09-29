@@ -1,5 +1,33 @@
-# Outgoing interface on host needs an IP - maybe this would be better with DHCP enabled
+param([switch] $Clean)
 
+<#
+Install-RemoteAccess -VpnType Vpn
+cmd.exe /c 'netsh routing ip nat install'
+cmd.exe /c 'netsh routing ip nat add interface $ExternalInterface'
+ 
+$ExternalInterface = 'External'
+$InternalInterface1 = 'LAN1'
+$InternalInterface2 = 'LAN2'
+$InternalInterface3 = 'LAN3'
+$InternalInterface4 = 'LAN4'
+ 
+cmd.exe /c 'netsh routing ip nat set interface $ExternalInterface mode=full'
+cmd.exe /c 'netsh routing ip nat add interface $InternalInterface1'
+cmd.exe /c 'netsh routing ip nat add interface $InternalInterface2'
+cmd.exe /c 'netsh routing ip nat add interface $InternalInterface3'
+cmd.exe /c 'netsh routing ip nat add interface $InternalInterface4'
+
+Add-ClusterResource -Name "Cluster Name" -group "Cluster Group" -ResourceType "Network Name"
+IsCoreResource = 1
+PersistState = 1
+Get-ClusterResource -Name "Cluster Name" | Set-ClusterParameter -Name Name -Value "C1"
+Add a dependency from it to IP
+
+
+&cluster /cluster:C3 /create /node:"C1N1" /ipaddress:10.0.1.100/255.255.255.0
+
+#>
+# Outgoing interface on host needs an IP - maybe this would be better with DHCP enabled
 Configuration WS2012 {
     param (
     )
@@ -22,35 +50,55 @@ Configuration WS2012 {
             ConfigurationMode    = "ApplyOnly"
             CertificateID        = $node.Thumbprint
         }
+        
+        for ($i = 0; $i -lt @($node.Lability_MACAddress).Count; $i++) {
+            NetAdapterName "RenameNetAdapter$i" {
+                NewName    = $node.NetworkAdapterName[$i];
+                MacAddress = $node.Lability_MACAddress[$i].Replace(":", "-");
+            }
 
-        IPAddress "IPAddress" {
-            AddressFamily  = "IPv4"
-            InterfaceAlias = "Ethernet"
-            IPAddress      = $node.IPAddress
+            if ($node.IPAddress[$i]) {
+                IPAddress "SetIPAddress$i" {
+                    AddressFamily = "IPv4"
+                    InterfaceAlias = $node.NetworkAdapterName[$i]
+                    IPAddress = $node.IPAddress[$i]
+                    DependsOn = "[NetAdapterName]RenameNetAdapter$i"
+                }
+            }
+
+            if ($node.GatewayAddress) {
+                DefaultGatewayAddress "SetDefaultGatewayAddress$i" {
+                    Address = $node.GatewayAddress
+                    InterfaceAlias = $node.NetworkAdapterName[$i]
+                    AddressFamily = "IPv4"
+                    DependsOn = "[NetAdapterName]RenameNetAdapter$i"
+                }
+            }
         }
 
         foreach ($firewallRule in @("FPS-ICMP4-ERQ-In", "FPS-ICMP6-ERQ-In", "RemoteDesktop-UserMode-In-TCP", "RemoteDesktop-UserMode-In-UDP")) {
+            # It used to be that you had to specify all the details. But no, now you can just turn on an existing rule.
             Firewall $firewallRule.Replace("-", "") {
-                Name        = $rule
-                Ensure = "Present"
+                Name    = $firewallRule
+                Ensure  = "Present"
                 Enabled = "True"
             }    
         }
 
         xRemoteDesktopAdmin "RDP" {
-            Ensure = "Present"
+            Ensure             = "Present"
             UserAuthentication = "NonSecure"
         }
 
+        $windowsFeatures = "RSAT-AD-Tools", "RSAT-AD-PowerShell", "RSAT-DNS-Server", "RSAT-Clustering", "RSAT-Clustering-CmdInterface", "RSAT-RemoteAccess"
         switch -Wildcard ($node.Role) {
             "DomainController" {
-                $windowsFeatures = "AD-Domain-Services", "DNS", "RSAT-AD-Tools", "RSAT-DNS-Server", "RSAT-Clustering" #, "Routing", "RSAT-RemoteAccess"
+                $windowsFeatures = "AD-Domain-Services", "DNS", "Routing"
             }
             "*ClusterNode" {
-                $windowsFeatures = "Failover-Clustering", "RSAT-Clustering"
+                $windowsFeatures = "Failover-Clustering"
             }
             default {
-                $windowsFeatures = @()
             }
         }
 
@@ -66,9 +114,21 @@ Configuration WS2012 {
                 Name = $node.NodeName
             }
 
-            DnsServerAddress "DNSServer" {
+            DnsServerAddress "DNSServer1" {
                 Address        = $node.DnsServerAddress
-                InterfaceAlias = "Ethernet"
+                InterfaceAlias = "LAN_10_0_0"
+                AddressFamily  = "IPv4"
+                DependsOn      = "[Computer]Name", "[WindowsFeature]DNS"
+            }
+            DnsServerAddress "DNSServer2" {
+                Address        = $node.DnsServerAddress
+                InterfaceAlias = "LAN_10_0_1"
+                AddressFamily  = "IPv4"
+                DependsOn      = "[Computer]Name", "[WindowsFeature]DNS"
+            }
+            DnsServerAddress "DNSServer3" {
+                Address        = $node.DnsServerAddress
+                InterfaceAlias = "LAN_10_0_2"
                 AddressFamily  = "IPv4"
                 DependsOn      = "[Computer]Name", "[WindowsFeature]DNS"
             }
@@ -78,20 +138,20 @@ Configuration WS2012 {
                 DomainAdministratorCredential = $domainAdministrator
                 SafemodeAdministratorPassword = $safemodeAdministrator
 
-                DependsOn                     = "[DnsServerAddress]DNSServer", "[WindowsFeature]ADDomainServices"
+                DependsOn                     = "[WindowsFeature]ADDomainServices"
             }
         }
         else {
             # If DNS is not defined computers can not be joined to the domain
             DnsServerAddress "PrimaryDNSClient" {
                 Address        = $node.DnsServerAddress
-                InterfaceAlias = "Ethernet"
+                InterfaceAlias = "LAN"
                 AddressFamily  = "IPv4"
             }
 
             DnsConnectionSuffix "PrimaryConnectionSuffix" {
                 ConnectionSpecificSuffix = $node.DomainName
-                InterfaceAlias           = "Ethernet"
+                InterfaceAlias           = "LAN"
             }
         }
 
@@ -114,7 +174,7 @@ Configuration WS2012 {
                 xCluster "Cluster" {
                     Name                          = "C1"
                     DomainAdministratorCredential = $domainAdministrator
-                    StaticIPAddress               = "10.0.0.21/24"
+                    StaticIPAddress               = "10.0.1.21/24"
                     # If RSAT-Clustering is not installed the cluster can not be created
                     DependsOn                     = "[WindowsFeature]FailoverClustering", "[WindowsFeature]RSATClustering", "[Computer]Name"
                 }
@@ -130,7 +190,7 @@ Configuration WS2012 {
                 xCluster "Cluster" {
                     Name                          = "C1"
                     DomainAdministratorCredential = $domainAdministrator
-                    StaticIPAddress               = "10.0.0.21/24"
+                    StaticIPAddress               = "10.0.2.21/24"
                     DependsOn                     = "[xWaitForCluster]Up"
                 }
             }
@@ -138,20 +198,42 @@ Configuration WS2012 {
         }
     }
 }
-WS2012 -ConfigurationData C:\Lability\Lab\WS2012.psd1 -OutputPath C:\Lability\Configurations
 
-# Clean up
-Remove-LabConfiguration -ConfigurationData C:\Lability\Lab\WS2012.psd1 -ErrorAction:SilentlyContinue -Confirm:$false
-Remove-Item C:\Lability\VMVirtualHardDisks\*
+$configurationData = Import-PowerShellDataFile -Path C:\Lability\Lab\WS2012.psd1
+$certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+$certificate.Import("$env:AllUsersProfile\Lability\Certificates\LabClient.cer")
+$configurationData.AllNodes[0].CertificateFile = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer"
+$configurationData.AllNodes[0].Thumbprint = $certificate.Thumbprint
+
+foreach ($node in $configurationData.AllNodes) {
+    if ($node.Lability_SwitchName) {
+        $macAddress = @()
+        foreach ($switchName in $node.Lability_SwitchName) {
+            # It's important to limit what MAC are used otherwise you will get weird failures on VM creation
+            $macAddress += ('00', '03', (0..3 | ForEach-Object { '{0:x}{1:x}' -f (Get-Random -Minimum 0 -Maximum 15),(Get-Random -Minimum 0 -Maximum 15)}) | ForEach-Object { $_ }) -join ':'
+        }
+
+        $node.Lability_MACAddress = $macAddress
+    }
+}
+
+WS2012 -ConfigurationData $configurationData -OutputPath C:\Lability\Configurations
+
+if ($Clean) {
+    # Clean up
+    Remove-LabConfiguration -ConfigurationData C:\Lability\Lab\WS2012.psd1 -ErrorAction:SilentlyContinue -Confirm:$false
+    Remove-Item C:\Lability\VMVirtualHardDisks\*
+    $error.Clear()
+}
 
 # Build
 $administrator = New-Object System.Management.Automation.PSCredential("Administrator", ("Admin2018!" | ConvertTo-SecureString -AsPlainText -Force))
-Start-LabConfiguration -ConfigurationData C:\Lability\Lab\WS2012.psd1 -IgnorePendingReboot -Credential $administrator
+Start-LabConfiguration -ConfigurationData $configurationData -IgnorePendingReboot -Credential $administrator
 
 # Start
-Start-Lab -ConfigurationData C:\Lability\Lab\WS2012.psd1
+Start-Lab -ConfigurationData $configurationData
 
-# Fix RDP
+# Fix local RDP client
 if (!(Test-Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP)) {
     New-Item HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP
 }

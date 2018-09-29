@@ -12,12 +12,8 @@
                 }
             )
             Lability_GuestIntegrationServices = $true
-
-            # $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-            # $certificate.Import("$env:AllUsersProfile\Lability\Certificates\LabClient.cer")
-            # $certificate.Thumbprint
-            CertificateFile                   = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer"
-            Thumbprint                        = "5940D7352AB397BFB2F37856AA062BB471B43E5E"
+            # CertificateFile                   = ""
+            # Thumbprint                        = ""
             PSDscAllowDomainUser              = $true
 
             DomainName                        = "lab.com"
@@ -26,35 +22,48 @@
 
         @{
             NodeName            = "DC1"
-            IPAddress           = "10.0.0.1/24"
-            DnsServerAddress    = "127.0.0.1"
-            Role                = "DomainController"
 
-            Lability_SwitchName = "LAN_10_0_0"
+            # Lability_MACAddress = ""
+            Lability_SwitchName = @("LAN_10_0_0", "LAN_10_0_1", "LAN_10_0_2", "Default Switch")
+            NetworkAdapterName  = @("LAN_10_0_0", "LAN_10_0_1", "LAN_10_0_2", "WAN")
+            IPAddress           = @("10.0.0.1/24", "10.0.1.1/24", "10.0.2.1/24", $null)
+            DnsServerAddress    = @("127.0.0.1", "127.0.0.1", "127.0.0.1", $null)
+            Role                = "DomainController"
         },
 
         @{
             NodeName            = "C1N1"
-            IPAddress           = "10.0.0.11/24"
+
+            # Lability_MACAddress = ""
+            Lability_SwitchName = @("LAN_10_0_1")
+            NetworkAdapterName  = @("LAN")
+            IPAddress           = @("10.0.1.11/24")
+            GatewayAddress      = "10.0.1.1"
+
             Role                = "FirstClusterNode"
 
-            Lability_SwitchName = "LAN_10_0_0"
         },
 
         @{
             NodeName            = "C1N2"
-            IPAddress           = "10.0.0.12/24"
-            Role                = "OtherClusterNode"
 
-            Lability_SwitchName = "LAN_10_0_0"
-        },
+            # Lability_MACAddress = ""
+            Lability_SwitchName = @("LAN_10_0_1")
+            NetworkAdapterName  = @("LAN")
+            IPAddress           = @("10.0.1.12/24")
+            GatewayAddress      = "10.0.1.1"
+            Role                = "OtherClusterNode"
+        }
 
         @{
             NodeName            = "C1N3"
-            IPAddress           = "10.0.0.13/24"
-            Role                = "OtherClusterNode"
 
-            Lability_SwitchName = "LAN_10_0_0"
+            # Lability_MACAddress = ""
+            Lability_SwitchName = @("LAN_10_0_2")
+            NetworkAdapterName  = @("LAN")
+            IPAddress           = @("10.0.2.12/24")
+            GatewayAddress      = "10.0.2.1"
+            Role                = "OtherClusterNode"
         }
 
     )
@@ -68,19 +77,15 @@
                 @{ Name = "ComputerManagementDsc"; RequiredVersion = "5.2.0.0"; }
                 @{ Name = "NetworkingDsc"; RequiredVersion = "6.1.0.0"; }
                 @{ Name = "xActiveDirectory"; RequiredVersion = "2.21.0.0"; }
-                @{ Name = "xFailOverCluster"; RequiredVersion = "1.10.0.0"; Provider = "FileSystem"; Path = "C:\xFailoverCluster"; }
+                @{ Name = "xFailOverCluster"; RequiredVersion = "1.10.0.0"; }
                 @{ Name = "xDnsServer"; RequiredVersion = "1.11.0.0"; }
                 @{ Name = "xRemoteDesktopAdmin"; RequiredVersion = "1.1.0.0"; }
             )
 
             Network     = @(
                 @{ Name = "LAN_10_0_0"; Type = "Internal"; }
-                <#
                 @{ Name = "LAN_10_1_0"; Type = "Internal"; }
                 @{ Name = "LAN_10_2_0"; Type = "Internal"; }
-                @{ Name = "LAN_10_2_3"; Type = "Internal"; }
-                #>
-                @{ Name = "WAN"; Type = "External"; NetAdapterName = "WAN"; }
             )
 
             Media       = @(
