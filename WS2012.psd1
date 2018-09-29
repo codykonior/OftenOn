@@ -3,7 +3,7 @@
         @{
             NodeName                          = "*"
             Lability_ProcessorCount           = 2
-            Lability_StartupMemory            = 4GB
+            Lability_StartupMemory            = 2GB
             Lability_Media                    = "Windows Server 2012 Standard Evaluation (Server with a GUI)"
             Lability_HardDiskDrive            = @(
                 @{
