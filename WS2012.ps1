@@ -1,5 +1,8 @@
 param([switch] $Clean)
 
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
 <#
 Install-RemoteAccess -VpnType Vpn
 cmd.exe /c 'netsh routing ip nat install'
@@ -51,27 +54,29 @@ Configuration WS2012 {
             CertificateID        = $node.Thumbprint
         }
         
-        for ($i = 0; $i -lt @($node.Lability_MACAddress).Count; $i++) {
-            NetAdapterName "RenameNetAdapter$i" {
-                NewName    = $node.NetworkAdapterName[$i];
-                MacAddress = $node.Lability_MACAddress[$i].Replace(":", "-");
-            }
-
-            if ($node.IPAddress[$i]) {
-                IPAddress "SetIPAddress$i" {
-                    AddressFamily = "IPv4"
-                    InterfaceAlias = $node.NetworkAdapterName[$i]
-                    IPAddress = $node.IPAddress[$i]
-                    DependsOn = "[NetAdapterName]RenameNetAdapter$i"
+        if ($node.ContainsKey("Lability_MACAddress")) {
+            for ($i = 0; $i -lt @($node.Lability_MACAddress).Count; $i++) {
+                NetAdapterName "RenameNetAdapter$i" {
+                    NewName    = $node.NetworkAdapterName[$i];
+                    MacAddress = $node.Lability_MACAddress[$i].Replace(":", "-");
                 }
-            }
 
-            if ($node.GatewayAddress) {
-                DefaultGatewayAddress "SetDefaultGatewayAddress$i" {
-                    Address = $node.GatewayAddress
-                    InterfaceAlias = $node.NetworkAdapterName[$i]
-                    AddressFamily = "IPv4"
-                    DependsOn = "[NetAdapterName]RenameNetAdapter$i"
+                if ($node.IPAddress[$i]) {
+                    IPAddress "SetIPAddress$i" {
+                        AddressFamily = "IPv4"
+                        InterfaceAlias = $node.NetworkAdapterName[$i]
+                        IPAddress = $node.IPAddress[$i]
+                        DependsOn = "[NetAdapterName]RenameNetAdapter$i"
+                    }
+                }
+
+                if ($node.ContainsKey("GatewayAddress")) {
+                    DefaultGatewayAddress "SetDefaultGatewayAddress$i" {
+                        Address = $node.GatewayAddress
+                        InterfaceAlias = $node.NetworkAdapterName[$i]
+                        AddressFamily = "IPv4"
+                        DependsOn = "[NetAdapterName]RenameNetAdapter$i"
+                    }
                 }
             }
         }
@@ -90,15 +95,13 @@ Configuration WS2012 {
             UserAuthentication = "NonSecure"
         }
 
-        $windowsFeatures = "RSAT-AD-Tools", "RSAT-AD-PowerShell", "RSAT-DNS-Server", "RSAT-Clustering", "RSAT-Clustering-CmdInterface", "RSAT-RemoteAccess"
+        $windowsFeatures = "RSAT-AD-Tools", "RSAT-AD-PowerShell", "RSAT-Clustering", "RSAT-Clustering-CmdInterface", "RSAT-DNS-Server", "RSAT-RemoteAccess"
         switch -Wildcard ($node.Role) {
             "DomainController" {
-                $windowsFeatures = "AD-Domain-Services", "DNS", "Routing"
+                $windowsFeatures += "AD-Domain-Services", "DNS", "Routing"
             }
             "*ClusterNode" {
-                $windowsFeatures = "Failover-Clustering"
-            }
-            default {
+                $windowsFeatures += "Failover-Clustering"
             }
         }
 
@@ -113,6 +116,28 @@ Configuration WS2012 {
             Computer "Name" {
                 Name = $node.NodeName
             }
+
+            Script SetIPInterfaceForwardingEnabled {
+                GetScript = {
+                    if (Get-NetIPInterface | Where-Object { $_.InterfaceAlias -like "LAN*" -and $_.Forwarding -ne "Enabled" }) {
+                        $result = "Fail"
+                    } else {
+                        $result = "Pass"
+                    }
+                    @{ Result = $result; }
+                }
+                TestScript = {
+                    if (Get-NetIPInterface | Where-Object { $_.InterfaceAlias -like "LAN*" -and $_.Forwarding -ne "Enabled" }) {
+                        $false
+                    } else {
+                        $true
+                    }
+                }
+                SetScript = {
+                    Get-NetIPInterface | Where-Object { $_.InterfaceAlias -like "LAN*" } | Set-NetIPInterface -Forwarding Enabled
+                }
+                DependsOn      = "[Computer]Name"
+            }    
 
             DnsServerAddress "DNSServer1" {
                 Address        = $node.DnsServerAddress
@@ -206,7 +231,7 @@ $configurationData.AllNodes[0].CertificateFile = "$env:AllUsersProfile\Lability\
 $configurationData.AllNodes[0].Thumbprint = $certificate.Thumbprint
 
 foreach ($node in $configurationData.AllNodes) {
-    if ($node.Lability_SwitchName) {
+    if ($node.ContainsKey("Lability_SwitchName")) {
         $macAddress = @()
         foreach ($switchName in $node.Lability_SwitchName) {
             # It's important to limit what MAC are used otherwise you will get weird failures on VM creation

@@ -24,10 +24,10 @@
             NodeName            = "DC1"
 
             # Lability_MACAddress = ""
-            Lability_SwitchName = @("LAN_10_0_0", "LAN_10_0_1", "LAN_10_0_2", "Default Switch")
-            NetworkAdapterName  = @("LAN_10_0_0", "LAN_10_0_1", "LAN_10_0_2", "WAN")
-            IPAddress           = @("10.0.0.1/24", "10.0.1.1/24", "10.0.2.1/24", $null)
-            DnsServerAddress    = @("127.0.0.1", "127.0.0.1", "127.0.0.1", $null)
+            Lability_SwitchName = @("LAN_10_0_0", "LAN_10_0_1", "LAN_10_0_2")
+            NetworkAdapterName  = @("LAN_10_0_0", "LAN_10_0_1", "LAN_10_0_2")
+            IPAddress           = @("10.0.0.1/24", "10.0.1.1/24", "10.0.2.1/24")
+            DnsServerAddress    = @("127.0.0.1", "127.0.0.1", "127.0.0.1")
             Role                = "DomainController"
         },
 
@@ -77,7 +77,8 @@
                 @{ Name = "ComputerManagementDsc"; RequiredVersion = "5.2.0.0"; }
                 @{ Name = "NetworkingDsc"; RequiredVersion = "6.1.0.0"; }
                 @{ Name = "xActiveDirectory"; RequiredVersion = "2.21.0.0"; }
-                @{ Name = "xFailOverCluster"; RequiredVersion = "1.10.0.0"; }
+                # The version on PowerShellGallery is too old, we need > 1.10.0.0
+                @{ Name = "xFailOverCluster"; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
                 @{ Name = "xDnsServer"; RequiredVersion = "1.11.0.0"; }
                 @{ Name = "xRemoteDesktopAdmin"; RequiredVersion = "1.1.0.0"; }
             )
