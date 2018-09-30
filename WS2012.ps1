@@ -18,7 +18,7 @@ $ErrorActionPreference = 'Stop'
 Install-RemoteAccess -VpnType Vpn
 cmd.exe /c 'netsh routing ip nat install'
 cmd.exe /c 'netsh routing ip nat add interface $ExternalInterface'
- $ExternalInterface = 'External'
+$ExternalInterface = 'External'
 $InternalInterface1 = 'LAN1'
 $InternalInterface2 = 'LAN2'
 $InternalInterface3 = 'LAN3'
@@ -97,10 +97,10 @@ Configuration WS2012 {
 
         # Enable windows features
         $windowsFeatures = 'RSAT-AD-Tools', 'RSAT-AD-PowerShell', 'RSAT-Clustering', 'RSAT-Clustering-CmdInterface', 'RSAT-DNS-Server', 'RSAT-RemoteAccess'
-        if ($node.ContainsKey("Role") -and $node.Role.ContainsKey('DomainController')) {
+        if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('DomainController')) {
             $windowsFeatures += 'AD-Domain-Services', 'DNS', 'Routing'
         }
-        if ($node.ContainsKey("Role") -and $node.Role.ContainsKey('Cluster')) {
+        if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('Cluster')) {
             $windowsFeatures += 'Failover-Clustering'
         }
 
@@ -123,7 +123,7 @@ Configuration WS2012 {
 
                 if ($network.ContainsKey('IPAddress')) {
                     IPAddress "SetIPAddress$($network.NetAdapterName)" {
-                        AddressFamily = "IPv4"
+                        AddressFamily = 'IPv4'
                         InterfaceAlias = $network.NetAdapterName
                         IPAddress = $network.IPAddress
                         DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
@@ -218,7 +218,7 @@ Configuration WS2012 {
                 $cluster = $node.Role.Cluster
                 $clusterIPAddress = $cluster.IPAddress
 
-                if ($cluster.ContainsKey("First") -and $cluster.First) {
+                if ($cluster.ContainsKey('First') -and $cluster.First) {
                     xCluster "CreateCluster$($cluster.Name)" {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
