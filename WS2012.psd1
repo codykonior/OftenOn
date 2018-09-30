@@ -25,7 +25,7 @@
             PSDscAllowDomainUser              = $true
 
             DomainName                        = 'lab.com'
-        },
+        }
 
         @{
             NodeName           = 'CHDC1'
@@ -41,16 +41,14 @@
 
             
             Lability_Resource  = @(
-                'SQLServer2012',
-                'SQLServer2012SP4',
-                'SQLServer2012SP4GDR',
-                'SQLServer2012SP4GDRHotfix'                
+                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix',
+                'SSMS179', 'NetFx472'             
             )
 
             Role               = @{
                 DomainController = $true
             }
-        },
+        }
 
         @{
             NodeName           = 'SEC1N1'
@@ -63,7 +61,7 @@
             Role               = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; First = $true; }
             }
-        },
+        }
 
         @{
             NodeName = 'SEC1N2'
@@ -75,7 +73,7 @@
             Role     = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
             }
-        },
+        }
 
         @{
             NodeName = 'SEC1N3'
@@ -87,7 +85,7 @@
             Role     = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
             }
-        },
+        }
 
         @{
             NodeName = 'DAC1N1'
@@ -99,7 +97,7 @@
             Role     = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
             }
-        },
+        }
 
         @{
             NodeName = 'DAC1N2'
@@ -176,24 +174,36 @@
                     Uri      = 'https://download.microsoft.com/download/4/C/7/4C7D40B9-BCF8-4F8A-9E76-06E9B92FE5AE/ENU/SQLFULL_ENU.iso'
                     Checksum = 'C44C1869A7657001250EF8FAD4F636D3'
                     Expand   = $true
-                },
+                }
                 @{
                     Id       = 'SQLServer2012SP4'
                     Filename = 'SQLServer2012SP4-KB4018073-x64-ENU.exe'
                     Uri      = 'https://download.microsoft.com/download/E/A/B/EABF1E75-54F0-42BB-B0EE-58E837B7A17F/SQLServer2012SP4-KB4018073-x64-ENU.exe'
                     Checksum = '5EFF56819F854866CCBAE26F0D091B63'
-                },
+                }
                 @{
                     Id       = 'SQLServer2012SP4GDR'
                     Filename = 'SQLServer2012-KB4057116-x64.exe'
                     Uri      = 'https://download.microsoft.com/download/F/6/1/F618E667-BA6E-4428-A36A-8B4F5190FCC8/SQLServer2012-KB4057116-x64.exe'
                     Checksum = 'FBD078835E0BDF5815271F848FD8CF58'
-                },
+                }
                 @{
                     Id       = 'SQLServer2012SP4GDRHotfix'
                     Filename = 'SQLServer2012-KB4091266-x64.exe'
                     Uri      = 'http://download.microsoft.com/download/3/D/9/3D95BF50-AED7-44A6-863B-BC7DC7C722CE/SQLServer2012-KB4091266-x64.exe'
                     Checksum = '54AF3D25BA0254440340E86320441A94'
+                }
+                @{
+                    Id       = 'SSMS179'
+                    Filename = 'SSMS-Setup-ENU.exe'
+                    Uri      = 'https://download.microsoft.com/download/B/8/3/B839AD7D-DDC7-4212-9643-28E148251DC1/SSMS-Setup-ENU.exe'
+                    Checksum = '9555158FEC4B01695B465B2F14C7A78D'
+                }
+                @{
+                    Id       = 'NetFx472'
+                    Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
+                    Uri      = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
+                    Checksum = '87450CFA175585B23A76BBD7052EE66B'
                 }
             )
         }
