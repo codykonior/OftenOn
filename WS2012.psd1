@@ -32,10 +32,10 @@
 
             # Script will add Lability_SwitchName @() and Lability_MACAddress @()
             Network           = @(
-                @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1' },
-                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; },
-                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; },
-                @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
+                @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1' }
+                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'DALLAS';  NetAdapterName = 'DALLAS';  IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
+                # @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
             )
 
             Lability_Resource = @(
@@ -110,12 +110,12 @@
             }
         }
     )
+
     NonNodeData = @{
         Lability = @{
             DSCResource = @(
-                # If these aren't defined (the block is empty), it will hang
-                # Not specifying FileSystem will make it download wrong versions from GitHub also
-                # @{ Name = 'PSDesiredStateConfiguration'; RequiredVersion = '1.1'; Provider = 'FileSystem'; }
+                # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
+                # will hang because DSC doesn't complete.
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; }
                 @{ Name = 'ComputerManagementDsc'; RequiredVersion = '5.2.0.0'; }
                 @{ Name = 'NetworkingDsc'; RequiredVersion = '6.1.0.0'; }
@@ -125,6 +125,7 @@
                 @{ Name = 'xDnsServer'; RequiredVersion = '1.11.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; }
             )
 
             Network     = @(

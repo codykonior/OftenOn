@@ -19,7 +19,7 @@ foreach ($node in $configurationData.AllNodes) {
         foreach ($network in $node.Network) {
             $switchName += $network.SwitchName
             # It's important to limit what MAC are used otherwise you will get confusing errors during VM creation
-            $macAddress += ('00', '03', (0..3 | ForEach-Object { '{0:x}{1:x}' -f (Get-Random -Minimum 0 -Maximum 15),(Get-Random -Minimum 0 -Maximum 15) }) | ForEach-Object { $_ }) -join ':'
+            $macAddress += ('00', '03', (0..3 | ForEach-Object { '{0:x}{1:x}' -f (Get-Random -Minimum 0 -Maximum 15), (Get-Random -Minimum 0 -Maximum 15) }) | ForEach-Object { $_ }) -join ':'
         }
 
         $node.Lability_SwitchName = $switchName
@@ -49,6 +49,7 @@ Task Build -depends Compile {
 }
 
 Task Start {
+    "Allow at least 15 minutes for the first boot to finish Domain Controller setup"
     Start-Lab -ConfigurationData $configurationData
 }
 
@@ -67,10 +68,14 @@ Task CleanAll -depends Clean {
 
 <#
 
+Add node to cluster can have an error which triggers a 15 minute wait.
+Having a WAN causes everything to fail. Confirm one more time, then set NICs to Private instead of Internal.
+
 TODO
     Install SQL
     Create SQL AG
     Create MSA accounts
+    Add modules SqlServer, DbaTools, Cim, DbData, Jojoba, Error
     Add SecurityPolicyDsc permissions
     Add DHCP for local host RDP
 

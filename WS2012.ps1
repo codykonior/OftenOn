@@ -202,6 +202,7 @@ Configuration WS2012 {
                         RetryIntervalSec = 15
                         RetryCount       = 120
 
+                        # If RSAT-Clustering is not installed the cluster can not be created
                         DependsOn        = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
                     }
     
@@ -210,7 +211,6 @@ Configuration WS2012 {
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterIPAddress
 
-                        # If RSAT-Clustering is not installed the cluster can not be created
                         DependsOn                     = "[xWaitForCluster]WaitForCluster$($cluster.Name)"
                     }
     
@@ -227,12 +227,12 @@ Configuration WS2012 {
                         }
                         SetScript = {
                             $clusterIPAddress = ($using:clusterIPAddress -split '/')[0]
-                            Get-Cluster | Add-ClusterResource -Name 'IP Address $clusterIPAddress' -Group 'Cluster Group' -ResourceType 'IP Address'
+                            Get-Cluster | Add-ClusterResource -Name "IP Address $clusterIPAddress" -Group 'Cluster Group' -ResourceType 'IP Address'
                             $clusterNetwork = Get-Cluster | Get-ClusterNetwork | Where-Object { (([Net.IPAddress] $_.Address).Address -band ([Net.IPAddress] $_.AddressMask).Address) -eq (([Net.IPAddress] $clusterIPAddress).Address -band ([Net.IPAddress] $_.AddressMask).Address)}
-                            Get-ClusterResource -Name 'IP Address $clusterIPAddress' | Set-ClusterParameter -Multiple @{ Address = $clusterIPAddress; Network = $clusterNetwork.Name; SubnetMask = $clusterNetwork.AddressMask; }
+                            Get-ClusterResource -Name "IP Address $clusterIPAddress" | Set-ClusterParameter -Multiple @{ Address = $clusterIPAddress; Network = $clusterNetwork.Name; SubnetMask = $clusterNetwork.AddressMask; }
                             $dependencyExpression = (Get-Cluster | Get-ClusterResourceDependency -Resource 'Cluster Name').DependencyExpression
                             if ($dependencyExpression -match '^\((.*)\)$') {
-                                $dependencyExpression = $Matches[1] + ' or [IP Address $clusterIPAddress]'
+                                $dependencyExpression = $Matches[1] + " or [IP Address $clusterIPAddress]"
                             } else {
                                 $dependencyExpression = $dependencyExpression + " or [IP Address $clusterIPAddress]"
                             }
