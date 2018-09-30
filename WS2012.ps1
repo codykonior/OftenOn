@@ -53,7 +53,7 @@ Configuration WS2012 {
             AllowModuleOverwrite = $true
             CertificateID        = $node.Thumbprint
 
-            # This retries the configration every 15 minutes (the minimum) until it has entirely passed once
+            # This retries the configuration every 15 minutes (the minimum) until it has entirely passed once
             ConfigurationMode    = 'ApplyOnly'
             ConfigurationModeFrequencyMins = 15
         }
