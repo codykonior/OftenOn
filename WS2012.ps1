@@ -1,36 +1,3 @@
-param(
-    [switch] $Clean
-)
-
-<#
-TODO:
-    Set up SQL
-    Set up SQL AG
-    Create SQL accounts
-    Create SecurityPolicyDsc permissions
-#>
-
-Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
-
-<#
-# How to set up WAN routing
-Install-RemoteAccess -VpnType Vpn
-cmd.exe /c 'netsh routing ip nat install'
-cmd.exe /c 'netsh routing ip nat add interface $ExternalInterface'
-$ExternalInterface = 'External'
-$InternalInterface1 = 'LAN1'
-$InternalInterface2 = 'LAN2'
-$InternalInterface3 = 'LAN3'
-$InternalInterface4 = 'LAN4'
-cmd.exe /c 'netsh routing ip nat set interface $ExternalInterface mode=full'
-cmd.exe /c 'netsh routing ip nat add interface $InternalInterface1'
-cmd.exe /c 'netsh routing ip nat add interface $InternalInterface2'
-cmd.exe /c 'netsh routing ip nat add interface $InternalInterface3'
-cmd.exe /c 'netsh routing ip nat add interface $InternalInterface4'
-#>
-
-# Outgoing interface on host needs an IP - maybe this would be better with DHCP enabled
 Configuration WS2012 {
     param (
     )

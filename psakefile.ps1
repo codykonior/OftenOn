@@ -1,5 +1,8 @@
 Task default -depends Compile
 
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
 # Load configuration data so we can do our own manipulation
 $configurationData = Import-PowerShellDataFile -Path C:\Lability\Configurations\WS2012.psd1
 $configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' } | ForEach-Object {
@@ -61,3 +64,25 @@ Task Clean -depends Stop {
 Task CleanAll -depends Clean {
     Remove-Item C:\Lability\MasterVirtualHardDisks\*
 }
+
+<#
+
+TODO
+    Install SQL
+    Create SQL AG
+    Create MSA accounts
+    Add SecurityPolicyDsc permissions
+    Add DHCP for local host RDP
+
+How to set up WAN routing
+    Install-RemoteAccess -VpnType Vpn
+    cmd.exe /c 'netsh routing ip nat install'
+    $ExternalInterface = 'External'
+    cmd.exe /c 'netsh routing ip nat add interface $ExternalInterface'
+    cmd.exe /c 'netsh routing ip nat set interface $ExternalInterface mode=full'
+    $InternalInterface1 = 'LAN1'
+    $InternalInterface2 = 'LAN2'
+    cmd.exe /c 'netsh routing ip nat add interface $InternalInterface1'
+    cmd.exe /c 'netsh routing ip nat add interface $InternalInterface2'
+
+#>
