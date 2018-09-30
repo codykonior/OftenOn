@@ -1,9 +1,9 @@
-param([switch] $Clean)
+param(
+    [switch] $Clean
+)
 
 <#
 TODO:
-    Move all Network settings into a hash table
-    Change LAN names
     Set up SQL
     Set up SQL AG
     Create SQL accounts
@@ -11,7 +11,7 @@ TODO:
 #>
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
 
 <#
 # How to set up WAN routing
@@ -45,269 +45,280 @@ Configuration WS2012 {
     Import-DscResource -ModuleName xSmbShare
 
     Node $AllNodes.NodeName {
-        $domainAdministrator = New-Object System.Management.Automation.PSCredential("LAB\Administrator", ("Admin2018!" | ConvertTo-SecureString -AsPlainText -Force))
-        $safemodeAdministrator = New-Object System.Management.Automation.PSCredential("Administrator", ("Safe2018!" | ConvertTo-SecureString -AsPlainText -Force))
+        $domainAdministrator = New-Object System.Management.Automation.PSCredential('LAB\Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2018!' | ConvertTo-SecureString -AsPlainText -Force))
 
         LocalConfigurationManager {
             RebootNodeIfNeeded   = $true
             AllowModuleOverwrite = $true
-            # It will retry, just that once EVERYTHING passes it will stop retries
-            ConfigurationMode    = "ApplyOnly"
             CertificateID        = $node.Thumbprint
-            # If there's an error (i.e. Cluster is coming up) then quickly retry
-            ConfigurationModeFrequencyMins = 1
+
+            # This retries the configration every 15 minutes (the minimum) until it has entirely passed once
+            ConfigurationMode    = 'ApplyOnly'
+            ConfigurationModeFrequencyMins = 15
         }
 
-        # Don't cache no-results for 15 minutes, like looking up the cluster name
-        Registry "DisableNegativeCacheTtl" {
-            Ensure = "Present"
-            Key = "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters"
-            ValueName = "MaxNegativeCacheTtl"
-            ValueData = "0"
-            ValueType = "DWord"
+        # Windows will cache "not found" results for 15 minutes which slows down configurations
+        # that check for a Cluster being alive, so we disable caching
+        Registry 'DisableNegativeCacheTtl' {
+            Ensure = 'Present'
+            Key = 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters'
+            ValueName = 'MaxNegativeCacheTtl'
+            ValueData = '0'
+            ValueType = 'DWord'
         }
         
-        # So you can rollback snapshots after more than 30 days
-        Registry "DisableMachineAccountPasswordChange" {
-            Ensure = "Present"
-            Key = "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters"
-            ValueName = "DisablePasswordChange"
-            ValueData = "1"
-            ValueType = "DWord"
+        # Windows cycles machine passwords in a domain which prevents you from restoring a
+        # snapshot older than 30 days, so we disable this
+        Registry 'DisableMachineAccountPasswordChange' {
+            Ensure = 'Present'
+            Key = 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters'
+            ValueName = 'DisablePasswordChange'
+            ValueData = '1'
+            ValueType = 'DWord'
         }
 
-        if ($node.ContainsKey("Lability_MACAddress")) {
-            for ($i = 0; $i -lt @($node.Lability_MACAddress).Count; $i++) {
-                NetAdapterName "RenameNetAdapter$i" {
-                    NewName    = $node.NetworkAdapterName[$i];
-                    MacAddress = $node.Lability_MACAddress[$i].Replace(":", "-");
-                }
-
-                if ($node.IPAddress[$i]) {
-                    IPAddress "SetIPAddress$i" {
-                        AddressFamily = "IPv4"
-                        InterfaceAlias = $node.NetworkAdapterName[$i]
-                        IPAddress = $node.IPAddress[$i]
-                        DependsOn = "[NetAdapterName]RenameNetAdapter$i"
-                    }
-                }
-
-                if ($node.ContainsKey("GatewayAddress")) {
-                    DefaultGatewayAddress "SetDefaultGatewayAddress$i" {
-                        Address = $node.GatewayAddress
-                        InterfaceAlias = $node.NetworkAdapterName[$i]
-                        AddressFamily = "IPv4"
-                        DependsOn = "[NetAdapterName]RenameNetAdapter$i"
-                    }
-                }
-            }
-        }
-
-        foreach ($firewallRule in @("FPS-ICMP4-ERQ-In", "FPS-ICMP6-ERQ-In", "RemoteDesktop-UserMode-In-TCP", "RemoteDesktop-UserMode-In-UDP")) {
-            # It used to be that you had to specify all the details. But no, now you can just turn on an existing rule.
-            Firewall $firewallRule.Replace("-", "") {
+        # Enable ping requests and incoming Remote Desktop
+        foreach ($firewallRule in @('FPS-ICMP4-ERQ-In', 'FPS-ICMP6-ERQ-In', 'RemoteDesktop-UserMode-In-TCP', 'RemoteDesktop-UserMode-In-UDP')) {
+            # In current versions of DSC you can pass a built-in rule name and enable it without
+            # specifying all of the other details
+            Firewall "EnableFirewallRule$($firewallRule.Replace('-', ''))" {
                 Name    = $firewallRule
-                Ensure  = "Present"
-                Enabled = "True"
+                Ensure  = 'Present'
+                Enabled = 'True'
             }    
         }
 
-        xRemoteDesktopAdmin "RDP" {
-            Ensure             = "Present"
-            UserAuthentication = "NonSecure"
+        # Enable Remote Desktop 
+        xRemoteDesktopAdmin 'EnableRemoteDesktop' {
+            Ensure             = 'Present'
+            UserAuthentication = 'NonSecure'
         }
 
-        $windowsFeatures = "RSAT-AD-Tools", "RSAT-AD-PowerShell", "RSAT-Clustering", "RSAT-Clustering-CmdInterface", "RSAT-DNS-Server", "RSAT-RemoteAccess"
-        switch -Wildcard ($node.Role) {
-            "DomainController" {
-                $windowsFeatures += "AD-Domain-Services", "DNS", "Routing"
-            }
-            "*ClusterNode" {
-                $windowsFeatures += "Failover-Clustering"
-            }
+        # Enable windows features
+        $windowsFeatures = 'RSAT-AD-Tools', 'RSAT-AD-PowerShell', 'RSAT-Clustering', 'RSAT-Clustering-CmdInterface', 'RSAT-DNS-Server', 'RSAT-RemoteAccess'
+        if ($node.ContainsKey("Role") -and $node.Role.ContainsKey('DomainController')) {
+            $windowsFeatures += 'AD-Domain-Services', 'DNS', 'Routing'
+        }
+        if ($node.ContainsKey("Role") -and $node.Role.ContainsKey('Cluster')) {
+            $windowsFeatures += 'Failover-Clustering'
         }
 
         foreach ($windowsFeature in $windowsFeatures) {
-            WindowsFeature $windowsFeature.Replace("-", "") {
-                Ensure = "Present"
+            WindowsFeature "AddWindowsFeature$($windowsFeature.Replace('-', ''))" {
+                Ensure = 'Present'
                 Name   = $windowsFeature
             }
         }
 
-        if ($node.Role -eq "DomainController") {
-            Computer "Name" {
-                Name = $node.NodeName
-            }
+        # Define each network adapter name, IP address, default gateway address, DNS server address, and DNS connection suffix
+        if ($node.ContainsKey('Network')) {
+            for ($i = 0; $i -lt $node.Network.Count; $i++) {
+                $network = $node.Network[$i]
 
-            xSmbShare AddResourceShare {
-                Name = "Resources"
-                Path = "C:\Resources"
-                ReadAccess = "Everyone"
-                Ensure = "Present"
-            }
-
-            Script SetIPInterfaceForwardingEnabled {
-                GetScript = {
+                NetAdapterName "RenameNetAdapterName$($network.NetAdapterName)" {
+                    NewName = $network.NetAdapterName
+                    MacAddress = $node.Lability_MACAddress[$i].Replace(':', '-')
                 }
-                TestScript = {
-                    if (Get-NetIPInterface | Where-Object { $_.InterfaceAlias -like "LAN*" -and $_.Forwarding -ne "Enabled" }) {
-                        $false
-                    } else {
-                        $true
+
+                if ($network.ContainsKey('IPAddress')) {
+                    IPAddress "SetIPAddress$($network.NetAdapterName)" {
+                        AddressFamily = "IPv4"
+                        InterfaceAlias = $network.NetAdapterName
+                        IPAddress = $network.IPAddress
+                        DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
                     }
                 }
-                SetScript = {
-                    Get-NetIPInterface | Where-Object { $_.InterfaceAlias -like "LAN*" } | Set-NetIPInterface -Forwarding Enabled
+
+                if ($network.ContainsKey('DefaultGatewayAddress')) {
+                    DefaultGatewayAddress "SetDefaultGatewayAddress$($network.NetAdapterName)" {
+                        AddressFamily = 'IPv4'
+                        InterfaceAlias = $network.NetAdapterName
+                        Address = $network.DefaultGatewayAddress
+                        DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
+                    }
                 }
-                DependsOn      = "[Computer]Name"
-            }    
 
-            DnsServerAddress "DNSServer1" {
-                Address        = $node.DnsServerAddress
-                InterfaceAlias = "LAN_10_0_0"
-                AddressFamily  = "IPv4"
-                DependsOn      = "[Computer]Name", "[WindowsFeature]DNS"
-            }
-            DnsServerAddress "DNSServer2" {
-                Address        = $node.DnsServerAddress
-                InterfaceAlias = "LAN_10_0_1"
-                AddressFamily  = "IPv4"
-                DependsOn      = "[Computer]Name", "[WindowsFeature]DNS"
-            }
-            DnsServerAddress "DNSServer3" {
-                Address        = $node.DnsServerAddress
-                InterfaceAlias = "LAN_10_0_2"
-                AddressFamily  = "IPv4"
-                DependsOn      = "[Computer]Name", "[WindowsFeature]DNS"
-            }
+                if ($network.ContainsKey('DnsServerAddress')) {
+                    DnsServerAddress "SetDnsServerAddress$($network.NetAdapterName)" {
+                        AddressFamily  = 'IPv4'
+                        InterfaceAlias = $network.NetAdapterName
+                        Address        = $network.DnsServerAddress
+                        DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
+                    }        
+                }
 
-            xADDomain "Domain" {
-                DomainName                    = $node.DomainName
-                DomainAdministratorCredential = $domainAdministrator
-                SafemodeAdministratorPassword = $safemodeAdministrator
-
-                DependsOn                     = "[WindowsFeature]ADDomainServices"
-            }
-        }
-        else {
-            # If DNS is not defined computers can not be joined to the domain
-            DnsServerAddress "PrimaryDNSClient" {
-                Address        = $node.DnsServerAddress
-                InterfaceAlias = "LAN"
-                AddressFamily  = "IPv4"
-            }
-
-            DnsConnectionSuffix "PrimaryConnectionSuffix" {
-                ConnectionSpecificSuffix = $node.DomainName
-                InterfaceAlias           = "LAN"
+                DnsConnectionSuffix "SetDnsConnectionSuffix$($network.NetAdapterName)" {
+                    InterfaceAlias           = $network.NetAdapterName
+                    ConnectionSpecificSuffix = $node.DomainName
+                    DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
+                }
             }
         }
 
-        if ($node.Role -like "*ClusterNode") {
-            xWaitForADDomain "Join" {
-                DomainName           = $node.DomainName
-                DomainUserCredential = $domainAdministrator
-                # 30 Minutes
-                RetryIntervalSec     = 15
-                RetryCount           = 120
-            }
-
-            Computer "Name" {
-                Name       = $node.NodeName
-                DomainName = $node.DomainName
-                Credential = $domainAdministrator
-                DependsOn  = "[xWaitForADDomain]Join"
-            }
-
-            if ($node.Role -eq "FirstClusterNode") {
-                xCluster "Cluster" {
-                    Name                          = "C1"
-                    DomainAdministratorCredential = $domainAdministrator
-                    StaticIPAddress               = $node.ClusterIPAddress
-                    # If RSAT-Clustering is not installed the cluster can not be created
-                    DependsOn                     = "[WindowsFeature]FailoverClustering", "[WindowsFeature]RSATClustering", "[Computer]Name"
+        if ($node.ContainsKey('Role')) {
+            if ($node.Role.ContainsKey('DomainController')) {
+                Computer 'RenameComputer' {
+                    Name = $node.NodeName
                 }
-            }
-            else {
-                xWaitForCluster "Up" {
-                    Name             = "C1"
-                    DependsOn        = "[WindowsFeature]FailoverClustering", "[WindowsFeature]RSATClustering", "[Computer]Name"
-                    # 30 Minutes
-                    RetryIntervalSec = 15
-                    RetryCount       = 120
-                }
-
-                xCluster "Cluster" {
-                    Name                          = "C1"
-                    DomainAdministratorCredential = $domainAdministrator
-                    StaticIPAddress               = $node.ClusterIPAddress
-                    DependsOn                     = "[xWaitForCluster]Up"
-                }
-
-                Script "ClusterIPAddress" {
+    
+                Script 'SetNetIPInterfaceForwardingEnabled' {
                     GetScript = {
                     }
                     TestScript = {
-                        $clusterIPAddress = ($using:node.ClusterIPAddress -split "/")[0]
-                        if (Get-Cluster | Get-ClusterResource | Where-Object { $_.ResourceType -eq "IP Address" } | Get-ClusterParameter -Name Address | Where-Object { $_.Value -eq $clusterIPAddress }) {
-                            $true
-                        } else {
+                        if (Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' }) {
                             $false
+                        } else {
+                            $true
                         }
                     }
                     SetScript = {
-                        $clusterIPAddress = ($using:node.ClusterIPAddress -split "/")[0]
-                        Get-Cluster | Add-ClusterResource -Name "IP Address $clusterIPAddress" -Group "Cluster Group" -ResourceType "IP Address"
-                        $network = Get-Cluster | Get-ClusterNetwork | Where-Object { (([Net.IPAddress] $_.Address).Address -band ([Net.IPAddress] $_.AddressMask).Address) -eq (([Net.IPAddress] $clusterIPAddress).Address -band ([Net.IPAddress] $_.AddressMask).Address)}
-                        Get-Cluster | Get-ClusterResource -Name "IP Address $clusterIPAddress" | Set-ClusterParameter -Multiple @{ Address = $clusterIPAddress; Network = $network.Name; SubnetMask = $network.AddressMask; }
-                        $expression = (Get-Cluster | Get-ClusterResourceDependency -Resource "Cluster Name").DependencyExpression
-                        if ($expression -match "^\((.*)\)$") {
-                            $expression = $Matches[1] + " or [IP Address $clusterIPAddress]"
-                        } else {
-                            $expression = $expression + " or [IP Address $clusterIPAddress]"
-                        }
-                        Get-Cluster | Set-ClusterResourceDependency -Resource "Cluster Name" -Dependency $expression
-                        # Without this, it won't start automatically on first try
-                        (Get-Cluster | Get-ClusterResource -Name "IP Address $clusterIPAddress").PersistentState = 1
+                        Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' } | Set-NetIPInterface -Forwarding Enabled
                     }
-                    DependsOn = "[xCluster]Cluster"
+
+                    DependsOn      = '[Computer]RenameComputer'
+                }
+    
+                xADDomain 'CreateDomain' {
+                    DomainName                    = $node.DomainName
+                    DomainAdministratorCredential = $domainAdministrator
+                    SafemodeAdministratorPassword = $safemodeAdministrator
+    
+                    DependsOn                     = '[WindowsFeature]AddWindowsFeatureADDomainServices'
+                }
+    
+                # Define a share with all of our Lability_Resources so clients can use them for installs
+                xSmbShare 'AddResourceShare' {
+                    Name = 'Resources'
+                    Ensure = 'Present'
+                
+                    Path = 'C:\Resources'
+                    ReadAccess = 'Everyone'
+                
+                    DependsOn = '[xADDomain]CreateDomain'
+                }    
+            } else {
+                xWaitForADDomain 'WaitForCreateDomain' {
+                    DomainName           = $node.DomainName
+                    DomainUserCredential = $domainAdministrator
+                    # 30 Minutes
+                    RetryIntervalSec     = 15
+                    RetryCount           = 120
+                }
+
+                Computer 'RenameComputer' {
+                    Name       = $node.NodeName
+                    DomainName = $node.DomainName
+                    Credential = $domainAdministrator
+                    DependsOn  = '[xWaitForADDomain]WaitForCreateDomain'
                 }
             }
 
+            if ($node.Role.ContainsKey('Cluster')) {
+                $cluster = $node.Role.Cluster
+                $clusterIPAddress = $cluster.IPAddress
+
+                if ($cluster.ContainsKey("First") -and $cluster.First) {
+                    xCluster "CreateCluster$($cluster.Name)" {
+                        Name                          = $cluster.Name
+                        DomainAdministratorCredential = $domainAdministrator
+                        StaticIPAddress               = $clusterIPAddress
+
+                        # If RSAT-Clustering is not installed the cluster can not be created
+                        DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
+                    }    
+                } else {
+                    xWaitForCluster "WaitForCluster$($cluster.Name)" {
+                        Name             = $cluster.Name
+
+                        # 30 Minutes
+                        RetryIntervalSec = 15
+                        RetryCount       = 120
+
+                        DependsOn        = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
+                    }
+    
+                    xCluster "AddNodeToCluster$($cluster.Name)" {
+                        Name                          = $cluster.Name
+                        DomainAdministratorCredential = $domainAdministrator
+                        StaticIPAddress               = $clusterIPAddress
+
+                        # If RSAT-Clustering is not installed the cluster can not be created
+                        DependsOn                     = "[xWaitForCluster]WaitForCluster$($cluster.Name)"
+                    }
+    
+                    Script "AddStaticIPToCluster$($cluster.Name)" {
+                        GetScript = {
+                        }
+                        TestScript = {
+                            $clusterIPAddress = ($using:clusterIPAddress -split '/')[0]
+                            if (Get-ClusterResource | Where-Object { $_.ResourceType -eq 'IP Address' } | Get-ClusterParameter -Name Address | Where-Object { $_.Value -eq $clusterIPAddress }) {
+                                $true
+                            } else {
+                                $false
+                            }
+                        }
+                        SetScript = {
+                            $clusterIPAddress = ($using:clusterIPAddress -split '/')[0]
+                            Get-Cluster | Add-ClusterResource -Name 'IP Address $clusterIPAddress' -Group 'Cluster Group' -ResourceType 'IP Address'
+                            $clusterNetwork = Get-Cluster | Get-ClusterNetwork | Where-Object { (([Net.IPAddress] $_.Address).Address -band ([Net.IPAddress] $_.AddressMask).Address) -eq (([Net.IPAddress] $clusterIPAddress).Address -band ([Net.IPAddress] $_.AddressMask).Address)}
+                            Get-ClusterResource -Name 'IP Address $clusterIPAddress' | Set-ClusterParameter -Multiple @{ Address = $clusterIPAddress; Network = $clusterNetwork.Name; SubnetMask = $clusterNetwork.AddressMask; }
+                            $dependencyExpression = (Get-Cluster | Get-ClusterResourceDependency -Resource 'Cluster Name').DependencyExpression
+                            if ($dependencyExpression -match '^\((.*)\)$') {
+                                $dependencyExpression = $Matches[1] + ' or [IP Address $clusterIPAddress]'
+                            } else {
+                                $dependencyExpression = $dependencyExpression + " or [IP Address $clusterIPAddress]"
+                            }
+                            Get-Cluster | Set-ClusterResourceDependency -Resource 'Cluster Name' -Dependency $dependencyExpression
+                            # Without this, it won't start automatically on first try
+                            (Get-Cluster | Get-ClusterResource -Name "IP Address $clusterIPAddress").PersistentState = 1
+                        }
+
+                        DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                    }    
+                }
+            }
         }
     }
 }
 
+# Load the data so we can do our own manipulation
 $configurationData = Import-PowerShellDataFile -Path C:\Lability\Configurations\WS2012.psd1
-$certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-$certificate.Import("$env:AllUsersProfile\Lability\Certificates\LabClient.cer")
-$configurationData.AllNodes[0].CertificateFile = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer"
-$configurationData.AllNodes[0].Thumbprint = $certificate.Thumbprint
+$configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' } | ForEach-Object {
+    $PSItem.CertificateFile = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer"
+}
 
+# Lability creates one NIC per entry in a SwitchName array. We also creat a Lability_MACAddress array
+# to assign AdapterName to each NIC as their default names are assigned randomly < Server 2012.
 foreach ($node in $configurationData.AllNodes) {
-    if ($node.ContainsKey("Lability_SwitchName")) {
+    if ($node.ContainsKey('Network')) {
+        $switchName = @()
         $macAddress = @()
-        foreach ($switchName in $node.Lability_SwitchName) {
-            # It's important to limit what MAC are used otherwise you will get weird failures on VM creation
-            $macAddress += ('00', '03', (0..3 | ForEach-Object { '{0:x}{1:x}' -f (Get-Random -Minimum 0 -Maximum 15),(Get-Random -Minimum 0 -Maximum 15)}) | ForEach-Object { $_ }) -join ':'
+
+        foreach ($network in $node.Network) {
+            $switchName += $network.SwitchName
+            # It's important to limit what MAC are used otherwise you will get confusing errors during VM creation
+            $macAddress += ('00', '03', (0..3 | ForEach-Object { '{0:x}{1:x}' -f (Get-Random -Minimum 0 -Maximum 15),(Get-Random -Minimum 0 -Maximum 15) }) | ForEach-Object { $_ }) -join ':'
         }
 
+        $node.Lability_SwitchName = $switchName
         $node.Lability_MACAddress = $macAddress
     }
 }
 
+# Compile it
 WS2012 -ConfigurationData $configurationData -OutputPath C:\Lability\Configurations
 
+# Clean up
 if ($Clean) {
-    # Clean up
     Remove-LabConfiguration -ConfigurationData C:\Lability\Configurations\WS2012.psd1 -ErrorAction:SilentlyContinue -Confirm:$false
     Remove-Item C:\Lability\VMVirtualHardDisks\*
     $error.Clear()
 }
 
 # Build
-$administrator = New-Object System.Management.Automation.PSCredential("Administrator", ("Admin2018!" | ConvertTo-SecureString -AsPlainText -Force))
-Start-LabConfiguration -ConfigurationData $configurationData -IgnorePendingReboot -Credential $administrator
+$administrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
+Start-LabConfiguration -ConfigurationData $configurationData -IgnorePendingReboot -Credential $administrator -NoSnapshot
 
 # Start
 Start-Lab -ConfigurationData $configurationData
@@ -319,4 +330,4 @@ if (!(Test-Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\
 if (!(Test-Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters)) {
     New-Item HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters
 }
-Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters' -Name "AllowEncryptionOracle" 2 -Type DWord
+Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters' -Name 'AllowEncryptionOracle' 2 -Type DWord
