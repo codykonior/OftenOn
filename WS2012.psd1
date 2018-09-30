@@ -28,36 +28,39 @@
         },
 
         @{
-            NodeName          = 'CHDC1'
+            NodeName           = 'CHDC1'
+            Lability_BootOrder = 1
 
             # Script will add Lability_SwitchName @() and Lability_MACAddress @()
-            Network           = @(
+            Network            = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1' }
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'DALLAS';  NetAdapterName = 'DALLAS';  IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
-                # @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
+                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
             )
 
-            Lability_Resource = @(
+            
+            Lability_Resource  = @(
                 'SQLServer2012',
                 'SQLServer2012SP4',
                 'SQLServer2012SP4GDR',
                 'SQLServer2012SP4GDRHotfix'                
             )
 
-            Role              = @{
+            Role               = @{
                 DomainController = $true
             }
         },
 
         @{
-            NodeName = 'SEC1N1'
+            NodeName           = 'SEC1N1'
+            Lability_BootOrder = 2
 
-            Network  = @(
+            Network            = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.11/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
             )
 
-            Role     = @{
+            Role               = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; First = $true; }
             }
         },
