@@ -202,23 +202,11 @@ Configuration WS2012 {
                         DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
                     }    
                 } else {
-                    <#
-                    WaitForAll "WaitForCluster$($cluster.Name)" {
+                    # xWaitForCluster has a race condition, this is better
+                    WaitForAny "WaitForCluster$($cluster.Name)" {
                         ResourceName = "[xCluster]CreateCluster$($cluster.Name)"
-                        NodeName = ($AllNodes | Where-Object { $_.ContainsKey("Role") -and $_.Role.ContainsKey("Cluster") -and $_.Role.Cluster.ContainsKey("First") -and $_.Role.Cluster.First }).NodeName
+                        NodeName = ($AllNodes | Where-Object { $_.ContainsKey("Role") -and $_.Role.ContainsKey("Cluster") -and $_.Role.Cluster.Name -eq $cluster.Name -and $_.Role.Cluster.ContainsKey("First") -and $_.Role.Cluster.First }).NodeName
     
-                        # 30 Minutes
-                        RetryIntervalSec = 15
-                        RetryCount       = 120
-
-                        # If RSAT-Clustering is not installed the cluster can not be created
-                        DependsOn        = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
-                    }
-                    #>
-
-                     xWaitForCluster "WaitForCluster$($cluster.Name)" {
-                        Name             = $cluster.Name
-
                         # 30 Minutes
                         RetryIntervalSec = 15
                         RetryCount       = 120
@@ -232,7 +220,7 @@ Configuration WS2012 {
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterIPAddress
 
-                        DependsOn                     = "[xWaitForCluster]WaitForCluster$($cluster.Name)"
+                        DependsOn                     = "[WaitForAny]WaitForCluster$($cluster.Name)"
                     }
     
                     Script "AddStaticIPToCluster$($cluster.Name)" {
