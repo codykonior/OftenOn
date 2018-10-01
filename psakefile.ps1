@@ -35,7 +35,7 @@ Task FixRDP {
     if (!(Test-Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters)) {
         New-Item HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters
     }
-    Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters' -Name 'AllowEncryptionOracle' 2 -Type DWord
+    Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters' -Name 'AllowEncryptionOracle' -Value 2 -Type DWord
 }
 
 Task Compile {
@@ -51,6 +51,9 @@ Task Build -depends Compile {
 Task Start {
     "Allow at least 15 minutes for the first boot to finish Domain Controller setup"
     Start-Lab -ConfigurationData $configurationData
+}
+
+Task BuildAll -Depends Clean, Build, Start {
 }
 
 Task Stop {

@@ -1,6 +1,7 @@
 Configuration WS2012 {
     param (
     )
+
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xPSDesiredStateConfiguration
     Import-DscResource -ModuleName ComputerManagementDsc
@@ -163,7 +164,19 @@ Configuration WS2012 {
                     ReadAccess = 'Everyone'
                 
                     DependsOn = '[xADDomain]CreateDomain'
-                }    
+                }
+
+                # Create some groups and users to get started
+                xADGroup 'AddResourceShare' {
+                    Name = 'Resources'
+                    Ensure = 'Present'
+                
+                    Path = 'C:\Resources'
+                    ReadAccess = 'Everyone'
+                
+                    DependsOn = '[xADDomain]CreateDomain'
+                }
+
             } else {
                 xWaitForADDomain 'WaitForCreateDomain' {
                     DomainName           = $node.DomainName

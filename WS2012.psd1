@@ -36,7 +36,7 @@
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1' }
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
+                # @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
             )
 
             
