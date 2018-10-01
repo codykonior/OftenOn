@@ -12,6 +12,9 @@ Configuration WS2012 {
     Import-DscResource -ModuleName xRemoteDesktopAdmin
     Import-DscResource -ModuleName xSmbShare
 
+    $clusterOrder = @{}
+    $domainController = $null
+    
     Node $AllNodes.NodeName {
         $domainAdministrator = New-Object System.Management.Automation.PSCredential('LAB\Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2018!' | ConvertTo-SecureString -AsPlainText -Force))
@@ -67,6 +70,9 @@ Configuration WS2012 {
         $windowsFeatures = 'RSAT-AD-Tools', 'RSAT-AD-PowerShell', 'RSAT-Clustering', 'RSAT-Clustering-CmdInterface', 'RSAT-DNS-Server', 'RSAT-RemoteAccess'
         if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('DomainController')) {
             $windowsFeatures += 'AD-Domain-Services', 'DNS', 'Routing'
+            if (!$domainController) {
+                $domainController = $node.NodeName
+            }
         }
         if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('Cluster')) {
             $windowsFeatures += 'Failover-Clustering'
@@ -77,6 +83,13 @@ Configuration WS2012 {
                 Ensure = 'Present'
                 Name   = $windowsFeature
             }
+        }
+
+        # NET 3.5 requires special handling
+        WindowsFeature 'AddWindowsFeatureNetFrameworkCore' {
+            Ensure = 'Present'
+            Name = 'Net-Framework-Core'
+            Source = "\\$domainController\Resources\WindowsServer2012\sources\sxs"
         }
 
         # Define each network adapter name, IP address, default gateway address, DNS server address, and DNS connection suffix
@@ -191,9 +204,11 @@ Configuration WS2012 {
             if ($node.Role.ContainsKey('Cluster')) {
                 $cluster = $node.Role.Cluster
                 $clusterIPAddress = $cluster.IPAddress
+                
+                if (!$clusterOrder.ContainsKey($cluster.Name)) {
+                    $clusterOrder.$($cluster.Name) = [array] $node.NodeName
 
-                if ($cluster.ContainsKey('First') -and $cluster.First) {
-                    xCluster "CreateCluster$($cluster.Name)" {
+                    xCluster "AddNodeToCluster$($cluster.Name)" {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterIPAddress
@@ -202,11 +217,10 @@ Configuration WS2012 {
                         DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
                     }    
                 } else {
-                    # xWaitForCluster has a race condition, this is better
                     WaitForAny "WaitForCluster$($cluster.Name)" {
-                        ResourceName = "[xCluster]CreateCluster$($cluster.Name)"
-                        NodeName = ($AllNodes | Where-Object { $_.ContainsKey("Role") -and $_.Role.ContainsKey("Cluster") -and $_.Role.Cluster.Name -eq $cluster.Name -and $_.Role.Cluster.ContainsKey("First") -and $_.Role.Cluster.First }).NodeName
-    
+                        ResourceName = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                        NodeName = ($clusterOrder.$($cluster.Name))[-1]
+
                         # 30 Minutes
                         RetryIntervalSec = 15
                         RetryCount       = 120

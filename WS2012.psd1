@@ -42,7 +42,7 @@
             
             Lability_Resource  = @(
                 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix',
-                'SSMS179', 'NetFx472'             
+                'SSMS179', 'NetFx472', 'WindowsServer2012'             
             )
 
             Role               = @{
@@ -59,7 +59,7 @@
             )
 
             Role               = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; First = $true; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; Group = 1; }
             }
         }
 
@@ -204,6 +204,13 @@
                     Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Uri      = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Checksum = '87450CFA175585B23A76BBD7052EE66B'
+                }
+                @{
+                    Id              = 'WindowsServer2012'
+                    Filename        = '..\ISOs\9200.16384.WIN8_RTM.120725-1247_X64FRE_SERVER_EVAL_EN-US-HRM_SSS_X64FREE_EN-US_DV5.ISO'
+                    Expand          = $true
+
+                    IsLocal         = $true
                 }
             )
         }

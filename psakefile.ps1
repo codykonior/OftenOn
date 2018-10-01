@@ -43,6 +43,16 @@ Task Compile {
     WS2012 -ConfigurationData $configurationData -OutputPath C:\Lability\Configurations
 }
 
+<#
+Task Extract {
+    if (!(Test-Path C:\Lability\Resources\Net-Framework-Core.zip)) {
+        $volume = Mount-DiskImage -Access ReadOnly -StorageType ISO -ImagePath C:\Lability\ISOs\9200.16384.WIN8_RTM.120725-1247_X64FRE_SERVER_EVAL_EN-US-HRM_SSS_X64FREE_EN-US_DV5.ISO -PassThru | Get-Volume
+        Compress-Archive -Path "$($volume.DriveLetter):\Sources\sxs" -DestinationPath C:\Lability\Resources\Net-Framework-Core.zip
+        Dismount-DiskImage -ImagePath C:\Lability\ISOs\9200.16384.WIN8_RTM.120725-1247_X64FRE_SERVER_EVAL_EN-US-HRM_SSS_X64FREE_EN-US_DV5.ISO
+    }
+}
+#>
+
 Task Build -depends Compile {
     $administrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
     Start-LabConfiguration -ConfigurationData $configurationData -IgnorePendingReboot -Credential $administrator -NoSnapshot
@@ -67,6 +77,7 @@ Task Clean -depends Stop {
 
 Task CleanAll -depends Clean {
     Remove-Item C:\Lability\MasterVirtualHardDisks\*
+    Remove-Item C:\Lability\Resources\sources.zip
 }
 
 <#
@@ -75,8 +86,9 @@ Add node to cluster can have an error which triggers a 15 minute wait.
 Having a WAN causes everything to fail. Confirm one more time, then set NICs to Private instead of Internal.
 
 TODO
+    Check if all windows features will work with source
     Install SQL
-    Create SQL AG
+    Create SQL AG (check on whether cluster, endpoint setup is really needed)
     Create MSA accounts
     Add modules SqlServer, DbaTools, Cim, DbData, Jojoba, Error
     Add SecurityPolicyDsc permissions
