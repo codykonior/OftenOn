@@ -11,7 +11,7 @@ xADUser CodyAdmin {
 
 xADGroup DomainAdmins {
     GroupName        = 'Domain Admins';
-    MembersToInclude = 'CodyAdmin';
+    MembersToInclude = 'Admin';
     DependsOn        = '[xADUser]CodyAdmin';
 }
 

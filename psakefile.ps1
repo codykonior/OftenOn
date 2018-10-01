@@ -57,7 +57,7 @@ Task BuildAll -Depends Clean, Build, Start {
 }
 
 Task Stop {
-    Stop-Lab -ConfigurationData $configurationData
+    Stop-Lab -ConfigurationData $configurationData -ErrorAction:SilentlyContinue
 }
 
 Task Clean -depends Stop {

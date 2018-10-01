@@ -124,6 +124,12 @@ Configuration WS2012 {
             }
         }
 
+        File 'CreateTempDirectory' {
+            DestinationPath = 'C:\Temp'
+            Ensure = 'Present'
+            Type = 'Directory'
+        }
+
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('DomainController')) {
                 Computer 'RenameComputer' {
@@ -165,18 +171,6 @@ Configuration WS2012 {
                 
                     DependsOn = '[xADDomain]CreateDomain'
                 }
-
-                # Create some groups and users to get started
-                xADGroup 'AddResourceShare' {
-                    Name = 'Resources'
-                    Ensure = 'Present'
-                
-                    Path = 'C:\Resources'
-                    ReadAccess = 'Everyone'
-                
-                    DependsOn = '[xADDomain]CreateDomain'
-                }
-
             } else {
                 xWaitForADDomain 'WaitForCreateDomain' {
                     DomainName           = $node.DomainName
@@ -208,7 +202,21 @@ Configuration WS2012 {
                         DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
                     }    
                 } else {
-                    xWaitForCluster "WaitForCluster$($cluster.Name)" {
+                    <#
+                    WaitForAll "WaitForCluster$($cluster.Name)" {
+                        ResourceName = "[xCluster]CreateCluster$($cluster.Name)"
+                        NodeName = ($AllNodes | Where-Object { $_.ContainsKey("Role") -and $_.Role.ContainsKey("Cluster") -and $_.Role.Cluster.ContainsKey("First") -and $_.Role.Cluster.First }).NodeName
+    
+                        # 30 Minutes
+                        RetryIntervalSec = 15
+                        RetryCount       = 120
+
+                        # If RSAT-Clustering is not installed the cluster can not be created
+                        DependsOn        = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
+                    }
+                    #>
+
+                     xWaitForCluster "WaitForCluster$($cluster.Name)" {
                         Name             = $cluster.Name
 
                         # 30 Minutes
@@ -218,7 +226,7 @@ Configuration WS2012 {
                         # If RSAT-Clustering is not installed the cluster can not be created
                         DependsOn        = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
                     }
-    
+
                     xCluster "AddNodeToCluster$($cluster.Name)" {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
