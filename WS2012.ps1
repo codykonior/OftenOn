@@ -13,9 +13,9 @@ Configuration WS2012 {
     Import-DscResource -ModuleName xSmbShare
     Import-DscResource -ModuleName SqlServerDsc
 
-    Node $AllNodes.NodeName {
-        $clusterOrder = @{}
+    $clusterOrder = @{}
 
+    Node $AllNodes.NodeName {
         $domainAdministrator = New-Object System.Management.Automation.PSCredential('LAB\Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2018!' | ConvertTo-SecureString -AsPlainText -Force))
 
@@ -224,7 +224,6 @@ Configuration WS2012 {
 
                 if (!$clusterOrder.ContainsKey($cluster.Name)) {
                     $clusterOrder.$($cluster.Name) = [array] $node.NodeName
-
                     xCluster "AddNodeToCluster$($cluster.Name)" {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
@@ -253,6 +252,8 @@ Configuration WS2012 {
 
                         DependsOn                     = "[WaitForAny]WaitForCluster$($cluster.Name)"
                     }
+
+                    $clusterOrder.$($cluster.Name) = [array] $node.NodeName
 
                     Script "AddStaticIPToCluster$($cluster.Name)" {
                         GetScript = {
@@ -286,12 +287,14 @@ Configuration WS2012 {
                 }
 
                 SqlSetup 'Install SQL' {
-                    InstanceName = 'MSSQLSERVER'
+                    InstanceName = 'MSSQLSERVER,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'
                     Action = 'Install'
                     SourcePath = '\\CHDC1\Resources\SQLServer2012'
                     SQLSysAdminAccounts = 'LAB\Administrator'
 
                     Features = 'SQLENGINE'
+                    UpdateEnabled = $false
+
                     DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
                 }
             }
