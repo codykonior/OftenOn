@@ -58,10 +58,11 @@
 
             Network            = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.11/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.1.21/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
             )
 
             Role               = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; Group = 1; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.31/24'; Group = 1; }
                 SqlServer = @{ }
             }
         }
@@ -71,10 +72,11 @@
 
             Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.12/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.1.22/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.31/24'; }
                 SqlServer = @{ }
             }
         }
@@ -84,10 +86,11 @@
 
             Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.13/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.1.23/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.31/24'; }
                 SqlServer = @{ }
             }
         }
@@ -97,10 +100,11 @@
 
             Network  = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.11/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.2.21/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.31/24'; }
                 SqlServer = @{ }
             }
         }
@@ -110,10 +114,11 @@
 
             Network  = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.12/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.2.22/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.31/24'; }
                 SqlServer = @{ }
             }
         }
