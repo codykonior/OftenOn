@@ -20,11 +20,12 @@
             #    $certificate.Import($configurationData.AllNodes[0].CertificateFile)
             #    $configurationData.AllNodes[0].Thumbprint = $certificate.Thumbprint
             # Certificate File will be set by script
-            # CertificateFile                 = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer" 
+            # CertificateFile                 = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer"
             Thumbprint                        = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
             PSDscAllowDomainUser              = $true
 
             DomainName                        = 'lab.com'
+            NetFrameworkCore                  = '\\CHDC1\Resources\WindowsServer2012\sources\sxs'
         }
 
         @{
@@ -39,15 +40,16 @@
                 # @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
             )
 
-            
             Lability_Resource  = @(
                 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix',
-                'SSMS179', 'NetFx472', 'WindowsServer2012'             
+                'SSMS179', 'NetFx472', 'WindowsServer2012'
             )
 
             Role               = @{
                 DomainController = $true
             }
+
+            NetFrameworkCore                  = 'C:\Resources\WindowsServer2012\sources\sxs'
         }
 
         @{

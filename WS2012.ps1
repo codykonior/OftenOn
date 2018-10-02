@@ -11,11 +11,11 @@ Configuration WS2012 {
     Import-DscResource -ModuleName xDnsServer
     Import-DscResource -ModuleName xRemoteDesktopAdmin
     Import-DscResource -ModuleName xSmbShare
+    Import-DscResource -ModuleName SqlServerDsc
 
-    $clusterOrder = @{}
-    $domainController = $null
-    
     Node $AllNodes.NodeName {
+        $clusterOrder = @{}
+
         $domainAdministrator = New-Object System.Management.Automation.PSCredential('LAB\Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2018!' | ConvertTo-SecureString -AsPlainText -Force))
 
@@ -38,7 +38,7 @@ Configuration WS2012 {
             ValueData = '0'
             ValueType = 'DWord'
         }
-        
+
         # Windows cycles machine passwords in a domain which prevents you from restoring a
         # snapshot older than 30 days, so we disable this
         Registry 'DisableMachineAccountPasswordChange' {
@@ -57,10 +57,10 @@ Configuration WS2012 {
                 Name    = $firewallRule
                 Ensure  = 'Present'
                 Enabled = 'True'
-            }    
+            }
         }
 
-        # Enable Remote Desktop 
+        # Enable Remote Desktop
         xRemoteDesktopAdmin 'EnableRemoteDesktop' {
             Ensure             = 'Present'
             UserAuthentication = 'NonSecure'
@@ -70,9 +70,6 @@ Configuration WS2012 {
         $windowsFeatures = 'RSAT-AD-Tools', 'RSAT-AD-PowerShell', 'RSAT-Clustering', 'RSAT-Clustering-CmdInterface', 'RSAT-DNS-Server', 'RSAT-RemoteAccess'
         if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('DomainController')) {
             $windowsFeatures += 'AD-Domain-Services', 'DNS', 'Routing'
-            if (!$domainController) {
-                $domainController = $node.NodeName
-            }
         }
         if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('Cluster')) {
             $windowsFeatures += 'Failover-Clustering'
@@ -119,7 +116,7 @@ Configuration WS2012 {
                         InterfaceAlias = $network.NetAdapterName
                         Address        = $network.DnsServerAddress
                         DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
-                    }        
+                    }
                 }
 
                 DnsConnectionSuffix "SetDnsConnectionSuffix$($network.NetAdapterName)" {
@@ -138,12 +135,10 @@ Configuration WS2012 {
 
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('DomainController')) {
-                $netFrameworkCore = "C:\Resources\WindowsServer2012\sources\sxs"
-
                 Computer 'RenameComputer' {
                     Name = $node.NodeName
                 }
-    
+
                 Script 'SetNetIPInterfaceForwardingEnabled' {
                     GetScript = {
                     }
@@ -165,23 +160,21 @@ Configuration WS2012 {
                     DomainName                    = $node.DomainName
                     DomainAdministratorCredential = $domainAdministrator
                     SafemodeAdministratorPassword = $safemodeAdministrator
-    
+
                     DependsOn                     = '[WindowsFeature]AddWindowsFeatureADDomainServices'
                 }
-    
+
                 # Define a share with all of our Lability_Resources so clients can use them for installs
                 xSmbShare 'AddResourceShare' {
                     Name = 'Resources'
                     Ensure = 'Present'
-                
+
                     Path = 'C:\Resources'
                     ReadAccess = 'Everyone'
-                
+
                     DependsOn = '[xADDomain]CreateDomain'
                 }
             } else {
-                $netFrameworkCore = "\\$domainController\Resources\WindowsServer2012\sources\sxs"
-
                 xWaitForADDomain 'WaitForCreateDomain' {
                     DomainName           = $node.DomainName
                     DomainUserCredential = $domainAdministrator
@@ -199,7 +192,7 @@ Configuration WS2012 {
             }
 
             # Despite the name, this is required to allow you to RDP to the server from your host (except for DC where it just works)
-            # This seems to happen by sudden replies to the computer name with an accessible IPv6 address 
+            # This seems to happen by sudden replies to the computer name with an accessible IPv6 address
             Script 'EnableFileAndPrinterSharing' {
                 GetScript = {
                 }
@@ -221,14 +214,14 @@ Configuration WS2012 {
             WindowsFeature 'AddWindowsFeatureNetFrameworkCore' {
                 Ensure = 'Present'
                 Name = 'Net-Framework-Core'
-                Source = $netFrameworkCore
+                Source = $node.NetFrameworkCore
                 DependsOn = '[Computer]RenameComputer'
             }
 
             if ($node.Role.ContainsKey('Cluster')) {
                 $cluster = $node.Role.Cluster
                 $clusterIPAddress = $cluster.IPAddress
-                
+
                 if (!$clusterOrder.ContainsKey($cluster.Name)) {
                     $clusterOrder.$($cluster.Name) = [array] $node.NodeName
 
@@ -239,7 +232,7 @@ Configuration WS2012 {
 
                         # If RSAT-Clustering is not installed the cluster can not be created
                         DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
-                    }    
+                    }
                 } else {
                     WaitForAny "WaitForCluster$($cluster.Name)" {
                         ResourceName = "[xCluster]AddNodeToCluster$($cluster.Name)"
@@ -260,7 +253,7 @@ Configuration WS2012 {
 
                         DependsOn                     = "[WaitForAny]WaitForCluster$($cluster.Name)"
                     }
-    
+
                     Script "AddStaticIPToCluster$($cluster.Name)" {
                         GetScript = {
                         }
@@ -289,7 +282,17 @@ Configuration WS2012 {
                         }
 
                         DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
-                    }    
+                    }
+                }
+
+                SqlSetup 'Install SQL' {
+                    InstanceName = 'MSSQLSERVER'
+                    Action = 'Install'
+                    SourcePath = '\\CHDC1\Resources\SQLServer2012'
+                    SQLSysAdminAccounts = 'LAB\Administrator'
+
+                    Features = 'SQLENGINE'
+                    DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
                 }
             }
         }
