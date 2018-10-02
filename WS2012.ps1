@@ -85,13 +85,6 @@ Configuration WS2012 {
             }
         }
 
-        # NET 3.5 requires special handling
-        WindowsFeature 'AddWindowsFeatureNetFrameworkCore' {
-            Ensure = 'Present'
-            Name = 'Net-Framework-Core'
-            Source = "\\$domainController\Resources\WindowsServer2012\sources\sxs"
-        }
-
         # Define each network adapter name, IP address, default gateway address, DNS server address, and DNS connection suffix
         if ($node.ContainsKey('Network')) {
             for ($i = 0; $i -lt $node.Network.Count; $i++) {
@@ -145,6 +138,8 @@ Configuration WS2012 {
 
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('DomainController')) {
+                $netFrameworkCore = "C:\Resources\WindowsServer2012\sources\sxs"
+
                 Computer 'RenameComputer' {
                     Name = $node.NodeName
                 }
@@ -165,7 +160,7 @@ Configuration WS2012 {
 
                     DependsOn      = '[Computer]RenameComputer'
                 }
-    
+
                 xADDomain 'CreateDomain' {
                     DomainName                    = $node.DomainName
                     DomainAdministratorCredential = $domainAdministrator
@@ -185,6 +180,8 @@ Configuration WS2012 {
                     DependsOn = '[xADDomain]CreateDomain'
                 }
             } else {
+                $netFrameworkCore = "\\$domainController\Resources\WindowsServer2012\sources\sxs"
+
                 xWaitForADDomain 'WaitForCreateDomain' {
                     DomainName           = $node.DomainName
                     DomainUserCredential = $domainAdministrator
@@ -199,6 +196,33 @@ Configuration WS2012 {
                     Credential = $domainAdministrator
                     DependsOn  = '[xWaitForADDomain]WaitForCreateDomain'
                 }
+            }
+
+            # Despite the name, this is required to allow you to RDP to the server from your host (except for DC where it just works)
+            # This seems to happen by sudden replies to the computer name with an accessible IPv6 address 
+            Script 'EnableFileAndPrinterSharing' {
+                GetScript = {
+                }
+                TestScript = {
+                    if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { !$_.Enabled }) {
+                        $false
+                    } else {
+                        $true
+                    }
+                }
+                SetScript = {
+                    Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { !$_.Enabled } | Set-NetFirewallRule -Enabled True
+                }
+
+                DependsOn      = '[Computer]RenameComputer'
+            }
+
+            # NET 3.5 requires special handling
+            WindowsFeature 'AddWindowsFeatureNetFrameworkCore' {
+                Ensure = 'Present'
+                Name = 'Net-Framework-Core'
+                Source = $netFrameworkCore
+                DependsOn = '[Computer]RenameComputer'
             }
 
             if ($node.Role.ContainsKey('Cluster')) {
