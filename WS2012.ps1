@@ -285,14 +285,16 @@ Configuration WS2012 {
                         DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
                     }
                 }
+            }
 
+            if ($node.Role.ContainsKey('SqlServer')) {
                 SqlSetup 'Install SQL' {
-                    InstanceName = 'MSSQLSERVER,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'
+                    InstanceName = 'MSSQLSERVER'
                     Action = 'Install'
                     SourcePath = '\\CHDC1\Resources\SQLServer2012'
                     SQLSysAdminAccounts = 'LAB\Administrator'
 
-                    Features = 'SQLENGINE'
+                    Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'
                     UpdateEnabled = $false
 
                     DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"

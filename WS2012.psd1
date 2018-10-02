@@ -62,6 +62,7 @@
 
             Role               = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; Group = 1; }
+                SqlServer = @{ }
             }
         }
 
@@ -74,6 +75,7 @@
 
             Role     = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
+                SqlServer = @{ }
             }
         }
 
@@ -86,6 +88,7 @@
 
             Role     = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
+                SqlServer = @{ }
             }
         }
 
@@ -98,6 +101,7 @@
 
             Role     = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
+                SqlServer = @{ }
             }
         }
 
@@ -110,6 +114,7 @@
 
             Role     = @{
                 Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
+                SqlServer = @{ }
             }
         }
     )
