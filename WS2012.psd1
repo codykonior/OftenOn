@@ -36,7 +36,9 @@
             Network            = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1' }
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'SEATTLE-HB'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.11.1/24'; DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'DALLAS-HB'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.12.1/24'; DnsServerAddress = '127.0.0.1'; }
                 # @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
             )
 
@@ -58,11 +60,11 @@
 
             Network            = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.11/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.1.21/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE-HB'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.11.11/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role               = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.31/24'; Group = 1; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
                 SqlServer = @{ }
             }
         }
@@ -72,11 +74,11 @@
 
             Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.12/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.1.22/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE-HB'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.11.12/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.31/24'; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
                 SqlServer = @{ }
             }
         }
@@ -86,11 +88,11 @@
 
             Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.13/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.1.23/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE-HB'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.11.13/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.31/24'; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
                 SqlServer = @{ }
             }
         }
@@ -100,11 +102,11 @@
 
             Network  = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.11/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
-                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.2.21/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS-HB'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.12.11/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.31/24'; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
                 SqlServer = @{ }
             }
         }
@@ -114,11 +116,11 @@
 
             Network  = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.12/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
-                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.2.22/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS-HB'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.12.12/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.31/24'; }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
                 SqlServer = @{ }
             }
         }
@@ -144,7 +146,9 @@
             Network     = @(
                 @{ Name = 'CHICAGO'; Type = 'Internal'; }
                 @{ Name = 'SEATTLE'; Type = 'Internal'; }
+                @{ Name = 'SEATTLE-HB'; Type = 'Internal'; }
                 @{ Name = 'DALLAS'; Type = 'Internal'; }
+                @{ Name = 'DALLAS-HB'; Type = 'Internal'; }
             )
 
             Media       = @(
@@ -159,6 +163,10 @@
                     MediaType       = 'ISO'
                     ImageName       = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
                     OperatingSystem = 'Windows'
+                    WindowsOptionalFeature = @(
+                        'NetFx3',
+                        'TelnetClient'
+                    )
                     Hotfixes        = @(
                         @{
                             # WMF 5.1 for Windows Server 2012

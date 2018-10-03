@@ -197,14 +197,14 @@ Configuration WS2012 {
                 GetScript = {
                 }
                 TestScript = {
-                    if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { !$_.Enabled }) {
+                    if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
                         $false
                     } else {
                         $true
                     }
                 }
                 SetScript = {
-                    Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { !$_.Enabled } | Set-NetFirewallRule -Enabled True
+                    Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' } | Set-NetFirewallRule -Enabled True
                 }
 
                 DependsOn      = '[Computer]RenameComputer'
@@ -253,6 +253,22 @@ Configuration WS2012 {
                         DependsOn                     = "[WaitForAny]WaitForCluster$($cluster.Name)"
                     }
 
+                    <#
+                    xClusterNetwork "RenameClusterNetwork$($cluster.Name)Client" {
+                        Address = ''
+                        AddressMask = ''
+                        Name = "Cluster Network $($adapterName)"
+                        Role = 1 # Heartbeat
+                    }
+
+                    xClusterNetwork "RenameClusterNetwork$($cluster.Name)Heartbeat" {
+                        Address = ''
+                        AddressMask = ''
+                        Name = ''
+                        Role = 3 # Heartbeat and Client
+                    }
+                    #>
+
                     $clusterOrder.$($cluster.Name) = [array] $node.NodeName
 
                     Script "AddStaticIPToCluster$($cluster.Name)" {
@@ -288,16 +304,26 @@ Configuration WS2012 {
             }
 
             if ($node.Role.ContainsKey('SqlServer')) {
-                SqlSetup 'Install SQL' {
+                SqlSetup 'InstallSQLServer' {
                     InstanceName = 'MSSQLSERVER'
                     Action = 'Install'
                     SourcePath = '\\CHDC1\Resources\SQLServer2012'
                     SQLSysAdminAccounts = 'LAB\Administrator'
 
                     Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'
-                    UpdateEnabled = $false
+                    UpdateEnabled = 'False'
 
                     DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                }
+
+                SqlWindowsFirewall 'AddFirewallRuleSQL' {
+                    InstanceName = 'MSSQLSERVER'
+                    SourcePath = '\\CHDC1\Resources\SQLServer2012'
+
+                    Features = 'SQLENGINE'
+                    Ensure = 'Present'
+
+                    DependsOn = '[SqlSetup]InstallSQLServer'
                 }
             }
         }
