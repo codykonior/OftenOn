@@ -209,15 +209,6 @@ Configuration WS2012 {
 
                 DependsOn      = '[Computer]RenameComputer'
             }
-
-            # NET 3.5 requires special handling
-            WindowsFeature 'AddWindowsFeatureNetFrameworkCore' {
-                Ensure = 'Present'
-                Name = 'Net-Framework-Core'
-                Source = $node.NetFrameworkCore
-                DependsOn = '[Computer]RenameComputer'
-            }
-
             if ($node.Role.ContainsKey('Cluster')) {
                 $cluster = $node.Role.Cluster
                 $clusterIPAddress = $cluster.IPAddress
@@ -228,7 +219,7 @@ Configuration WS2012 {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterIPAddress
-
+                        IgnoreNetwork                 = $cluster.IgnoreNetwork
                         # If RSAT-Clustering is not installed the cluster can not be created
                         DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
                     }
@@ -249,7 +240,7 @@ Configuration WS2012 {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterIPAddress
-
+                        IgnoreNetwork = $cluster.IgnoreNetwork
                         DependsOn                     = "[WaitForAny]WaitForCluster$($cluster.Name)"
                     }
 
@@ -305,22 +296,22 @@ Configuration WS2012 {
 
             if ($node.Role.ContainsKey('SqlServer')) {
                 SqlSetup 'InstallSQLServer' {
-                    InstanceName = 'MSSQLSERVER'
+                    InstanceName = $node.InstanceName
                     Action = 'Install'
-                    SourcePath = '\\CHDC1\Resources\SQLServer2012'
-                    SQLSysAdminAccounts = 'LAB\Administrator'
+                    SourcePath = $node.SourcePath
+                    Features = $node.Features
 
-                    Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'
+                    SQLSysAdminAccounts = 'LAB\Administrator'
                     UpdateEnabled = 'False'
 
                     DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
                 }
 
                 SqlWindowsFirewall 'AddFirewallRuleSQL' {
-                    InstanceName = 'MSSQLSERVER'
-                    SourcePath = '\\CHDC1\Resources\SQLServer2012'
+                    InstanceName = $node.InstanceName
+                    SourcePath = $node.SourcePath
+                    Features = $node.Features
 
-                    Features = 'SQLENGINE'
                     Ensure = 'Present'
 
                     DependsOn = '[SqlSetup]InstallSQLServer'

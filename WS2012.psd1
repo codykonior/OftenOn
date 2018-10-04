@@ -25,7 +25,6 @@
             PSDscAllowDomainUser              = $true
 
             DomainName                        = 'lab.com'
-            NetFrameworkCore                  = '\\CHDC1\Resources\WindowsServer2012\sources\sxs'
         }
 
         @{
@@ -36,22 +35,20 @@
             Network            = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1' }
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'SEATTLE-HB'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.11.1/24'; DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.1/24'; DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'DALLAS-HB'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.12.1/24'; DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.1/24'; DnsServerAddress = '127.0.0.1'; }
                 # @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
             )
 
             Lability_Resource  = @(
                 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix',
-                'SSMS179', 'NetFx472', 'WindowsServer2012'
+                'SSMS179', 'NetFx472'
             )
 
             Role               = @{
                 DomainController = $true
             }
-
-            NetFrameworkCore                  = 'C:\Resources\WindowsServer2012\sources\sxs'
         }
 
         @{
@@ -60,12 +57,12 @@
 
             Network            = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.11/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE-HB'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.11.11/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.11/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role               = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
-                SqlServer = @{ }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
 
@@ -74,12 +71,12 @@
 
             Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.12/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE-HB'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.11.12/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.12/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
-                SqlServer = @{ }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
 
@@ -88,12 +85,12 @@
 
             Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.13/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE-HB'; NetAdapterName = 'SEATTLE-HB'; IPAddress = '10.0.11.13/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.13/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; }
-                SqlServer = @{ }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
 
@@ -102,12 +99,12 @@
 
             Network  = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.11/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
-                @{ SwitchName = 'DALLAS-HB'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.12.11/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
+                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.11/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
-                SqlServer = @{ }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
 
@@ -116,12 +113,12 @@
 
             Network  = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.12/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
-                @{ SwitchName = 'DALLAS-HB'; NetAdapterName = 'DALLAS-HB'; IPAddress = '10.0.12.12/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
+                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.12/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; }
-                SqlServer = @{ }
+                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
     )
@@ -146,9 +143,9 @@
             Network     = @(
                 @{ Name = 'CHICAGO'; Type = 'Internal'; }
                 @{ Name = 'SEATTLE'; Type = 'Internal'; }
-                @{ Name = 'SEATTLE-HB'; Type = 'Internal'; }
+                @{ Name = 'SEATTLE_HB'; Type = 'Private'; }
                 @{ Name = 'DALLAS'; Type = 'Internal'; }
-                @{ Name = 'DALLAS-HB'; Type = 'Internal'; }
+                @{ Name = 'DALLAS_HB'; Type = 'Private'; }
             )
 
             Media       = @(
@@ -163,10 +160,6 @@
                     MediaType       = 'ISO'
                     ImageName       = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
                     OperatingSystem = 'Windows'
-                    WindowsOptionalFeature = @(
-                        'NetFx3',
-                        'TelnetClient'
-                    )
                     Hotfixes        = @(
                         @{
                             # WMF 5.1 for Windows Server 2012
@@ -182,6 +175,10 @@
                             # Similar to the below, but, this doesn't work well in DSC (throws errors)
                             # 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine -Force -ErrorAction SilentlyContinue;'
                             'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306'
+                        )
+                        WindowsOptionalFeature = @(
+                            'NetFx3',
+                            'TelnetClient'
                         )
                     }
                 }
@@ -224,13 +221,6 @@
                     Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Uri      = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Checksum = '87450CFA175585B23A76BBD7052EE66B'
-                }
-                @{
-                    Id              = 'WindowsServer2012'
-                    Filename        = '..\ISOs\9200.16384.WIN8_RTM.120725-1247_X64FRE_SERVER_EVAL_EN-US-HRM_SSS_X64FREE_EN-US_DV5.ISO'
-                    Expand          = $true
-
-                    IsLocal         = $true
                 }
             )
         }

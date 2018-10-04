@@ -3,6 +3,59 @@ Task default -depends Compile
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+
+function ConvertFrom-CIDR {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [ValidateScript({ $_ -match "(.*)\/(\d+)" })]
+        [string] $IPAddress
+    )
+
+    Write-Verbose ($IPAddress -match "(.*)\/(\d+)")
+    $ip = [IPAddress] $Matches[1]
+    $cidr = [int] $Matches[2]
+    $mask = ("1" * $cidr) + ("0" * (32 - $cidr))
+    $mask = [IPAddress] ([Convert]::ToUInt64($mask, 2))
+
+    Write-Verbose "IP $ip CIDR $cidr MASK $mask"
+
+    [PSCustomObject] @{
+        RawIPAddress = $ip
+        Prefix = $cidr
+        IPAddress = $IPAddress
+        NetworkID = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
+        SubnetMask = $mask.IPAddressToString
+    }
+}
+
+function ConvertTo-CIDR {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [string] $IPAddress,
+        [Parameter(Mandatory)]
+        [string] $SubnetMask
+    )
+
+    $ip = [IPAddress] $IPAddress
+    $mask = [IPAddress] $SubnetMask
+    Write-Verbose ($mask.IPAddressToString -match '(.*)\.(.*)\.(.*)\.(.*)')
+    $cidr = ""
+    $Matches[1..4] | ForEach-Object {
+        $cidr += [Convert]::ToString([int] $_, 2) + ("0" * (8 - [Convert]::ToString([int] $_, 2).Length))
+    }
+    $cidr = ($cidr -split "[^1]")[0].Length
+
+    [PSCustomObject] @{
+        RawIPAddress = $IPAddress
+        Prefix       = $cidr
+        IPAddress    = "$IPAddress/$cidr"
+        NetworkID    = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
+        SubnetMask   = $mask.IPAddressToString
+    }
+}
+
 # Load configuration data so we can do our own manipulation
 $configurationData = Import-PowerShellDataFile -Path C:\Lability\Configurations\WS2012.psd1
 $configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' } | ForEach-Object {
@@ -77,7 +130,6 @@ Task Clean -depends Stop {
 
 Task CleanAll -depends Clean {
     Remove-Item C:\Lability\MasterVirtualHardDisks\*
-    Remove-Item C:\Lability\Resources\sources.zip
 }
 
 <#
@@ -86,9 +138,9 @@ Add node to cluster can have an error which triggers a 15 minute wait.
 Having a WAN causes everything to fail. Confirm one more time, then set NICs to Private instead of Internal.
 
 TODO
-    Check if all windows features will work with source
-    Install SQL
-    Create SQL AG (check on whether cluster, endpoint setup is really needed)
+    Change cluster heartbeat names
+    Set cluster networks to heartbeat only
+    Create SQL AG
     Create MSA accounts
     Add modules SqlServer, DbaTools, Cim, DbData, Jojoba, Error
     Add SecurityPolicyDsc permissions
