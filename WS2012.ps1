@@ -7,7 +7,7 @@ Configuration WS2012 {
     Import-DscResource -ModuleName ComputerManagementDsc
     Import-DscResource -ModuleName NetworkingDsc
     Import-DscResource -ModuleName xActiveDirectory
-    Import-DscResource -ModuleName xFailOverCluster
+    Import-DscResource -ModuleName C:\xFailOverCluster
     Import-DscResource -ModuleName xDnsServer
     Import-DscResource -ModuleName xRemoteDesktopAdmin
     Import-DscResource -ModuleName xSmbShare
@@ -174,6 +174,16 @@ Configuration WS2012 {
 
                     DependsOn = '[xADDomain]CreateDomain'
                 }
+
+                xSmbShare 'AddTempShare' {
+                    Name = 'Temp'
+                    Ensure = 'Present'
+
+                    Path = 'C:\Temp'
+                    FullAccess = 'Everyone'
+
+                    DependsOn = '[xADDomain]CreateDomain'
+                }
             } else {
                 xWaitForADDomain 'WaitForCreateDomain' {
                     DomainName           = $node.DomainName
@@ -211,15 +221,16 @@ Configuration WS2012 {
             }
             if ($node.Role.ContainsKey('Cluster')) {
                 $cluster = $node.Role.Cluster
-                $clusterIPAddress = $cluster.IPAddress
+                $clusterStaticAddress = $cluster.StaticAddress
+                $clusterIgnoreNetwork = $cluster.IgnoreNetwork
 
                 if (!$clusterOrder.ContainsKey($cluster.Name)) {
                     $clusterOrder.$($cluster.Name) = [array] $node.NodeName
                     xCluster "AddNodeToCluster$($cluster.Name)" {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
-                        StaticIPAddress               = $clusterIPAddress
-                        IgnoreNetwork                 = $cluster.IgnoreNetwork
+                        StaticIPAddress               = $clusterStaticAddress.CIDR
+                        IgnoreNetwork                 = $clusterIgnoreNetwork.CIDR
                         # If RSAT-Clustering is not installed the cluster can not be created
                         DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
                     }
@@ -239,68 +250,67 @@ Configuration WS2012 {
                     xCluster "AddNodeToCluster$($cluster.Name)" {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
-                        StaticIPAddress               = $clusterIPAddress
-                        IgnoreNetwork = $cluster.IgnoreNetwork
+                        StaticIPAddress               = $clusterStaticAddress.CIDR
+                        IgnoreNetwork                 = $clusterIgnoreNetwork.CIDR
                         DependsOn                     = "[WaitForAny]WaitForCluster$($cluster.Name)"
                     }
 
-                    <#
-                    xClusterNetwork "RenameClusterNetwork$($cluster.Name)Client" {
-                        Address = ''
-                        AddressMask = ''
-                        Name = "Cluster Network $($adapterName)"
-                        Role = 1 # Heartbeat
-                    }
-
-                    xClusterNetwork "RenameClusterNetwork$($cluster.Name)Heartbeat" {
-                        Address = ''
-                        AddressMask = ''
-                        Name = ''
-                        Role = 3 # Heartbeat and Client
-                    }
-                    #>
-
-                    $clusterOrder.$($cluster.Name) = [array] $node.NodeName
+                    $clusterOrder.$($cluster.Name) += [array] $node.NodeName
 
                     Script "AddStaticIPToCluster$($cluster.Name)" {
                         GetScript = {
                         }
                         TestScript = {
-                            $clusterIPAddress = ($using:clusterIPAddress -split '/')[0]
-                            if (Get-ClusterResource | Where-Object { $_.ResourceType -eq 'IP Address' } | Get-ClusterParameter -Name Address | Where-Object { $_.Value -eq $clusterIPAddress }) {
+                            if (Get-ClusterResource | Where-Object { $_.ResourceType -eq 'IP Address' } | Get-ClusterParameter -Name Address | Where-Object { $_.Value -eq $using:clusterStaticAddress.IPAddress }) {
                                 $true
                             } else {
                                 $false
                             }
                         }
                         SetScript = {
-                            $clusterIPAddress = ($using:clusterIPAddress -split '/')[0]
-                            Get-Cluster | Add-ClusterResource -Name "IP Address $clusterIPAddress" -Group 'Cluster Group' -ResourceType 'IP Address'
-                            $clusterNetwork = Get-Cluster | Get-ClusterNetwork | Where-Object { (([Net.IPAddress] $_.Address).Address -band ([Net.IPAddress] $_.AddressMask).Address) -eq (([Net.IPAddress] $clusterIPAddress).Address -band ([Net.IPAddress] $_.AddressMask).Address)}
-                            Get-ClusterResource -Name "IP Address $clusterIPAddress" | Set-ClusterParameter -Multiple @{ Address = $clusterIPAddress; Network = $clusterNetwork.Name; SubnetMask = $clusterNetwork.AddressMask; }
+                            $resourceName = "IP Address $($using:clusterStaticAddress.IPAddress)"
+                            Get-Cluster | Add-ClusterResource -Name $resourceName -Group 'Cluster Group' -ResourceType 'IP Address'
+                            Get-ClusterResource -Name $resourceName | Set-ClusterParameter -Multiple @{ Address = $clusterStaticAddress.IPAddress; Network = $using:clusterStaticAddress.Name; SubnetMask = $using:clusterStaticAddress.SubnetMask; }
                             $dependencyExpression = (Get-Cluster | Get-ClusterResourceDependency -Resource 'Cluster Name').DependencyExpression
                             if ($dependencyExpression -match '^\((.*)\)$') {
-                                $dependencyExpression = $Matches[1] + " or [IP Address $clusterIPAddress]"
+                                $dependencyExpression = $Matches[1] + " or [$resourceName]"
                             } else {
-                                $dependencyExpression = $dependencyExpression + " or [IP Address $clusterIPAddress]"
+                                $dependencyExpression = $dependencyExpression + " or [$resourceName]"
                             }
                             Get-Cluster | Set-ClusterResourceDependency -Resource 'Cluster Name' -Dependency $dependencyExpression
                             # Without this, it won't start automatically on first try
-                            (Get-Cluster | Get-ClusterResource -Name "IP Address $clusterIPAddress").PersistentState = 1
+                            (Get-Cluster | Get-ClusterResource -Name $resourceName).PersistentState = 1
                         }
 
-                        DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                        DependsOn = "[xClusterNetwork]RenameClusterNetwork$($cluster.Name)Client", "[xClusterNetwork]RenameClusterNetwork$($cluster.Name)Heartbeat"
                     }
+                }
+
+                xClusterNetwork "RenameClusterNetwork$($cluster.Name)Client" {
+                    Address = $clusterStaticAddress.NetworkID
+                    AddressMask = $clusterStaticAddress.SubnetMask
+                    Name = $clusterStaticAddress.Name
+                    Role = 3 # Heartbeat and Client
+
+                    DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                }
+
+                xClusterNetwork "RenameClusterNetwork$($cluster.Name)Heartbeat" {
+                    Address = $clusterIgnoreNetwork.NetworkID
+                    AddressMask = $clusterIgnoreNetwork.SubnetMask
+                    Name = $clusterIgnoreNetwork.Name
+                    Role = 1 # Heartbeat Only
+
+                    DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
                 }
             }
 
             if ($node.Role.ContainsKey('SqlServer')) {
                 SqlSetup 'InstallSQLServer' {
-                    InstanceName = $node.InstanceName
+                    InstanceName = $node.Role.SqlServer.InstanceName
                     Action = 'Install'
-                    SourcePath = $node.SourcePath
-                    Features = $node.Features
-
+                    SourcePath = $node.Role.SqlServer.SourcePath
+                    Features = $node.Role.SqlServer.Features
                     SQLSysAdminAccounts = 'LAB\Administrator'
                     UpdateEnabled = 'False'
 
@@ -308,13 +318,31 @@ Configuration WS2012 {
                 }
 
                 SqlWindowsFirewall 'AddFirewallRuleSQL' {
-                    InstanceName = $node.InstanceName
-                    SourcePath = $node.SourcePath
-                    Features = $node.Features
-
+                    InstanceName = $node.Role.SqlServer.InstanceName
+                    SourcePath = $node.Role.SqlServer.SourcePath
+                    Features = $node.Role.SqlServer.Features
                     Ensure = 'Present'
 
                     DependsOn = '[SqlSetup]InstallSQLServer'
+                }
+
+                SqlAlwaysOnService 'EnableAlwaysOn' {
+                    ServerName = $node.NodeName
+                    InstanceName = $node.Role.SqlServer.InstanceName
+                    Ensure = 'Present'
+
+                    DependsOn = '[SqlSetup]AddFirewallRuleSQL'
+                }
+
+                SqlServerEndpoint 'CreateHadrEndpoint'
+                {
+                    EndPointName         = 'HADR'
+                    Ensure               = 'Present'
+                    Port                 = 5022
+                    ServerName           = $node.NodeName
+                    InstanceName         = $node.Role.SqlServer.InstanceName
+
+                    DependsOn = '[SqlAlwaysOnService]EnableAlwaysOn'
                 }
             }
         }

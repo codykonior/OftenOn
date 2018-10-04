@@ -3,7 +3,6 @@ Task default -depends Compile
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-
 function ConvertFrom-CIDR {
     [CmdletBinding()]
     param (
@@ -14,16 +13,16 @@ function ConvertFrom-CIDR {
 
     Write-Verbose ($IPAddress -match "(.*)\/(\d+)")
     $ip = [IPAddress] $Matches[1]
-    $cidr = [int] $Matches[2]
-    $mask = ("1" * $cidr) + ("0" * (32 - $cidr))
+    $suffix = [int] $Matches[2]
+    $mask = ("1" * $suffix) + ("0" * (32 - $suffix))
     $mask = [IPAddress] ([Convert]::ToUInt64($mask, 2))
 
-    Write-Verbose "IP $ip CIDR $cidr MASK $mask"
+    Write-Verbose "IP $ip CIDR $suffix MASK $mask"
 
-    [PSCustomObject] @{
-        RawIPAddress = $ip
-        Prefix = $cidr
-        IPAddress = $IPAddress
+    @{
+        IPAddress = $ip
+        CIDR = $IPAddress
+        CIDRSuffix = $suffix
         NetworkID = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
         SubnetMask = $mask.IPAddressToString
     }
@@ -41,16 +40,16 @@ function ConvertTo-CIDR {
     $ip = [IPAddress] $IPAddress
     $mask = [IPAddress] $SubnetMask
     Write-Verbose ($mask.IPAddressToString -match '(.*)\.(.*)\.(.*)\.(.*)')
-    $cidr = ""
+    $suffix = ""
     $Matches[1..4] | ForEach-Object {
-        $cidr += [Convert]::ToString([int] $_, 2) + ("0" * (8 - [Convert]::ToString([int] $_, 2).Length))
+        $suffix += [Convert]::ToString([int] $_, 2) + ("0" * (8 - [Convert]::ToString([int] $_, 2).Length))
     }
-    $cidr = ($cidr -split "[^1]")[0].Length
+    $suffix = ($suffix -split "[^1]")[0].Length
 
-    [PSCustomObject] @{
-        RawIPAddress = $IPAddress
-        Prefix       = $cidr
-        IPAddress    = "$IPAddress/$cidr"
+    @{
+        IPAddres     = $IPAddress
+        CIDR         = "$IPAddress/$suffix"
+        CIDRSuffix   = $suffix
         NetworkID    = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
         SubnetMask   = $mask.IPAddressToString
     }
@@ -77,6 +76,13 @@ foreach ($node in $configurationData.AllNodes) {
 
         $node.Lability_SwitchName = $switchName
         $node.Lability_MACAddress = $macAddress
+    }
+
+    if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('Cluster')) {
+        $node.Role.Cluster.StaticAddress = ConvertFrom-CIDR $node.Role.Cluster.StaticAddress
+        $node.Role.Cluster.StaticAddress.Name = "Cluster Network " + ($node.Network | Where-Object { (ConvertFrom-CIDR $_.IPAddress).NetworkID -eq $node.Role.Cluster.StaticAddress.NetworkID }).NetAdapterName + " (Client)"
+        $node.Role.Cluster.IgnoreNetwork = ConvertFrom-CIDR $node.Role.Cluster.IgnoreNetwork
+        $node.Role.Cluster.IgnoreNetwork.Name = "Cluster Network " + ($node.Network | Where-Object { (ConvertFrom-CIDR $_.IPAddress).NetworkID -eq $node.Role.Cluster.IgnoreNetwork.NetworkID }).NetAdapterName + " (Heartbeat)"
     }
 }
 
@@ -138,9 +144,13 @@ Add node to cluster can have an error which triggers a 15 minute wait.
 Having a WAN causes everything to fail. Confirm one more time, then set NICs to Private instead of Internal.
 
 TODO
-    Change cluster heartbeat names
-    Set cluster networks to heartbeat only
     Create SQL AG
+        clussvc is no good it seems, for creating an ag
+        grant view server state to [nt authority\system]
+        grant alter any availability group to [nt authority\system]
+        change to service accounts also
+        grant connect endpoint to service account
+
     Create MSA accounts
     Add modules SqlServer, DbaTools, Cim, DbData, Jojoba, Error
     Add SecurityPolicyDsc permissions

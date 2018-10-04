@@ -61,7 +61,7 @@
             )
 
             Role               = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -75,7 +75,7 @@
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -89,7 +89,7 @@
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -103,7 +103,7 @@
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -117,7 +117,7 @@
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; IPAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -133,7 +133,8 @@
                 @{ Name = 'NetworkingDsc'; RequiredVersion = '6.1.0.0'; }
                 @{ Name = 'xActiveDirectory'; RequiredVersion = '2.21.0.0'; }
                 # The version on PowerShellGallery is too old, we need > 1.10.0.0
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\DscResources\xDscResources\xFailOverCluster'; }
+                # @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\DscResources\xDscResources\xFailOverCluster'; }
+                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\xFailOverCluster'; }
                 @{ Name = 'xDnsServer'; RequiredVersion = '1.11.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
