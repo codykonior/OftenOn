@@ -331,7 +331,7 @@ Configuration WS2012 {
                     InstanceName = $node.Role.SqlServer.InstanceName
                     Ensure = 'Present'
 
-                    DependsOn = '[SqlSetup]AddFirewallRuleSQL'
+                    DependsOn = '[SqlWindowsFirewall]AddFirewallRuleSQL'
                 }
 
                 SqlServerEndpoint 'CreateHadrEndpoint'

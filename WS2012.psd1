@@ -33,11 +33,11 @@
 
             # Script will add Lability_SwitchName @() and Lability_MACAddress @()
             Network            = @(
-                @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1' }
-                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'CHICAGO';    NetAdapterName = 'CHICAGO';    IPAddress = '10.0.0.1/24';  DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.1/24';  DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.1/24'; DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.1/24'; DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'DALLAS';     NetAdapterName = 'DALLAS';     IPAddress = '10.0.2.1/24';  DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'DALLAS_HB';  NetAdapterName = 'DALLAS_HB';  IPAddress = '10.0.12.1/24'; DnsServerAddress = '127.0.0.1'; }
                 # @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
             )
 
@@ -47,7 +47,7 @@
             )
 
             Role               = @{
-                DomainController = $true
+                DomainController = @{ }
             }
         }
 
@@ -56,12 +56,12 @@
             Lability_BootOrder = 2
 
             Network            = @(
-                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.11/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.11/24';  DnsServerAddress = '10.0.1.1';  DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.11/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role               = @{
-                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster =   @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -70,7 +70,7 @@
             NodeName = 'SEC1N2'
 
             Network  = @(
-                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.12/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.12/24';  DnsServerAddress = '10.0.1.1';  DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.12/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
@@ -84,12 +84,12 @@
             NodeName = 'SEC1N3'
 
             Network  = @(
-                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.13/24'; DnsServerAddress = '10.0.1.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.13/24';  DnsServerAddress = '10.0.1.1';  DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.13/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster =   @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -98,12 +98,12 @@
             NodeName = 'DAC1N1'
 
             Network  = @(
-                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.11/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS';    NetAdapterName = 'DALLAS';    IPAddress = '10.0.2.11/24';  DnsServerAddress = '10.0.2.1';  DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.11/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                Cluster =   @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -112,12 +112,12 @@
             NodeName = 'DAC1N2'
 
             Network  = @(
-                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.12/24'; DnsServerAddress = '10.0.2.1'; DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS';    NetAdapterName = 'DALLAS';    IPAddress = '10.0.2.12/24';  DnsServerAddress = '10.0.2.1';  DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.12/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
             Role     = @{
-                Cluster = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                Cluster =   @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
             }
         }
@@ -142,6 +142,8 @@
             )
 
             Network     = @(
+                # You'll get this error if you change a switch type:
+                # WARNING: [1:51:28 AM] DSC resource 'Set-VMTargetResource' failed with errror 'Sequence contains more than one element'.
                 @{ Name = 'CHICAGO'; Type = 'Internal'; }
                 @{ Name = 'SEATTLE'; Type = 'Internal'; }
                 @{ Name = 'SEATTLE_HB'; Type = 'Private'; }
