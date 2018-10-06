@@ -439,6 +439,7 @@ Configuration WS2012 {
                             InstanceName            = $node.Role.SQLServer.InstanceName
                             Ensure                  = 'Present'
                             PsDscRunAsCredential    = $localAdministrator
+                            MatchDatabaseOwner = $true # EXECUTE AS
                             DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)"
                         }
                     } else {
