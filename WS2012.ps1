@@ -1,3 +1,5 @@
+# Try manual run on DA node to check for listener IP working
+# Modify database add to AG with WaitForAll
 Configuration WS2012 {
     param (
     )
@@ -14,10 +16,13 @@ Configuration WS2012 {
     Import-DscResource -ModuleName SqlServerDsc
 
     $clusterOrder = @{}
+    $availabilityReplicaOrder = @{}
 
     Node $AllNodes.NodeName {
         $domainAdministrator = New-Object System.Management.Automation.PSCredential('LAB\Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $localAdministrator = New-Object System.Management.Automation.PSCredential('LAB\LocalAdministrator', ('Local2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $sqlEngineServiceC1 = New-Object System.Management.Automation.PSCredential('LAB\SQLEngineServiceC1', ('Engine2018!' | ConvertTo-SecureString -AsPlainText -Force))
 
         LocalConfigurationManager {
             RebootNodeIfNeeded   = $true
@@ -164,6 +169,24 @@ Configuration WS2012 {
                     DependsOn                     = '[WindowsFeature]AddWindowsFeatureADDomainServices'
                 }
 
+                xADUser "CreateSQLEngineServiceC1User" {
+                    DomainName  = $node.DomainName
+                    UserName    = 'SQLEngineServiceC1'
+                    Description = 'SQL Engine for Cluster 1'
+                    Password    = $sqlEngineServiceC1
+                    Ensure      = 'Present'
+                    DependsOn   = '[xADDomain]CreateDomain'
+                }
+
+                xADUser "CreateLocalAdministratorUser" {
+                    DomainName  = $node.DomainName
+                    UserName    = 'LocalAdministrator'
+                    Description = 'Local Administrator'
+                    Password    = $localAdministrator
+                    Ensure      = 'Present'
+                    DependsOn   = '[xADDomain]CreateDomain'
+                }
+
                 # Define a share with all of our Lability_Resources so clients can use them for installs
                 xSmbShare 'AddResourceShare' {
                     Name = 'Resources'
@@ -199,6 +222,23 @@ Configuration WS2012 {
                     Credential = $domainAdministrator
                     DependsOn  = '[xWaitForADDomain]WaitForCreateDomain'
                 }
+            }
+
+            WaitForAny "WaitForLocalAdministratorUser" {
+                ResourceName = '[xADUser]CreateLocalAdministratorUser'
+                NodeName = 'CHDC1'
+
+                # 30 Minutes
+                RetryIntervalSec = 15
+                RetryCount       = 120
+            }
+
+            Group 'AddLocalAdministratorToAdministrators' {
+                GroupName = 'Administrators'
+                # Credential = $domainAdministrator
+                Ensure = 'Present'
+                MembersToInclude = $localAdministrator.UserName
+                DependsOn = '[WaitForAny]WaitForLocalAdministratorUser'
             }
 
             # Despite the name, this is required to allow you to RDP to the server from your host (except for DC where it just works)
@@ -311,7 +351,8 @@ Configuration WS2012 {
                     Action = 'Install'
                     SourcePath = $node.Role.SqlServer.SourcePath
                     Features = $node.Role.SqlServer.Features
-                    SQLSysAdminAccounts = 'LAB\Administrator'
+                    SQLSvcAccount = $sqlEngineServiceC1
+                    SQLSysAdminAccounts = $localAdministrator.UserName
                     UpdateEnabled = 'False'
 
                     DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
@@ -343,6 +384,101 @@ Configuration WS2012 {
                     InstanceName         = $node.Role.SqlServer.InstanceName
 
                     DependsOn = '[SqlAlwaysOnService]EnableAlwaysOn'
+                }
+
+                SqlServerPermission 'AddPermissionsForAGMembership'
+                {
+                    Ensure               = 'Present'
+                    ServerName           = $node.NodeName
+                    InstanceName         = $node.Role.SqlServer.InstanceName
+                    Principal            = 'NT AUTHORITY\SYSTEM'
+                    Permission           = 'AlterAnyAvailabilityGroup', 'ViewServerState'
+
+                    PsDscRunAsCredential = $localAdministrator
+                }
+
+                if ($node.Role.ContainsKey("AvailabilityGroup")) {
+                    if (!$availabilityReplicaOrder.ContainsKey($node.Role.AvailabilityGroup.Name)) {
+                        $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name) = [array] $node.NodeName
+
+                        # Create the availability group on the instance tagged as the primary replica
+                        SqlAG "CreateAvailabilityGroup$($node.Role.AvailabilityGroup.Name)" {
+                            Ensure               = 'Present'
+                            Name                 = $node.Role.AvailabilityGroup.Name
+                            InstanceName         = $node.Role.SQLServer.InstanceName
+                            ServerName           = $node.NodeName
+                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership'
+                            PsDscRunAsCredential = $localAdministrator
+                        }
+
+                        SqlDatabase "CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)" {
+                            Ensure       = 'Present'
+                            ServerName   = $node.NodeName
+                            InstanceName = $node.Role.SQLServer.InstanceName
+                            Name         = "Dummy$($node.Role.AvailabilityGroup.Name)"
+                            PsDscRunAsCredential = $localAdministrator
+                            DependsOn = '[SqlSetup]InstallSQLServer'
+                        }
+
+                        SqlDatabaseRecoveryModel "SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)" {
+                            Name         = "Dummy$($node.Role.AvailabilityGroup.Name)"
+                            RecoveryModel        = 'Full'
+                            ServerName           = $node.NodeName
+                            InstanceName         = $node.Role.SQLServer.InstanceName
+                            PsDscRunAsCredential = $localAdministrator
+                            DependsOn = "[SqlDatabase]CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)"
+                        }
+
+                        # This really needs wait for all replicas to be added
+                        SqlAGDatabase "AddDatabaseTo$($node.Role.AvailabilityGroup.Name)"
+                        {
+                            AvailabilityGroupName   = $node.Role.AvailabilityGroup.Name
+                            BackupPath              = '\\CHDC1\Temp'
+                            DatabaseName            = "Dummy$($node.Role.AvailabilityGroup.Name)"
+                            ServerName              = $node.NodeName
+                            InstanceName            = $node.Role.SQLServer.InstanceName
+                            Ensure                  = 'Present'
+                            PsDscRunAsCredential    = $localAdministrator
+                            DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)"
+                        }
+                    } else {
+                        SqlWaitForAG "WaitFor$($node.Role.AvailabilityGroup.Name)" {
+                            Name                 = $node.Role.AvailabilityGroup.Name
+                            RetryIntervalSec     = 15
+                            RetryCount           = 120
+
+                            PsDscRunAsCredential = $localAdministrator
+                        }
+
+                        SqlAGReplica "AddReplicaToAvailabilityGroup$($node.Role.AvailabilityGroup.Name)" {
+                            Ensure               = 'Present'
+                            AvailabilityGroupName = $node.Role.AvailabilityGroup.Name
+
+                            Name                 = $node.NodeName # X\X format
+                            ServerName           = $node.NodeName
+                            InstanceName         = $node.Role.SQLServer.InstanceName
+                            PrimaryReplicaServerName   = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
+                            PrimaryReplicaInstanceName = $node.Role.SQLServer.InstanceName
+                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership', "[SqlWaitForAG]WaitFor$($node.Role.AvailabilityGroup.Name)"
+                            PsDscRunAsCredential = $localAdministrator
+                        }
+                    }
+
+                    # Interesting if this works on all nodes
+                    SqlAGListener "CreateListener$($node.Role.AvailabilityGroup.ListenerName)" {
+                        Ensure               = 'Present'
+                        ServerName           = $node.NodeName
+                        InstanceName         = $node.Role.SQLServer.InstanceName
+                        AvailabilityGroup    = $node.Role.AvailabilityGroup.Name
+                        Name                 = $node.Role.AvailabilityGroup.ListenerName
+                        IpAddress            = $node.Role.AvailabilityGroup.IPAddress
+                        Port                 = 1433
+
+                        PsDscRunAsCredential = $localAdministrator
+                    }
+
+
+
                 }
             }
         }

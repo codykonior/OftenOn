@@ -144,12 +144,12 @@ Add node to cluster can have an error which triggers a 15 minute wait.
 Having a WAN causes everything to fail. Confirm one more time, then set NICs to Private instead of Internal.
 
 TODO
-    Create domain users
-    Install SQL as Domain
+    x Create domain users
+    x Install SQL as Domain
     Create SQL AG
         clussvc is no good it seems, for creating an ag
-        grant view server state to [nt authority\system]
-        grant alter any availability group to [nt authority\system]
+        x grant view server state to [nt authority\system]
+        x grant alter any availability group to [nt authority\system]
         ? grant connect endpoint to service account
         ? grant 5022 firewall access
         Create database
