@@ -485,7 +485,7 @@ Configuration WS2012 {
                             InstanceName         = $node.Role.SQLServer.InstanceName
                             PrimaryReplicaServerName   = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
                             PrimaryReplicaInstanceName = $node.Role.SQLServer.InstanceName
-                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership', "CreateListener$($node.Role.AvailabilityGroup.ListenerName)"
+                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership', "[SQLAGListener]CreateListener$($node.Role.AvailabilityGroup.ListenerName)"
                             PsDscRunAsCredential = $localAdministrator
                         }
                     }
