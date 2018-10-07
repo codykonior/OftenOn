@@ -429,7 +429,7 @@ Configuration WS2012 {
                             DependsOn = "[SqlDatabase]CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)"
                         }
 
-                        $completeReplicaList = $AllNodes.Nodes | Where-Object { $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.NodeName }
+                        $completeReplicaList = $AllNodes | Where-Object { $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.NodeName }
 
                         WaitForAll 'WaitForAllAGReplicas' {
                             ResourceName = "AddReplicaToAvailabilityGroup$($node.Role.AvailabilityGroup.Name)"
@@ -450,7 +450,7 @@ Configuration WS2012 {
                             Ensure                  = 'Present'
                             PsDscRunAsCredential    = $localAdministrator
                             MatchDatabaseOwner = $true # EXECUTE AS
-                            DependsOn = '[WaitForAll]WaitForAllAGReplcas'
+                            DependsOn = '[WaitForAll]WaitForAllAGReplicas'
                         }
                     } else {
                         SqlWaitForAG "WaitFor$($node.Role.AvailabilityGroup.Name)" {
