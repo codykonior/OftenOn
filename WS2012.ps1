@@ -1,5 +1,5 @@
-# Try manual run on DA node to check for listener IP working
 # Modify database add to AG with WaitForAll
+# DAC1N1 is being added to the AG but then it's failing on retry because it tries to add it again
 Configuration WS2012 {
     param (
     )
@@ -429,6 +429,16 @@ Configuration WS2012 {
                             DependsOn = "[SqlDatabase]CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)"
                         }
 
+                        $completeReplicaList = $AllNodes.Nodes | Where-Object { $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.NodeName }
+
+                        WaitForAll 'WaitForAllAGReplicas' {
+                            ResourceName = "AddReplicaToAvailabilityGroup$($node.Role.AvailabilityGroup.Name)"
+                            NodeName = $completeReplicaList
+                            RetryCount = 120
+                            RetryIntervalSec = 15
+                            DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)"
+                        }
+
                         # This really needs wait for all replicas to be added
                         SqlAGDatabase "AddDatabaseTo$($node.Role.AvailabilityGroup.Name)"
                         {
@@ -440,7 +450,7 @@ Configuration WS2012 {
                             Ensure                  = 'Present'
                             PsDscRunAsCredential    = $localAdministrator
                             MatchDatabaseOwner = $true # EXECUTE AS
-                            DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)"
+                            DependsOn = '[WaitForAll]WaitForAllAGReplcas'
                         }
                     } else {
                         SqlWaitForAG "WaitFor$($node.Role.AvailabilityGroup.Name)" {
@@ -449,6 +459,21 @@ Configuration WS2012 {
                             RetryCount           = 120
 
                             PsDscRunAsCredential = $localAdministrator
+                        }
+
+                        # Interesting if this works on all nodes
+                        # This MUST happen before adding a replica from another subnet, otherwise that will fail
+                        SqlAGListener "CreateListener$($node.Role.AvailabilityGroup.ListenerName)" {
+                            Ensure               = 'Present'
+                            ServerName           = $node.NodeName
+                            InstanceName         = $node.Role.SQLServer.InstanceName
+                            AvailabilityGroup    = $node.Role.AvailabilityGroup.Name
+                            Name                 = $node.Role.AvailabilityGroup.ListenerName
+                            IpAddress            = $node.Role.AvailabilityGroup.IPAddress
+                            Port                 = 1433
+
+                            PsDscRunAsCredential = $localAdministrator
+                            DependsOn = "[SqlWaitForAG]WaitFor$($node.Role.AvailabilityGroup.Name)"
                         }
 
                         SqlAGReplica "AddReplicaToAvailabilityGroup$($node.Role.AvailabilityGroup.Name)" {
@@ -460,25 +485,10 @@ Configuration WS2012 {
                             InstanceName         = $node.Role.SQLServer.InstanceName
                             PrimaryReplicaServerName   = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
                             PrimaryReplicaInstanceName = $node.Role.SQLServer.InstanceName
-                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership', "[SqlWaitForAG]WaitFor$($node.Role.AvailabilityGroup.Name)"
+                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership', "CreateListener$($node.Role.AvailabilityGroup.ListenerName)"
                             PsDscRunAsCredential = $localAdministrator
                         }
                     }
-
-                    # Interesting if this works on all nodes
-                    SqlAGListener "CreateListener$($node.Role.AvailabilityGroup.ListenerName)" {
-                        Ensure               = 'Present'
-                        ServerName           = $node.NodeName
-                        InstanceName         = $node.Role.SQLServer.InstanceName
-                        AvailabilityGroup    = $node.Role.AvailabilityGroup.Name
-                        Name                 = $node.Role.AvailabilityGroup.ListenerName
-                        IpAddress            = $node.Role.AvailabilityGroup.IPAddress
-                        Port                 = 1433
-
-                        PsDscRunAsCredential = $localAdministrator
-                    }
-
-
 
                 }
             }
