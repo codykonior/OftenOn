@@ -139,7 +139,7 @@
                 @{ Name = 'xActiveDirectory'; RequiredVersion = '2.21.0.0'; }
                 # The version on PowerShellGallery is too old, we need > 1.10.0.0
                 # @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\DscResources\xDscResources\xFailOverCluster'; }
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\xFailOverCluster'; }
+                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\xFailOverCluster'; }
                 @{ Name = 'xDnsServer'; RequiredVersion = '1.11.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }

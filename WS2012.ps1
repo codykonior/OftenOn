@@ -9,7 +9,7 @@ Configuration WS2012 {
     Import-DscResource -ModuleName ComputerManagementDsc
     Import-DscResource -ModuleName NetworkingDsc
     Import-DscResource -ModuleName xActiveDirectory
-    Import-DscResource -ModuleName C:\xFailOverCluster
+    Import-DscResource -ModuleName C:\Git\xFailOverCluster
     Import-DscResource -ModuleName xDnsServer
     Import-DscResource -ModuleName xRemoteDesktopAdmin
     Import-DscResource -ModuleName xSmbShare
