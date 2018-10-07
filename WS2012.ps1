@@ -411,6 +411,40 @@ Configuration WS2012 {
                             PsDscRunAsCredential = $localAdministrator
                         }
 
+                        $completeListenerList = $AllNodes | Where-Object { $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.Role.AvailabilityGroup.IPAddress } | Select-Object -Unique
+
+                        <#
+                            If you try to create a listener with an IP but not the IP on the primary, it will fail.
+
+                            None of the IP addresses configured for the availability group listener can be hosted by the server 'SEC1N1'. Either
+                            configure a public cluster network on which one of the specified IP addresses can be hosted, or add another listener
+                            IP address which can be hosted on a public cluster network for this server.
+                                + CategoryInfo          : InvalidOperation: (:) [], CimException
+                                + FullyQualifiedErrorId : ExecutionFailed,Microsoft.SqlServer.Management.PowerShell.Hadr.NewSqlAvailabilityGroupLi
+                            stenerCommand
+                                + PSComputerName        : DAC1N1
+
+                            If you have a listener with an IP:
+                                If you try to add another server you need to add it on one side, add the listener
+                                IP, and then join on the secondary, otherwise you'll get an error trying to join the secondary too early because
+                                there's no listener IP. DSC isn't this fine-grained.
+                            If you have a listener defined with all IPs:
+                                You can join immediately.
+                            If you have no listener, you can join easily.
+                        #>
+                        SqlAGListener "CreateListener$($node.Role.AvailabilityGroup.ListenerName)" {
+                            Ensure               = 'Present'
+                            ServerName           = $node.NodeName
+                            InstanceName         = $node.Role.SQLServer.InstanceName
+                            AvailabilityGroup    = $node.Role.AvailabilityGroup.Name
+                            Name                 = $node.Role.AvailabilityGroup.ListenerName
+                            IpAddress            = $completeListenerList
+                            Port                 = 1433
+
+                            PsDscRunAsCredential = $localAdministrator
+                            DependsOn = "[SqlAg]CreateAvailabilityGroup$($node.Role.AvailabilityGroup.Name)"
+                        }
+
                         SqlDatabase "CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)" {
                             Ensure       = 'Present'
                             ServerName   = $node.NodeName
@@ -443,7 +477,7 @@ Configuration WS2012 {
                         SqlAGDatabase "AddDatabaseTo$($node.Role.AvailabilityGroup.Name)"
                         {
                             AvailabilityGroupName   = $node.Role.AvailabilityGroup.Name
-                            BackupPath              = '\\CHDC1\Temp'
+                            BackupPath              = '\\CHDC1\Temp' # TODO: Remove this
                             DatabaseName            = "Dummy$($node.Role.AvailabilityGroup.Name)"
                             ServerName              = $node.NodeName
                             InstanceName            = $node.Role.SQLServer.InstanceName
@@ -453,27 +487,13 @@ Configuration WS2012 {
                             DependsOn = '[WaitForAll]WaitForAllAGReplicas'
                         }
                     } else {
-                        SqlWaitForAG "WaitFor$($node.Role.AvailabilityGroup.Name)" {
-                            Name                 = $node.Role.AvailabilityGroup.Name
+                        WaitForAny "WaitFor$($node.Role.AvailabilityGroup.ListenerName)" {
+                            ResourceName         = "[SqlAGListener]CreateListener$($node.Role.AvailabilityGroup.ListenerName)"
+                            NodeName             = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
                             RetryIntervalSec     = 15
                             RetryCount           = 120
 
                             PsDscRunAsCredential = $localAdministrator
-                        }
-
-                        # Interesting if this works on all nodes
-                        # This MUST happen before adding a replica from another subnet, otherwise that will fail
-                        SqlAGListener "CreateListener$($node.Role.AvailabilityGroup.ListenerName)" {
-                            Ensure               = 'Present'
-                            ServerName           = $node.NodeName
-                            InstanceName         = $node.Role.SQLServer.InstanceName
-                            AvailabilityGroup    = $node.Role.AvailabilityGroup.Name
-                            Name                 = $node.Role.AvailabilityGroup.ListenerName
-                            IpAddress            = $node.Role.AvailabilityGroup.IPAddress
-                            Port                 = 1433
-
-                            PsDscRunAsCredential = $localAdministrator
-                            DependsOn = "[SqlWaitForAG]WaitFor$($node.Role.AvailabilityGroup.Name)"
                         }
 
                         SqlAGReplica "AddReplicaToAvailabilityGroup$($node.Role.AvailabilityGroup.Name)" {
@@ -485,7 +505,7 @@ Configuration WS2012 {
                             InstanceName         = $node.Role.SQLServer.InstanceName
                             PrimaryReplicaServerName   = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
                             PrimaryReplicaInstanceName = $node.Role.SQLServer.InstanceName
-                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership', "[SQLAGListener]CreateListener$($node.Role.AvailabilityGroup.ListenerName)"
+                            DependsOn            = "[WaitForAny]WaitFor$($node.Role.AvailabilityGroup.ListenerName)"
                             PsDscRunAsCredential = $localAdministrator
                         }
                     }

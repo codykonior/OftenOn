@@ -29,7 +29,6 @@
 
         @{
             NodeName           = 'CHDC1'
-            Lability_BootOrder = 1
 
             # Script will add Lability_SwitchName @() and Lability_MACAddress @()
             Network            = @(
@@ -144,6 +143,19 @@
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
                 @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; }
+            )
+
+            # Can be included with Lability_Module
+            Module = @(
+                @{ Name = 'Cim'; }
+                @{ Name = 'DbData'; }
+                @{ Name = 'Disposable'; }
+                @{ Name = 'Error'; }
+                @{ Name = 'Jojoba'; }
+                @{ Name = 'ParseSql'; }
+                @{ Name = 'Performance'; }
+                @{ Name = 'PoshRSJob'; }
+                @{ Name = 'SqlServer'; }
             )
 
             Network     = @(
