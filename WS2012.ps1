@@ -146,6 +146,11 @@ Configuration WS2012 {
 
                 Script 'SetNetIPInterfaceForwardingEnabled' {
                     GetScript = {
+                        if (Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' }) {
+                            @{ Result = "false"; }
+                        } else {
+                            @{ Result = "true"; }
+                        }
                     }
                     TestScript = {
                         if (Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' }) {
@@ -224,7 +229,7 @@ Configuration WS2012 {
                 }
             }
 
-            WaitForAny "WaitForLocalAdministratorUser" {
+            WaitForAll "WaitForLocalAdministratorUser" {
                 ResourceName = '[xADUser]CreateLocalAdministratorUser'
                 NodeName = 'CHDC1'
 
@@ -238,13 +243,18 @@ Configuration WS2012 {
                 # Credential = $domainAdministrator
                 Ensure = 'Present'
                 MembersToInclude = $localAdministrator.UserName
-                DependsOn = '[WaitForAny]WaitForLocalAdministratorUser'
+                DependsOn = '[WaitForAll]WaitForLocalAdministratorUser'
             }
 
             # Despite the name, this is required to allow you to RDP to the server from your host (except for DC where it just works)
             # This seems to happen by sudden replies to the computer name with an accessible IPv6 address
             Script 'EnableFileAndPrinterSharing' {
                 GetScript = {
+                    if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
+                        @{ Result = "false"; }
+                    } else {
+                        @{ Result = "true"; }
+                    }
                 }
                 TestScript = {
                     if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
@@ -275,7 +285,7 @@ Configuration WS2012 {
                         DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
                     }
                 } else {
-                    WaitForAny "WaitForCluster$($cluster.Name)" {
+                    WaitForAll "WaitForCluster$($cluster.Name)" {
                         ResourceName = "[xCluster]AddNodeToCluster$($cluster.Name)"
                         NodeName = ($clusterOrder.$($cluster.Name))[-1]
 
@@ -292,13 +302,18 @@ Configuration WS2012 {
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterStaticAddress.CIDR
                         IgnoreNetwork                 = $clusterIgnoreNetwork.CIDR
-                        DependsOn                     = "[WaitForAny]WaitForCluster$($cluster.Name)"
+                        DependsOn                     = "[WaitForAll]WaitForCluster$($cluster.Name)"
                     }
 
                     $clusterOrder.$($cluster.Name) += [array] $node.NodeName
 
                     Script "AddStaticIPToCluster$($cluster.Name)" {
                         GetScript = {
+                            if (Get-ClusterResource | Where-Object { $_.ResourceType -eq 'IP Address' } | Get-ClusterParameter -Name Address | Where-Object { $_.Value -eq $using:clusterStaticAddress.IPAddress }) {
+                                @{ Result = "true"; }
+                            } else {
+                                @{ Result = "false"; }
+                            }
                         }
                         TestScript = {
                             if (Get-ClusterResource | Where-Object { $_.ResourceType -eq 'IP Address' } | Get-ClusterParameter -Name Address | Where-Object { $_.Value -eq $using:clusterStaticAddress.IPAddress }) {
@@ -375,9 +390,20 @@ Configuration WS2012 {
                     DependsOn = '[SqlWindowsFirewall]AddFirewallRuleSQL'
                 }
 
+                SqlServerLogin 'CreateLoginForAG'
+                {
+                    Ensure               = 'Present'
+                    ServerName           = $node.NodeName
+                    InstanceName         = $node.Role.SqlServer.InstanceName
+                    Name                 = $sqlEngineServiceC1.UserName
+
+                    DependsOn = '[SqlSetup]InstallSQLServer'
+                    PsDscRunAsCredential = $localAdministrator
+                }
+                
                 SqlServerEndpoint 'CreateHadrEndpoint'
                 {
-                    EndPointName         = 'HADR'
+                    EndPointName         = 'Hadr_endpoint' # For some reason the Examples use HADR; but this is what the wizard uses
                     Ensure               = 'Present'
                     Port                 = 5022
                     ServerName           = $node.NodeName
@@ -385,6 +411,20 @@ Configuration WS2012 {
 
                     DependsOn = '[SqlAlwaysOnService]EnableAlwaysOn'
                 }
+
+                SqlServerEndpointPermission 'AddLoginForAGEndpointPermission'
+                {
+                    Ensure               = 'Present'
+                    ServerName           = $node.NodeName
+                    InstanceName         = $node.Role.SqlServer.InstanceName
+                    Name                 = 'Hadr_endpoint'
+                    Principal            = $sqlEngineServiceC1.UserName
+                    Permission           = 'CONNECT'
+        
+                    PsDscRunAsCredential = $localAdministrator
+                    DependsOn = '[SqlServerEndpoint]CreateHadrEndpoint', '[SqlServerLogin]CreateLoginForAG'
+                }
+
 
                 SqlServerPermission 'AddPermissionsForAGMembership'
                 {
@@ -394,6 +434,7 @@ Configuration WS2012 {
                     Principal            = 'NT AUTHORITY\SYSTEM'
                     Permission           = 'AlterAnyAvailabilityGroup', 'ViewServerState'
 
+                    DependsOn = '[SqlSetup]InstallSQLServer'
                     PsDscRunAsCredential = $localAdministrator
                 }
 
@@ -463,10 +504,11 @@ Configuration WS2012 {
                             DependsOn = "[SqlDatabase]CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)"
                         }
 
-                        $completeReplicaList = $AllNodes | Where-Object { $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.NodeName }
+                        $completeReplicaList = $AllNodes | Where-Object { $_.NodeName -ne $node.NodeName -and $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.NodeName }
 
+                        # This won't give you an error if you forget the resource [] part of the ResourceName!
                         WaitForAll 'WaitForAllAGReplicas' {
-                            ResourceName = "AddReplicaToAvailabilityGroup$($node.Role.AvailabilityGroup.Name)"
+                            ResourceName = "[SqlAGReplica]AddReplicaToAvailabilityGroup$($node.Role.AvailabilityGroup.Name)"
                             NodeName = $completeReplicaList
                             RetryCount = 120
                             RetryIntervalSec = 15
@@ -474,6 +516,7 @@ Configuration WS2012 {
                         }
 
                         # This really needs wait for all replicas to be added
+                        # This will give an error if you use MatchDatabaseOwner on SQL 2012
                         SqlAGDatabase "AddDatabaseTo$($node.Role.AvailabilityGroup.Name)"
                         {
                             AvailabilityGroupName   = $node.Role.AvailabilityGroup.Name
@@ -483,11 +526,11 @@ Configuration WS2012 {
                             InstanceName            = $node.Role.SQLServer.InstanceName
                             Ensure                  = 'Present'
                             PsDscRunAsCredential    = $localAdministrator
-                            MatchDatabaseOwner = $true # EXECUTE AS
+                            # MatchDatabaseOwner = $true # EXECUTE AS
                             DependsOn = '[WaitForAll]WaitForAllAGReplicas'
                         }
                     } else {
-                        WaitForAny "WaitFor$($node.Role.AvailabilityGroup.ListenerName)" {
+                        WaitForAll "WaitFor$($node.Role.AvailabilityGroup.ListenerName)" {
                             ResourceName         = "[SqlAGListener]CreateListener$($node.Role.AvailabilityGroup.ListenerName)"
                             NodeName             = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
                             RetryIntervalSec     = 15
@@ -505,7 +548,7 @@ Configuration WS2012 {
                             InstanceName         = $node.Role.SQLServer.InstanceName
                             PrimaryReplicaServerName   = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
                             PrimaryReplicaInstanceName = $node.Role.SQLServer.InstanceName
-                            DependsOn            = "[WaitForAny]WaitFor$($node.Role.AvailabilityGroup.ListenerName)"
+                            DependsOn            = "[WaitForAll]WaitFor$($node.Role.AvailabilityGroup.ListenerName)"
                             PsDscRunAsCredential = $localAdministrator
                         }
                     }
