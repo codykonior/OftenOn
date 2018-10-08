@@ -1,5 +1,3 @@
-# Modify database add to AG with WaitForAll
-# DAC1N1 is being added to the AG but then it's failing on retry because it tries to add it again
 Configuration WS2012 {
     param (
     )
