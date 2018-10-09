@@ -11,7 +11,7 @@ Configuration WS2012 {
     Import-DscResource -ModuleName xDnsServer
     Import-DscResource -ModuleName xRemoteDesktopAdmin
     Import-DscResource -ModuleName xSmbShare
-    Import-DscResource -ModuleName SqlServerDsc
+    Import-DscResource -ModuleName C:\Git\SqlServerDsc
 
     $clusterOrder = @{}
     $availabilityReplicaOrder = @{}
@@ -398,7 +398,7 @@ Configuration WS2012 {
                     DependsOn = '[SqlSetup]InstallSQLServer'
                     PsDscRunAsCredential = $localAdministrator
                 }
-                
+
                 SqlServerEndpoint 'CreateHadrEndpoint'
                 {
                     EndPointName         = 'Hadr_endpoint' # For some reason the Examples use HADR; but this is what the wizard uses
@@ -418,7 +418,7 @@ Configuration WS2012 {
                     Name                 = 'Hadr_endpoint'
                     Principal            = $sqlEngineServiceC1.UserName
                     Permission           = 'CONNECT'
-        
+
                     PsDscRunAsCredential = $localAdministrator
                     DependsOn = '[SqlServerEndpoint]CreateHadrEndpoint', '[SqlServerLogin]CreateLoginForAG'
                 }

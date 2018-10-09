@@ -13,14 +13,8 @@
             )
             Lability_GuestIntegrationServices = $true
 
-            # Encryption information (Lability will translate the environment variable)
-            # The certificate is part of Lability and doesn't change. However if it did change this
-            # is how you'd regenerate the Thumbprint in a script and insert it back.
-            #    $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-            #    $certificate.Import($configurationData.AllNodes[0].CertificateFile)
-            #    $configurationData.AllNodes[0].Thumbprint = $certificate.Thumbprint
-            # Certificate File will be set by script
-            # CertificateFile                 = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer"
+            # Encryption information (the script will translate the environment variable)
+            CertificateFile                   = '$env:ALLUSERSPROFILE\Lability\Certificates\LabClient.cer'
             Thumbprint                        = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
             PSDscAllowDomainUser              = $true
 
@@ -142,7 +136,8 @@
                 @{ Name = 'xDnsServer'; RequiredVersion = '1.11.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; }
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\SqlServer'; }
             )
 
             # Can be included with Lability_Module

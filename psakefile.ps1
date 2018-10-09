@@ -3,6 +3,7 @@ Task default -depends Compile
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+#region Supporting functions
 function ConvertFrom-CIDR {
     [CmdletBinding()]
     param (
@@ -54,16 +55,29 @@ function ConvertTo-CIDR {
         SubnetMask   = $mask.IPAddressToString
     }
 }
+#endregion
 
-# Load configuration data so we can do our own manipulation
+#region Manipulate configuration data encryption information
 $configurationData = Import-PowerShellDataFile -Path C:\Lability\Configurations\WS2012.psd1
 $configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' } | ForEach-Object {
-    $PSItem.CertificateFile = "$env:AllUsersProfile\Lability\Certificates\LabClient.cer"
+    $PSItem.CertificateFile = $PSItem.CertificateFile.Replace('$env:ALLUSERSPROFILE', $env:ALLUSERSPROFILE)
+    $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+    $certificate.Import($PSItem.CertificateFile)
+    $PSItem.Thumbprint = $certificate.Thumbprint
 }
+#endregion
 
-# Lability creates one NIC per entry in a SwitchName array. We also creat a Lability_MACAddress array
-# to assign AdapterName to each NIC as their default names are assigned randomly < Server 2012.
+#region Manipulate configuration data network information
 foreach ($node in $configurationData.AllNodes) {
+    <#
+        Lability creates one NIC for each entry in the Lability_SwitchName array. We put these into a Network
+        array instead so that we have more fine-grained control.
+
+        We use that to populate Lability_SwitchName and Lability_MACAddress which assigns a random MAC. This
+        is used later to match up with the network AdapterName and rename the NIC.
+
+        This must be done because most versions of Windows assign default NIC names in an uncontrolled manner.
+    #>
     if ($node.ContainsKey('Network')) {
         $switchName = @()
         $macAddress = @()
@@ -78,6 +92,10 @@ foreach ($node in $configurationData.AllNodes) {
         $node.Lability_MACAddress = $macAddress
     }
 
+    <#
+        Different xFailoverCluster resources need different combinations of IP, CIDR, and Subnet. This splits
+        out all of the different variations for easy use during configuration.
+    #>
     if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('Cluster')) {
         $node.Role.Cluster.StaticAddress = ConvertFrom-CIDR $node.Role.Cluster.StaticAddress
         $node.Role.Cluster.StaticAddress.Name = "Cluster Network " + ($node.Network | Where-Object { (ConvertFrom-CIDR $_.IPAddress).NetworkID -eq $node.Role.Cluster.StaticAddress.NetworkID }).NetAdapterName + " (Client)"
@@ -85,9 +103,10 @@ foreach ($node in $configurationData.AllNodes) {
         $node.Role.Cluster.IgnoreNetwork.Name = "Cluster Network " + ($node.Network | Where-Object { (ConvertFrom-CIDR $_.IPAddress).NetworkID -eq $node.Role.Cluster.IgnoreNetwork.NetworkID }).NetAdapterName + " (Heartbeat)"
     }
 }
+#endregion
 
+#region Apply a local RDP fix so that it can connect to unpatched RDP servers such as will be in our VMs.
 Task FixRDP {
-    # Fix local RDP client
     if (!(Test-Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP)) {
         New-Item HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP
     }
@@ -96,47 +115,52 @@ Task FixRDP {
     }
     Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters' -Name 'AllowEncryptionOracle' -Value 2 -Type DWord
 }
+#endregion
 
+#region Just compile the MOF resources
 Task Compile {
     . .\WS2012.ps1
     WS2012 -ConfigurationData $configurationData -OutputPath C:\Lability\Configurations
 }
+#endregion
 
-<#
-Task Extract {
-    if (!(Test-Path C:\Lability\Resources\Net-Framework-Core.zip)) {
-        $volume = Mount-DiskImage -Access ReadOnly -StorageType ISO -ImagePath C:\Lability\ISOs\9200.16384.WIN8_RTM.120725-1247_X64FRE_SERVER_EVAL_EN-US-HRM_SSS_X64FREE_EN-US_DV5.ISO -PassThru | Get-Volume
-        Compress-Archive -Path "$($volume.DriveLetter):\Sources\sxs" -DestinationPath C:\Lability\Resources\Net-Framework-Core.zip
-        Dismount-DiskImage -ImagePath C:\Lability\ISOs\9200.16384.WIN8_RTM.120725-1247_X64FRE_SERVER_EVAL_EN-US-HRM_SSS_X64FREE_EN-US_DV5.ISO
-    }
-}
-#>
-
+#region Compile the MOF resources and configure the lab VMs
 Task Build -depends Compile {
     $administrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
     Start-LabConfiguration -ConfigurationData $configurationData -IgnorePendingReboot -Credential $administrator -NoSnapshot
 }
+#endregion
 
+#region Start the lab VMs
 Task Start {
     "Allow at least 15 minutes for the first boot to finish Domain Controller setup"
     Start-Lab -ConfigurationData $configurationData
 }
+#endregion
 
+#region Remove existing VMs, then compile the MOF resources, configure the lab VMs, and start the lab VMs
 Task BuildAll -Depends Clean, Build, Start {
 }
+#endregion
 
+#region Stop the lab VMs
 Task Stop {
     Stop-Lab -ConfigurationData $configurationData -ErrorAction:SilentlyContinue
 }
+#endregion
 
+#region Remove existing VMs
 Task Clean -depends Stop {
     Remove-LabConfiguration -ConfigurationData C:\Lability\Configurations\WS2012.psd1 -ErrorAction:SilentlyContinue -Confirm:$false
     Remove-Item C:\Lability\VMVirtualHardDisks\*
 }
+#endregion
 
+#region Remove existing VMs and also master hard disks so the server OS is rebuilt
 Task CleanAll -depends Clean {
     Remove-Item C:\Lability\MasterVirtualHardDisks\*
 }
+#endregion
 
 <#
 
