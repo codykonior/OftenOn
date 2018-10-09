@@ -3,12 +3,12 @@ Task default -depends Compile
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-#region Supporting functions
+#region Network translation functions
 function ConvertFrom-CIDR {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [ValidateScript({ $_ -match "(.*)\/(\d+)" })]
+        [ValidateScript( { $_ -match "(.*)\/(\d+)" })]
         [string] $IPAddress
     )
 
@@ -21,10 +21,10 @@ function ConvertFrom-CIDR {
     Write-Verbose "IP $ip CIDR $suffix MASK $mask"
 
     @{
-        IPAddress = $ip
-        CIDR = $IPAddress
+        IPAddress  = $ip
+        CIDR       = $IPAddress
         CIDRSuffix = $suffix
-        NetworkID = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
+        NetworkID  = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
         SubnetMask = $mask.IPAddressToString
     }
 }
@@ -48,16 +48,16 @@ function ConvertTo-CIDR {
     $suffix = ($suffix -split "[^1]")[0].Length
 
     @{
-        IPAddres     = $IPAddress
-        CIDR         = "$IPAddress/$suffix"
-        CIDRSuffix   = $suffix
-        NetworkID    = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
-        SubnetMask   = $mask.IPAddressToString
+        IPAddres   = $IPAddress
+        CIDR       = "$IPAddress/$suffix"
+        CIDRSuffix = $suffix
+        NetworkID  = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
+        SubnetMask = $mask.IPAddressToString
     }
 }
 #endregion
 
-#region Manipulate configuration data encryption information
+#region Always-run, manipulate configuration data encryption information
 $configurationData = Import-PowerShellDataFile -Path C:\Lability\Configurations\WS2012.psd1
 $configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' } | ForEach-Object {
     $PSItem.CertificateFile = $PSItem.CertificateFile.Replace('$env:ALLUSERSPROFILE', $env:ALLUSERSPROFILE)
@@ -67,7 +67,7 @@ $configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' } | ForEach-Obj
 }
 #endregion
 
-#region Manipulate configuration data network information
+#region Always-run, manipulate configuration data network information
 foreach ($node in $configurationData.AllNodes) {
     <#
         Lability creates one NIC for each entry in the Lability_SwitchName array. We put these into a Network
@@ -168,23 +168,11 @@ Add node to cluster can have an error which triggers a 15 minute wait.
 Having a WAN causes everything to fail. Confirm one more time, then set NICs to Private instead of Internal.
 
 TODO
-    x Create domain users
-    x Install SQL as Domain
-    Create SQL AG
-        clussvc is no good it seems, for creating an ag
-        x grant view server state to [nt authority\system]
-        x grant alter any availability group to [nt authority\system]
-        ? grant connect endpoint to service account
-        ? grant 5022 firewall access
-        Create database
-        Create AG
-        Add Replicas
-        Create Listener
-
+    Change order of resource processing so SQL gets installed earlier
     Create MSA accounts
-    Add modules SqlServer, DbaTools, Cim, DbData, Jojoba, Error
     Add SecurityPolicyDsc permissions
     Create RDCMan
+    Try adding a WAN card
 
 How to set up WAN routing
     Install-RemoteAccess -VpnType Vpn
