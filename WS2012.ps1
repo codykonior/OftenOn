@@ -2,26 +2,33 @@ Configuration WS2012 {
     param (
     )
 
+    #region Resources
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xPSDesiredStateConfiguration
     Import-DscResource -ModuleName ComputerManagementDsc
     Import-DscResource -ModuleName NetworkingDsc
     Import-DscResource -ModuleName xActiveDirectory
-    Import-DscResource -ModuleName C:\Git\xFailOverCluster
     Import-DscResource -ModuleName xDnsServer
     Import-DscResource -ModuleName xRemoteDesktopAdmin
     Import-DscResource -ModuleName xSmbShare
+    Import-DscResource -ModuleName xSystemSecurity
+    Import-DscResource -ModuleName C:\Git\xFailOverCluster
     Import-DscResource -ModuleName C:\Git\SqlServerDsc
+    #endregion
 
     $clusterOrder = @{}
     $availabilityReplicaOrder = @{}
+    $domainController = @{}
 
     Node $AllNodes.NodeName {
-        $domainAdministrator = New-Object System.Management.Automation.PSCredential('LAB\Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2018!' | ConvertTo-SecureString -AsPlainText -Force))
-        $localAdministrator = New-Object System.Management.Automation.PSCredential('LAB\LocalAdministrator', ('Local2018!' | ConvertTo-SecureString -AsPlainText -Force))
-        $sqlEngineServiceC1 = New-Object System.Management.Automation.PSCredential('LAB\SQLEngineServiceC1', ('Engine2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2018!' | ConvertTo-SecureString -AsPlainText -Force))
 
+        # These starting blocks don't have dependencies
+
+        #region Local Configuration Manager settings
         LocalConfigurationManager {
             RebootNodeIfNeeded   = $true
             AllowModuleOverwrite = $true
@@ -31,9 +38,10 @@ Configuration WS2012 {
             ConfigurationMode    = 'ApplyOnly'
             ConfigurationModeFrequencyMins = 15
         }
+        #endregion
 
-        # Windows will cache "not found" results for 15 minutes which slows down configurations
-        # that check for a Cluster being alive, so we disable caching
+        #region Registry settings useful in a lab
+        # Stop Windows from caching "not found" DNS requests (defaults at 15 minutes) because it slows down DSC WaitForX
         Registry 'DisableNegativeCacheTtl' {
             Ensure = 'Present'
             Key = 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters'
@@ -42,8 +50,7 @@ Configuration WS2012 {
             ValueType = 'DWord'
         }
 
-        # Windows cycles machine passwords in a domain which prevents you from restoring a
-        # snapshot older than 30 days, so we disable this
+        # Stop Windows from cycling machine passwors in a domain that prevent snapshots > 30 days old from booting
         Registry 'DisableMachineAccountPasswordChange' {
             Ensure = 'Present'
             Key = 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters'
@@ -51,46 +58,87 @@ Configuration WS2012 {
             ValueData = '1'
             ValueType = 'DWord'
         }
+        #endregion
 
-        # Enable ping requests and incoming Remote Desktop
+        #region Enable Remote Desktop
+        # Enable the service
+        xRemoteDesktopAdmin 'EnableRemoteDesktopService' {
+            Ensure             = 'Present'
+            UserAuthentication = 'NonSecure'
+        }
+
+        # Enable firewall exceptions
         foreach ($firewallRule in @('FPS-ICMP4-ERQ-In', 'FPS-ICMP6-ERQ-In', 'RemoteDesktop-UserMode-In-TCP', 'RemoteDesktop-UserMode-In-UDP')) {
-            # In current versions of DSC you can pass a built-in rule name and enable it without
-            # specifying all of the other details
-            Firewall "EnableFirewallRule$($firewallRule.Replace('-', ''))" {
+            # In current versions of DSC you can pass a built-in rule name and enable it without specifying all of the other details
+            Firewall "Enable$($firewallRule.Replace('-', ''))" {
                 Name    = $firewallRule
                 Ensure  = 'Present'
                 Enabled = 'True'
             }
         }
 
-        # Enable Remote Desktop
-        xRemoteDesktopAdmin 'EnableRemoteDesktop' {
-            Ensure             = 'Present'
-            UserAuthentication = 'NonSecure'
-        }
-
-        # Enable windows features
-        $windowsFeatures = 'RSAT-AD-Tools', 'RSAT-AD-PowerShell', 'RSAT-Clustering', 'RSAT-Clustering-CmdInterface', 'RSAT-DNS-Server', 'RSAT-RemoteAccess'
-        if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('DomainController')) {
-            $windowsFeatures += 'AD-Domain-Services', 'DNS', 'Routing'
-        }
-        if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('Cluster')) {
-            $windowsFeatures += 'Failover-Clustering'
-        }
-
-        foreach ($windowsFeature in $windowsFeatures) {
-            WindowsFeature "AddWindowsFeature$($windowsFeature.Replace('-', ''))" {
-                Ensure = 'Present'
-                Name   = $windowsFeature
+        # Bulk-enable firewall exceptions for File and Printer sharing (needed to RDP from your host)
+        Script 'EnableFileAndPrinterSharing' {
+            GetScript = {
+                if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
+                    @{ Result = "false"; }
+                } else {
+                    @{ Result = "true"; }
+                }
+            }
+            TestScript = {
+                if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
+                    $false
+                } else {
+                    $true
+                }
+            }
+            SetScript = {
+                Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' } | Set-NetFirewallRule -Enabled True
             }
         }
+        #endregion
 
-        # Define each network adapter name, IP address, default gateway address, DNS server address, and DNS connection suffix
+        #region Add a C:\Temp
+        File 'CreateTempDirectory' {
+            DestinationPath = 'C:\Temp'
+            Ensure = 'Present'
+            Type = 'Directory'
+        }
+
+        xFileSystemAccessRule 'GrantAccessToLocalTempFolder' {
+            Path = 'C:\Temp'
+            Identity = 'EVERYONE'
+            Rights = @('FullControl')
+            DependsOn = '[File]CreateTempDirectory'
+        }
+        #endregion
+
+        #region Add basic Windows features depending on Role
+        $windowsFeatures = 'RSAT-AD-Tools', 'RSAT-AD-PowerShell', 'RSAT-Clustering', 'RSAT-Clustering-CmdInterface', 'RSAT-DNS-Server', 'RSAT-RemoteAccess'
+        if ($node.ContainsKey('Role')) {
+            if ($node.Role.ContainsKey('DomainController')) {
+                $windowsFeatures += 'AD-Domain-Services', 'DNS', 'Routing'
+            }
+            if ($node.Role.ContainsKey('Cluster')) {
+                $windowsFeatures += 'Failover-Clustering'
+            }
+        }
+        WindowsFeatureSet "All" {
+            Name   = $windowsFeatures
+            Ensure = 'Present'
+        }
+        #endregion
+        #       ^-- DependsOn 'WindowsFeatureSet[All]'
+
+        # More complex dependency chains start here
+
+        #region Rename network adapters and configure settings
         if ($node.ContainsKey('Network')) {
             for ($i = 0; $i -lt $node.Network.Count; $i++) {
                 $network = $node.Network[$i]
 
-                NetAdapterName "RenameNetAdapterName$($network.NetAdapterName)" {
+                NetAdapterName "Rename$($network.NetAdapterName)" {
                     NewName = $network.NetAdapterName
                     MacAddress = $node.Lability_MACAddress[$i].Replace(':', '-')
                 }
@@ -100,7 +148,7 @@ Configuration WS2012 {
                         AddressFamily = 'IPv4'
                         InterfaceAlias = $network.NetAdapterName
                         IPAddress = $network.IPAddress
-                        DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
+                        DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
                     }
                 }
 
@@ -109,7 +157,7 @@ Configuration WS2012 {
                         AddressFamily = 'IPv4'
                         InterfaceAlias = $network.NetAdapterName
                         Address = $network.DefaultGatewayAddress
-                        DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
+                        DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
                     }
                 }
 
@@ -118,31 +166,35 @@ Configuration WS2012 {
                         AddressFamily  = 'IPv4'
                         InterfaceAlias = $network.NetAdapterName
                         Address        = $network.DnsServerAddress
-                        DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
+                        DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
                     }
                 }
 
                 DnsConnectionSuffix "SetDnsConnectionSuffix$($network.NetAdapterName)" {
                     InterfaceAlias           = $network.NetAdapterName
-                    ConnectionSpecificSuffix = $node.DomainName
-                    DependsOn = "[NetAdapterName]RenameNetAdapterName$($network.NetAdapterName)"
+                    ConnectionSpecificSuffix = $node.FullyQualifiedDomainName
+                    DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
                 }
             }
         }
+        #endregion
+        #       ^-- DependsOn "[NetAdapterName]Rename$($network.NetAdapterName)"
 
-        File 'CreateTempDirectory' {
-            DestinationPath = 'C:\Temp'
-            Ensure = 'Present'
-            Type = 'Directory'
-        }
-
+        #region Active Directory
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('DomainController')) {
-                Computer 'RenameComputer' {
+                $domainController.$($node.DomainName) = $node.NodeName
+
+                # These execute in sequence
+
+                #region Rename the computer
+                Computer 'Rename' {
                     Name = $node.NodeName
                 }
+                #endregion
 
-                Script 'SetNetIPInterfaceForwardingEnabled' {
+                #region Enable subnet routing on the Domain Controller
+                Script 'EnableRouting' {
                     GetScript = {
                         if (Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' }) {
                             @{ Result = "false"; }
@@ -161,112 +213,104 @@ Configuration WS2012 {
                         Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' } | Set-NetIPInterface -Forwarding Enabled
                     }
 
-                    DependsOn      = '[Computer]RenameComputer'
+                    DependsOn      = '[Computer]Rename'
                 }
+                #endregion
 
-                xADDomain 'CreateDomain' {
-                    DomainName                    = $node.DomainName
+                #region Create Domain
+                xADDomain 'Create' {
+                    DomainName                    = $node.FullyQualifiedDomainName
                     DomainAdministratorCredential = $domainAdministrator
                     SafemodeAdministratorPassword = $safemodeAdministrator
 
-                    DependsOn                     = '[WindowsFeature]AddWindowsFeatureADDomainServices'
+                    DependsOn                     = '[WindowsFeatureSet]All', '[Script]EnableRouting'
                 }
+                #endregion
 
-                xADUser "CreateSQLEngineServiceC1User" {
-                    DomainName  = $node.DomainName
-                    UserName    = 'SQLEngineServiceC1'
-                    Description = 'SQL Engine for Cluster 1'
-                    Password    = $sqlEngineServiceC1
+                #region Create Users/Groups
+                xADUser 'CreateUserSQLEngineService' {
+                    DomainName  = $node.FullyQualifiedDomainName
+                    UserName    = $sqlEngineService.UserName
+                    Description = 'SQL Engine Service'
+                    Password    = $sqlEngineService
                     Ensure      = 'Present'
-                    DependsOn   = '[xADDomain]CreateDomain'
+                    DependsOn   = '[xADDomain]Create'
                 }
 
-                xADUser "CreateLocalAdministratorUser" {
-                    DomainName  = $node.DomainName
-                    UserName    = 'LocalAdministrator'
+                xADUser "CreateLocalAdministrator" {
+                    DomainName  = $node.FullyQualifiedDomainName
+                    UserName    = $localAdministrator.UserName
                     Description = 'Local Administrator'
                     Password    = $localAdministrator
                     Ensure      = 'Present'
-                    DependsOn   = '[xADDomain]CreateDomain'
+                    DependsOn   = '[xADDomain]Create'
                 }
+                #endregion
 
-                # Define a share with all of our Lability_Resources so clients can use them for installs
-                xSmbShare 'AddResourceShare' {
+                #region Create a Resources and Temp share on the Domain Controller for other VMs to use
+                xSmbShare 'CreateResources' {
                     Name = 'Resources'
                     Ensure = 'Present'
 
                     Path = 'C:\Resources'
                     ReadAccess = 'Everyone'
 
-                    DependsOn = '[xADDomain]CreateDomain'
+                    DependsOn = '[xADDomain]Create'
                 }
 
-                xSmbShare 'AddTempShare' {
+                xSmbShare 'CreateTemp' {
                     Name = 'Temp'
                     Ensure = 'Present'
 
                     Path = 'C:\Temp'
                     FullAccess = 'Everyone'
 
-                    DependsOn = '[xADDomain]CreateDomain'
+                    DependsOn = '[xADDomain]Create'
                 }
-            } else {
-                xWaitForADDomain 'WaitForCreateDomain' {
-                    DomainName           = $node.DomainName
+                #endregion
+            } elseif ($node.Role.ContainsKey('DomainMember')) {
+                #region Wait for Active Directory
+                xWaitForADDomain 'Create' {
+                    DomainName           = $node.FullyQualifiedDomainName
                     DomainUserCredential = $domainAdministrator
                     # 30 Minutes
                     RetryIntervalSec     = 15
                     RetryCount           = 120
                 }
+                #endregion
 
-                Computer 'RenameComputer' {
+                #region Rename computer (while joining to Active Directory)
+                Computer 'Rename' {
                     Name       = $node.NodeName
-                    DomainName = $node.DomainName
+                    DomainName = $node.FullyQualifiedDomainName
                     Credential = $domainAdministrator
-                    DependsOn  = '[xWaitForADDomain]WaitForCreateDomain'
+                    DependsOn  = '[xWaitForADDomain]Create'
                 }
-            }
+                #endregion
 
-            WaitForAll "WaitForLocalAdministratorUser" {
-                ResourceName = '[xADUser]CreateLocalAdministratorUser'
-                NodeName = 'CHDC1'
+                #region Add LocalAdministrator to Administrators Group
+                WaitForAll "CreateLocalAdministrator" {
+                    ResourceName = '[xADUser]CreateLocalAdministrator'
+                    NodeName = $domainController.$($node.DomainName)
 
-                # 30 Minutes
-                RetryIntervalSec = 15
-                RetryCount       = 120
-            }
-
-            Group 'AddLocalAdministratorToAdministrators' {
-                GroupName = 'Administrators'
-                # Credential = $domainAdministrator
-                Ensure = 'Present'
-                MembersToInclude = $localAdministrator.UserName
-                DependsOn = '[WaitForAll]WaitForLocalAdministratorUser'
-            }
-
-            # Despite the name, this is required to allow you to RDP to the server from your host (except for DC where it just works)
-            # This seems to happen by sudden replies to the computer name with an accessible IPv6 address
-            Script 'EnableFileAndPrinterSharing' {
-                GetScript = {
-                    if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
-                        @{ Result = "false"; }
-                    } else {
-                        @{ Result = "true"; }
-                    }
-                }
-                TestScript = {
-                    if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
-                        $false
-                    } else {
-                        $true
-                    }
-                }
-                SetScript = {
-                    Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' } | Set-NetFirewallRule -Enabled True
+                    # 30 Minutes
+                    RetryIntervalSec = 15
+                    RetryCount       = 120
                 }
 
-                DependsOn      = '[Computer]RenameComputer'
+                Group 'AddLocalAdministratorToAdministratorsGroup' {
+                    GroupName = 'Administrators'
+                    Ensure = 'Present'
+                    MembersToInclude = $localAdministrator.UserName
+                    DependsOn = '[WaitForAll]CreateLocalAdministrator'
+                }
+                #endregion
             }
+        }
+        #endregion
+
+        #region Clustering
+        if ($node.ContainsKey("Role")) {
             if ($node.Role.ContainsKey('Cluster')) {
                 $cluster = $node.Role.Cluster
                 $clusterStaticAddress = $cluster.StaticAddress
@@ -280,7 +324,7 @@ Configuration WS2012 {
                         StaticIPAddress               = $clusterStaticAddress.CIDR
                         IgnoreNetwork                 = $clusterIgnoreNetwork.CIDR
                         # If RSAT-Clustering is not installed the cluster can not be created
-                        DependsOn                     = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
+                        DependsOn                     = '[WindowsFeatureSet]All', '[Computer]Rename'
                     }
                 } else {
                     WaitForAll "WaitForCluster$($cluster.Name)" {
@@ -292,7 +336,7 @@ Configuration WS2012 {
                         RetryCount       = 120
 
                         # If RSAT-Clustering is not installed the cluster can not be created
-                        DependsOn        = '[WindowsFeature]AddWindowsFeatureFailoverClustering', '[WindowsFeature]AddWindowsFeatureRSATClustering', '[Computer]RenameComputer'
+                        DependsOn        = '[WindowsFeatureSet]All', '[Computer]Rename'
                     }
 
                     xCluster "AddNodeToCluster$($cluster.Name)" {
@@ -357,14 +401,18 @@ Configuration WS2012 {
                     DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
                 }
             }
+        }
+        #endregion
 
+        #region SQL Server
+        if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('SqlServer')) {
                 SqlSetup 'InstallSQLServer' {
                     InstanceName = $node.Role.SqlServer.InstanceName
                     Action = 'Install'
                     SourcePath = $node.Role.SqlServer.SourcePath
                     Features = $node.Role.SqlServer.Features
-                    SQLSvcAccount = $sqlEngineServiceC1
+                    SQLSvcAccount = $sqlEngineService
                     SQLSysAdminAccounts = $localAdministrator.UserName
                     UpdateEnabled = 'False'
 
@@ -393,7 +441,7 @@ Configuration WS2012 {
                     Ensure               = 'Present'
                     ServerName           = $node.NodeName
                     InstanceName         = $node.Role.SqlServer.InstanceName
-                    Name                 = $sqlEngineServiceC1.UserName
+                    Name                 = $sqlEngineService.UserName
 
                     DependsOn = '[SqlSetup]InstallSQLServer'
                     PsDscRunAsCredential = $localAdministrator
@@ -416,7 +464,7 @@ Configuration WS2012 {
                     ServerName           = $node.NodeName
                     InstanceName         = $node.Role.SqlServer.InstanceName
                     Name                 = 'Hadr_endpoint'
-                    Principal            = $sqlEngineServiceC1.UserName
+                    Principal            = $sqlEngineService.UserName
                     Permission           = 'CONNECT'
 
                     PsDscRunAsCredential = $localAdministrator
@@ -515,8 +563,7 @@ Configuration WS2012 {
 
                         # This really needs wait for all replicas to be added
                         # This will give an error if you use MatchDatabaseOwner on SQL 2012
-                        SqlAGDatabase "AddDatabaseTo$($node.Role.AvailabilityGroup.Name)"
-                        {
+                        SqlAGDatabase "AddDatabaseTo$($node.Role.AvailabilityGroup.Name)" {
                             AvailabilityGroupName   = $node.Role.AvailabilityGroup.Name
                             BackupPath              = '\\CHDC1\Temp' # TODO: Remove this
                             DatabaseName            = "Dummy$($node.Role.AvailabilityGroup.Name)"
@@ -554,5 +601,6 @@ Configuration WS2012 {
                 }
             }
         }
+        #endregion
     }
 }

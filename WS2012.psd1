@@ -18,7 +18,8 @@
             Thumbprint                        = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
             PSDscAllowDomainUser              = $true
 
-            DomainName                        = 'lab.com'
+            FullyQualifiedDomainName          = 'lab.com'
+            DomainName                        = 'LAB'
         }
 
         @{
@@ -54,6 +55,7 @@
             )
 
             Role               = @{
+                DomainMember = @{ }
                 Cluster =   @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; }
@@ -69,6 +71,7 @@
             )
 
             Role     = @{
+                DomainMember = @{ }
                 Cluster = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; }
@@ -84,6 +87,7 @@
             )
 
             Role     = @{
+                DomainMember = @{ }
                 Cluster =   @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; }
@@ -99,6 +103,7 @@
             )
 
             Role     = @{
+                DomainMember = @{ }
                 Cluster =   @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.2.31/255.255.255.0'; }
@@ -114,6 +119,7 @@
             )
 
             Role     = @{
+                DomainMember = @{ }
                 Cluster =   @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
                 SqlServer = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC1\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.2.31/255.255.255.0'; }
@@ -130,12 +136,12 @@
                 @{ Name = 'ComputerManagementDsc'; RequiredVersion = '5.2.0.0'; }
                 @{ Name = 'NetworkingDsc'; RequiredVersion = '6.1.0.0'; }
                 @{ Name = 'xActiveDirectory'; RequiredVersion = '2.21.0.0'; }
-                # The version on PowerShellGallery is too old, we need > 1.10.0.0
-                # @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\DscResources\xDscResources\xFailOverCluster'; }
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\xFailOverCluster'; }
                 @{ Name = 'xDnsServer'; RequiredVersion = '1.11.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
+                @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
+                # @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\DscResources\xDscResources\xFailOverCluster'; }
+                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\xFailOverCluster'; }
                 # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; }
                 @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\SqlServer'; }
             )
