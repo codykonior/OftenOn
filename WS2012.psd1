@@ -143,7 +143,7 @@
                 # @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\DscResources\xDscResources\xFailOverCluster'; }
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\xFailOverCluster'; }
                 # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; }
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\SqlServer'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\SqlServerDsc'; }
             )
 
             # Can be included with Lability_Module
