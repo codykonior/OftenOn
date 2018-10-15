@@ -25,8 +25,8 @@ Configuration WS2012 {
         $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2018!' | ConvertTo-SecureString -AsPlainText -Force))
         # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @lab.com
-        $localAdministrator = New-Object System.Management.Automation.PSCredential("LocalAdministrator", ('Local2018!' | ConvertTo-SecureString -AsPlainText -Force))
-        $sqlEngineService = New-Object System.Management.Automation.PSCredential("SQLEngineService", ('Engine2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2018!' | ConvertTo-SecureString -AsPlainText -Force))
 
         # These starting blocks don't have dependencies
 
@@ -233,7 +233,7 @@ Configuration WS2012 {
                 xADUser 'CreateUserSQLEngineService' {
                     # Make sure the UserName is a straight username because the DSC adds @DomainName onto the end.
                     DomainName  = $node.FullyQualifiedDomainName
-                    UserName    = $sqlEngineService.UserName
+                    UserName    = ($sqlEngineService.UserName -split '\\')[1]
                     Description = 'SQL Engine Service'
                     Password    = $sqlEngineService
                     Ensure      = 'Present'
@@ -242,7 +242,7 @@ Configuration WS2012 {
 
                 xADUser "CreateLocalAdministrator" {
                     DomainName  = $node.FullyQualifiedDomainName
-                    UserName    = $localAdministrator.UserName
+                    UserName    = ($localAdministrator.UserName -split '\\')[1]
                     Description = 'Local Administrator'
                     Password    = $localAdministrator
                     Ensure      = 'Present'
