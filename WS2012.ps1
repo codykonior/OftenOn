@@ -4,7 +4,6 @@ Configuration WS2012 {
 
     #region Resources
     Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName xPSDesiredStateConfiguration
     Import-DscResource -ModuleName ComputerManagementDsc
     Import-DscResource -ModuleName NetworkingDsc
     Import-DscResource -ModuleName xActiveDirectory
@@ -14,6 +13,8 @@ Configuration WS2012 {
     Import-DscResource -ModuleName xSystemSecurity
     Import-DscResource -ModuleName C:\Git\xFailOverCluster
     Import-DscResource -ModuleName C:\Git\SqlServerDsc
+    Import-DscResource -ModuleName C:\Git\xPSDesiredStateConfiguration
+    Import-DscResource -ModuleName xWinEventLog
     #endregion
 
     $clusterOrder = @{}
@@ -43,6 +44,19 @@ Configuration WS2012 {
         #endregion
 
         #region Registry settings useful in a lab
+
+        #region Enable DSC logging
+        xWinEventLog "EnableDSCAnalyticLog" {
+            LogName = "Microsoft-Windows-DSC/Analytic"
+            IsEnabled = $true
+        }
+
+        xWinEventLog "EnableDSCDebugLog" {
+            LogName = "Microsoft-Windows-DSC/Debug"
+            IsEnabled = $true
+        }
+        #endregion
+
         # Stop Windows from caching "not found" DNS requests (defaults at 15 minutes) because it slows down DSC WaitForX
         Registry 'DisableNegativeCacheTtl' {
             Ensure = 'Present'
@@ -120,10 +134,13 @@ Configuration WS2012 {
         $windowsFeatures = 'RSAT-AD-Tools', 'RSAT-AD-PowerShell', 'RSAT-Clustering', 'RSAT-Clustering-CmdInterface', 'RSAT-DNS-Server', 'RSAT-RemoteAccess'
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('DomainController')) {
-                $windowsFeatures += 'AD-Domain-Services', 'DNS', 'Routing'
+                $windowsFeatures += 'AD-Domain-Services', 'DNS'
             }
             if ($node.Role.ContainsKey('Cluster')) {
                 $windowsFeatures += 'Failover-Clustering'
+            }
+            if ($node.Role.ContainsKey('Router')) {
+                $windowsFeatures += 'Routing'
             }
         }
         WindowsFeatureSet "All" {
@@ -182,19 +199,8 @@ Configuration WS2012 {
         #endregion
         #       ^-- DependsOn "[NetAdapterName]Rename$($network.NetAdapterName)"
 
-        #region Active Directory
         if ($node.ContainsKey('Role')) {
-            if ($node.Role.ContainsKey('DomainController')) {
-                $domainController.$($node.DomainName) = $node.NodeName
-
-                # These execute in sequence
-
-                #region Rename the computer
-                Computer 'Rename' {
-                    Name = $node.NodeName
-                }
-                #endregion
-
+            if ($node.Role.ContainsKey('Router')) {
                 #region Enable subnet routing on the Domain Controller
                 Script 'EnableRouting' {
                     GetScript = {
@@ -215,7 +221,22 @@ Configuration WS2012 {
                         Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' } | Set-NetIPInterface -Forwarding Enabled
                     }
 
-                    DependsOn      = '[Computer]Rename'
+                    # DependsOn      = '[Computer]Rename'
+                }
+                #endregion
+            }
+        }
+
+        #region Active Directory
+        if ($node.ContainsKey('Role')) {
+            if ($node.Role.ContainsKey('DomainController')) {
+                $domainController.$($node.DomainName) = $node.NodeName
+
+                # These execute in sequence
+
+                #region Rename the computer
+                Computer 'Rename' {
+                    Name = $node.NodeName
                 }
                 #endregion
 
@@ -225,7 +246,15 @@ Configuration WS2012 {
                     DomainAdministratorCredential = $domainAdministrator
                     SafemodeAdministratorPassword = $safemodeAdministrator
 
-                    DependsOn                     = '[WindowsFeatureSet]All', '[Script]EnableRouting'
+                    DependsOn                     = '[WindowsFeatureSet]All'
+                }
+                #endregion
+
+                #region Disable DNS forwarding, this stops other machines from resolving internet addresses
+                xDnsServerSetting 'DisableDnsForwarding' {
+                    Name = 'DNS'
+                    NoRecursion = $true
+                    DependsOn = '[xADDomain]Create'
                 }
                 #endregion
 
@@ -273,6 +302,11 @@ Configuration WS2012 {
                 #endregion
             } elseif ($node.Role.ContainsKey('DomainMember')) {
                 #region Wait for Active Directory
+                # If you don't have a WAN link, the fully qualified domain name works here
+                # and in the computer rename. If you do have a WAN link and disable forwarding
+                # then you MUST use the short domain name otherwise the domain isn't found.
+                # However it will then break. So not being able to use a full one indicates
+                # another issue in your setpu.
                 xWaitForADDomain 'Create' {
                     DomainName           = $node.FullyQualifiedDomainName
                     DomainUserCredential = $domainAdministrator
@@ -605,5 +639,52 @@ Configuration WS2012 {
             }
         }
         #endregion
+
+        #region Workstation
+        if ($node.ContainsKey('Role')) {
+            if ($node.Role.ContainsKey('Workstation')) {
+                $resourceLocation = "\\$($domainController.$($node.DomainName))\Resources"
+
+                Script 'NetFx472' {
+                    GetScript = {
+                        Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
+
+                        $release = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' 'Release' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Release
+                        @{ Result = "$release"; }
+                    }
+                    TestScript = {
+                        Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
+
+                        $release = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' 'Release' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Release
+                        if ($release -and $release -ge 461814) {
+                            $true
+                        } else {
+                            $false
+                        }
+                    }
+                    SetScript = {
+                        Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
+
+                        # If you don't use -NoNewWindow it will hang with an Open File - Security Warning
+                        $result = Start-Process -FilePath "$using:resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe" -ArgumentList '/quiet' -PassThru -Wait -NoNewWindow
+                        if ($result.ExitCode -in @(1641, 3010)) {
+                            $global:DSCMachineStatus = 1
+                        } elseif ($result.ExitCode -ne 0) {
+                            Write-Error "Installation failed with exit code $($result.ExitCode)"
+                        } else {
+                            Write-Verbose "Installation succeeded"
+                        }
+                    }
+                }
+
+                xPackage 'SSMS179' {
+                    Name = 'SSMS179'
+                    Path = "$resourceLocation\SSMS-Setup-ENU.exe"
+                    ProductId = 'a0010c7f-d2e9-486b-a658-a1a1106847da'
+                    Arguments = '/install /quiet'
+                    DependsOn  = '[Script]NetFx472'
+                }
+            }
+        }
     }
 }

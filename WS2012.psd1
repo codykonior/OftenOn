@@ -27,12 +27,7 @@
 
             # Script will add Lability_SwitchName @() and Lability_MACAddress @()
             Network            = @(
-                @{ SwitchName = 'CHICAGO';    NetAdapterName = 'CHICAGO';    IPAddress = '10.0.0.1/24';  DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.1/24';  DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.1/24'; DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'DALLAS';     NetAdapterName = 'DALLAS';     IPAddress = '10.0.2.1/24';  DnsServerAddress = '127.0.0.1'; }
-                @{ SwitchName = 'DALLAS_HB';  NetAdapterName = 'DALLAS_HB';  IPAddress = '10.0.12.1/24'; DnsServerAddress = '127.0.0.1'; }
-                # @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; }
+                @{ SwitchName = 'CHICAGO';    NetAdapterName = 'CHICAGO';    IPAddress = '10.0.0.2/24';  DnsServerAddress = '127.0.0.1'; DefaultGatewayAddress = "10.0.0.1"; }
             )
 
             Lability_Resource  = @(
@@ -46,12 +41,47 @@
         }
 
         @{
+            NodeName = 'ROUTER'
+            Lability_BootOrder = 2
+
+            Network            = @(
+                @{ SwitchName = 'CHICAGO';    NetAdapterName = 'CHICAGO';    IPAddress = '10.0.0.1/24';  DnsServerAddress = '10.0.0.2'; }
+                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.1/24';  DnsServerAddress = '10.0.0.2'; }
+                @{ SwitchName = 'DALLAS';     NetAdapterName = 'DALLAS';     IPAddress = '10.0.2.1/24';  DnsServerAddress = '10.0.0.2'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.1/24'; } # DnsServerAddress = '127.0.0.1'; }
+                @{ SwitchName = 'DALLAS_HB';  NetAdapterName = 'DALLAS_HB';  IPAddress = '10.0.12.1/24'; } # DnsServerAddress = '127.0.0.1'; }
+
+                # If the Dns isn't set then this will break all the other servers and stop them from querying, unless recursive DNS is disabled
+                @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; } # DnsServerAddress = '127.0.0.1'; }
+            )
+
+            Role               = @{
+                DomainMember = @{ }
+                Router = @{ }
+            }
+        }
+
+        @{
+            NodeName           = 'WORK01'
+            Lability_BootOrder = 2
+
+            Network            = @(
+                @{ SwitchName = 'CHICAGO';    NetAdapterName = 'CHICAGO';    IPAddress = '10.0.0.3/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.0.1'; }
+            )
+
+            Role               = @{
+                DomainMember = @{ }
+                Workstation = @{ }
+            }
+        }
+
+        @{
             NodeName           = 'SEC1N1'
             Lability_BootOrder = 2
 
             Network            = @(
-                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.11/24';  DnsServerAddress = '10.0.1.1';  DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.11/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.11/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.11/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role               = @{
@@ -66,8 +96,8 @@
             NodeName = 'SEC1N2'
 
             Network  = @(
-                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.12/24';  DnsServerAddress = '10.0.1.1';  DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.12/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.12/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.12/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role     = @{
@@ -82,8 +112,8 @@
             NodeName = 'SEC1N3'
 
             Network  = @(
-                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.13/24';  DnsServerAddress = '10.0.1.1';  DefaultGatewayAddress = '10.0.1.1'; }
-                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.13/24'; DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+                @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.13/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.13/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
             Role     = @{
@@ -98,8 +128,8 @@
             NodeName = 'DAC1N1'
 
             Network  = @(
-                @{ SwitchName = 'DALLAS';    NetAdapterName = 'DALLAS';    IPAddress = '10.0.2.11/24';  DnsServerAddress = '10.0.2.1';  DefaultGatewayAddress = '10.0.2.1'; }
-                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.11/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
+                @{ SwitchName = 'DALLAS';    NetAdapterName = 'DALLAS';    IPAddress = '10.0.2.11/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.11/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
             Role     = @{
@@ -114,8 +144,8 @@
             NodeName = 'DAC1N2'
 
             Network  = @(
-                @{ SwitchName = 'DALLAS';    NetAdapterName = 'DALLAS';    IPAddress = '10.0.2.12/24';  DnsServerAddress = '10.0.2.1';  DefaultGatewayAddress = '10.0.2.1'; }
-                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.12/24'; DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
+                @{ SwitchName = 'DALLAS';    NetAdapterName = 'DALLAS';    IPAddress = '10.0.2.12/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.12/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
             Role     = @{
@@ -132,7 +162,6 @@
             DSCResource = @(
                 # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
                 # will hang because DSC doesn't complete.
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; }
                 @{ Name = 'ComputerManagementDsc'; RequiredVersion = '5.2.0.0'; }
                 @{ Name = 'NetworkingDsc'; RequiredVersion = '6.1.0.0'; }
                 @{ Name = 'xActiveDirectory'; RequiredVersion = '2.21.0.0'; }
@@ -144,6 +173,9 @@
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\xFailOverCluster'; }
                 # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; }
                 @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\SqlServerDsc'; }
+                # @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\xPSDesiredStateConfiguration'; }
+                @{ Name = 'xWinEventLog'; RequiredVersion = '1.2.0.0'; }
             )
 
             # Can be included with Lability_Module
@@ -193,8 +225,6 @@
                     )
                     CustomData      = @{
                         CustomBootStrap = @(
-                            # Similar to the below, but, this doesn't work well in DSC (throws errors)
-                            # 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine -Force -ErrorAction SilentlyContinue;'
                             'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306'
                         )
                         WindowsOptionalFeature = @(
