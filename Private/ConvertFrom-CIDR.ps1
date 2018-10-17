@@ -15,7 +15,7 @@ function ConvertFrom-CIDR {
     Write-Verbose "IP $ip CIDR $suffix MASK $mask"
 
     @{
-        IPAddress  = $ip
+        IPAddress  = $ip.ToString()
         CIDR       = $IPAddress
         CIDRSuffix = $suffix
         NetworkID  = ([IPAddress] ($ip.Address -band $mask.Address)).IPAddressToString
