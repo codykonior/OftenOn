@@ -9,6 +9,6 @@ function Remove-OftenOnLab {
     # Remove-Item C:\Lability\VMVirtualHardDisks\*
 
     if ($MasterVirtualHardDisk) {
-        Remove-Item C:\Lability\MasterVirtualHardDisks\*
+        Remove-Item "$((Get-LabHostDefault).ParentVhdPath)\*.*"
     }
 }
