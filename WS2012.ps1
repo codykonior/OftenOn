@@ -76,78 +76,14 @@ Configuration WS2012 {
 
         # More complex dependency chains start here
 
-        #region Rename network adapters and configure settings
-        if ($node.ContainsKey('Network')) {
-            for ($i = 0; $i -lt $node.Network.Count; $i++) {
-                $network = $node.Network[$i]
-
-                NetAdapterName "Rename$($network.NetAdapterName)" {
-                    NewName = $network.NetAdapterName
-                    MacAddress = $node.Lability_MACAddress[$i].Replace(':', '-')
-                }
-
-                if ($network.ContainsKey('IPAddress')) {
-                    IPAddress "SetIPAddress$($network.NetAdapterName)" {
-                        AddressFamily = 'IPv4'
-                        InterfaceAlias = $network.NetAdapterName
-                        IPAddress = $network.IPAddress
-                        DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
-                    }
-                }
-
-                if ($network.ContainsKey('DefaultGatewayAddress')) {
-                    DefaultGatewayAddress "SetDefaultGatewayAddress$($network.NetAdapterName)" {
-                        AddressFamily = 'IPv4'
-                        InterfaceAlias = $network.NetAdapterName
-                        Address = $network.DefaultGatewayAddress
-                        DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
-                    }
-                }
-
-                if ($network.ContainsKey('DnsServerAddress')) {
-                    DnsServerAddress "SetDnsServerAddress$($network.NetAdapterName)" {
-                        AddressFamily  = 'IPv4'
-                        InterfaceAlias = $network.NetAdapterName
-                        Address        = $network.DnsServerAddress
-                        DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
-                    }
-                }
-
-                DnsConnectionSuffix "SetDnsConnectionSuffix$($network.NetAdapterName)" {
-                    InterfaceAlias           = $network.NetAdapterName
-                    ConnectionSpecificSuffix = $node.FullyQualifiedDomainName
-                    DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
-                }
-            }
+        ooNetwork 'RenameNetworks' {
+            Node = $node     
         }
-        #endregion
-        #       ^-- DependsOn "[NetAdapterName]Rename$($network.NetAdapterName)"
 
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('Router')) {
-                #region Enable subnet routing on the Domain Controller
-                Script 'EnableRouting' {
-                    GetScript = {
-                        if (Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' }) {
-                            @{ Result = "false"; }
-                        } else {
-                            @{ Result = "true"; }
-                        }
-                    }
-                    TestScript = {
-                        if (Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' }) {
-                            $false
-                        } else {
-                            $true
-                        }
-                    }
-                    SetScript = {
-                        Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' } | Set-NetIPInterface -Forwarding Enabled
-                    }
-
-                    # DependsOn      = '[Computer]Rename'
+                ooRouter 'EnableRouter' {                    
                 }
-                #endregion
             }
         }
 
