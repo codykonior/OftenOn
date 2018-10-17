@@ -15,6 +15,7 @@ Configuration WS2012 {
     Import-DscResource -ModuleName C:\Git\SqlServerDsc
     Import-DscResource -ModuleName C:\Git\xPSDesiredStateConfiguration
     Import-DscResource -ModuleName xWinEventLog
+    Import-DscResource -ModuleName OftenOn
     #endregion
 
     $clusterOrder = @{}
@@ -645,36 +646,8 @@ Configuration WS2012 {
             if ($node.Role.ContainsKey('Workstation')) {
                 $resourceLocation = "\\$($domainController.$($node.DomainName))\Resources"
 
-                Script 'NetFx472' {
-                    GetScript = {
-                        Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
-
-                        $release = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' 'Release' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Release
-                        @{ Result = "$release"; }
-                    }
-                    TestScript = {
-                        Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
-
-                        $release = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' 'Release' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Release
-                        if ($release -and $release -ge 461814) {
-                            $true
-                        } else {
-                            $false
-                        }
-                    }
-                    SetScript = {
-                        Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
-
-                        # If you don't use -NoNewWindow it will hang with an Open File - Security Warning
-                        $result = Start-Process -FilePath "$using:resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe" -ArgumentList '/quiet' -PassThru -Wait -NoNewWindow
-                        if ($result.ExitCode -in @(1641, 3010)) {
-                            $global:DSCMachineStatus = 1
-                        } elseif ($result.ExitCode -ne 0) {
-                            Write-Error "Installation failed with exit code $($result.ExitCode)"
-                        } else {
-                            Write-Verbose "Installation succeeded"
-                        }
-                    }
+                NetFramework 'Install472' {
+                    ResourceLocation = "$resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe"
                 }
 
                 # ProductId is critical to get right, if it's not right then the computer will keep rebooting
@@ -688,7 +661,7 @@ Configuration WS2012 {
                     Path = "$resourceLocation\SSMS-Setup-ENU.exe"
                     ProductId = 'a0010c7f-d2e9-486b-a658-a1a1106847da'
                     Arguments = '/install /quiet'
-                    DependsOn  = '[Script]NetFx472'
+                    DependsOn  = '[NetFramework]Install472'
                 }
             }
         }
