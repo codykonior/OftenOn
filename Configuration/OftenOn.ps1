@@ -15,7 +15,7 @@ Configuration OftenOn {
 
     Import-DscResource -ModuleName C:\Git\xFailOverCluster # Fixes retries
     Import-DscResource -ModuleName C:\Git\SqlServerDsc # Fixes MatchDatabaseOwner
-    Import-DscResource -ModuleName C:\Git\xPSDesiredStateConfiguration # Fixes misnamed variabl
+    Import-DscResource -ModuleName C:\Git\xPSDesiredStateConfiguration # Fixes misnamed variable
 
     # This is a composite resource and doesn't need to be on the destination machine
     Import-DscResource -ModuleName OftenOn
