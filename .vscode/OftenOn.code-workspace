@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "C:\\Git\\OftenOn"
+		}
+	],
+	"settings": {
+		"files.trimFinalNewlines": true,
+		"files.trimTrailingWhitespace": true,
+		"powershell.codeFormatting.preset": "OTBS"
+	}
+}

@@ -1,4 +1,4 @@
-Configuration NetFramework {
+Configuration ooNetFramework {
     param(
         [Parameter(Mandatory)]
         [string] $ResourceLocation
