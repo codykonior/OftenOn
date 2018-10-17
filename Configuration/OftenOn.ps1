@@ -140,6 +140,13 @@ Configuration OftenOn {
                     Ensure      = 'Present'
                     DependsOn   = '[xADDomain]Create'
                 }
+
+                Group 'AddLocalAdministratorToAdministratorsGroup' {
+                    GroupName = 'Administrators'
+                    Ensure = 'Present'
+                    MembersToInclude = $localAdministrator.UserName
+                    DependsOn = '[xADUser]CreateLocalAdministrator'
+                }
                 #endregion
 
                 #region Create a Resources and Temp share on the Domain Controller for other VMs to use
