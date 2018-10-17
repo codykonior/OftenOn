@@ -162,6 +162,17 @@ Task CleanAll -depends Clean {
 }
 #endregion
 
+Task Composite {
+    $configuration = Read-Host "Configuration name"
+    New-Item -ItemType Directory C:\Git\OftenOn\DSCResources\$configuration
+    New-ModuleManifest "C:\Git\OftenOn\DSCResources\$configuration\$($configuration).psd1" -RootModule ".\$($configuration).schema.psm1" -Author "Cody Konior" -CompanyName ""
+    $content = "Configuration $configuration {
+}
+"
+    [System.IO.File]::WriteAllLines("C:\Git\OftenOn\DSCResources\$configuration\$($configuration).schema.psm1", $content)
+    code "C:\Git\OftenOn\DSCResources\$configuration\$($configuration).schema.psm1"
+}
+
 <#
 
 Add node to cluster can have an error which triggers a 15 minute wait.

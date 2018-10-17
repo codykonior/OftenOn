@@ -30,8 +30,6 @@ Configuration WS2012 {
         $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2018!' | ConvertTo-SecureString -AsPlainText -Force))
         $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2018!' | ConvertTo-SecureString -AsPlainText -Force))
 
-        # These starting blocks don't have dependencies
-
         #region Local Configuration Manager settings
         LocalConfigurationManager {
             RebootNodeIfNeeded   = $true
@@ -44,92 +42,17 @@ Configuration WS2012 {
         }
         #endregion
 
-        #region Registry settings useful in a lab
-
-        #region Enable DSC logging
-        xWinEventLog "EnableDSCAnalyticLog" {
-            LogName = "Microsoft-Windows-DSC/Analytic"
-            IsEnabled = $true
+        ooDscLog 'EnableDscLog' {
         }
 
-        xWinEventLog "EnableDSCDebugLog" {
-            LogName = "Microsoft-Windows-DSC/Debug"
-            IsEnabled = $true
-        }
-        #endregion
-
-        # Stop Windows from caching "not found" DNS requests (defaults at 15 minutes) because it slows down DSC WaitForX
-        Registry 'DisableNegativeCacheTtl' {
-            Ensure = 'Present'
-            Key = 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters'
-            ValueName = 'MaxNegativeCacheTtl'
-            ValueData = '0'
-            ValueType = 'DWord'
+        ooRegistry 'SetRegistry' {
         }
 
-        # Stop Windows from cycling machine passwors in a domain that prevent snapshots > 30 days old from booting
-        Registry 'DisableMachineAccountPasswordChange' {
-            Ensure = 'Present'
-            Key = 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters'
-            ValueName = 'DisablePasswordChange'
-            ValueData = '1'
-            ValueType = 'DWord'
-        }
-        #endregion
-
-        #region Enable Remote Desktop
-        # Enable the service
-        xRemoteDesktopAdmin 'EnableRemoteDesktopService' {
-            Ensure             = 'Present'
-            UserAuthentication = 'NonSecure'
+        ooRemoteDesktop 'EnableRemoteDesktop' {
         }
 
-        # Enable firewall exceptions
-        foreach ($firewallRule in @('FPS-ICMP4-ERQ-In', 'FPS-ICMP6-ERQ-In', 'RemoteDesktop-UserMode-In-TCP', 'RemoteDesktop-UserMode-In-UDP')) {
-            # In current versions of DSC you can pass a built-in rule name and enable it without specifying all of the other details
-            Firewall "Enable$($firewallRule.Replace('-', ''))" {
-                Name    = $firewallRule
-                Ensure  = 'Present'
-                Enabled = 'True'
-            }
+        ooTemp 'CreateTempDirectory' {            
         }
-
-        # Bulk-enable firewall exceptions for File and Printer sharing (needed to RDP from your host)
-        Script 'EnableFileAndPrinterSharing' {
-            GetScript = {
-                if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
-                    @{ Result = "false"; }
-                } else {
-                    @{ Result = "true"; }
-                }
-            }
-            TestScript = {
-                if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
-                    $false
-                } else {
-                    $true
-                }
-            }
-            SetScript = {
-                Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' } | Set-NetFirewallRule -Enabled True
-            }
-        }
-        #endregion
-
-        #region Add a C:\Temp
-        File 'CreateTempDirectory' {
-            DestinationPath = 'C:\Temp'
-            Ensure = 'Present'
-            Type = 'Directory'
-        }
-
-        xFileSystemAccessRule 'GrantAccessToLocalTempFolder' {
-            Path = 'C:\Temp'
-            Identity = 'EVERYONE'
-            Rights = @('FullControl')
-            DependsOn = '[File]CreateTempDirectory'
-        }
-        #endregion
 
         #region Add basic Windows features depending on Role
         $windowsFeatures = 'RSAT-AD-Tools', 'RSAT-AD-PowerShell', 'RSAT-Clustering', 'RSAT-Clustering-CmdInterface', 'RSAT-DNS-Server', 'RSAT-RemoteAccess'
@@ -509,7 +432,6 @@ Configuration WS2012 {
                     DependsOn = '[SqlServerEndpoint]CreateHadrEndpoint', '[SqlServerLogin]CreateLoginForAG'
                 }
 
-
                 SqlServerPermission 'AddPermissionsForAGMembership'
                 {
                     Ensure               = 'Present'
@@ -646,22 +568,13 @@ Configuration WS2012 {
             if ($node.Role.ContainsKey('Workstation')) {
                 $resourceLocation = "\\$($domainController.$($node.DomainName))\Resources"
 
-                NetFramework 'Install472' {
+                ooNetFramework 'Install472' {
                     ResourceLocation = "$resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe"
                 }
 
-                # ProductId is critical to get right, if it's not right then the computer will keep rebooting
-                <#
-                Get-ChildItem -Path 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall' | 
-                    Where-Object { $_.Property -contains 'DisplayName' -and $_.GetValue('DisplayName') -like "*17.9*" } | 
-                    ForEach-Object { $_.GetValue('BundleProviderKey') }
-                #>
-                xPackage 'SSMS179' {
-                    Name = 'SSMS179'
-                    Path = "$resourceLocation\SSMS-Setup-ENU.exe"
-                    ProductId = 'a0010c7f-d2e9-486b-a658-a1a1106847da'
-                    Arguments = '/install /quiet'
-                    DependsOn  = '[NetFramework]Install472'
+                ooManagementStudio 'Install179' {
+                    ResourceLocation = "$resourceLocation\SSMS-Setup-ENU.exe"
+                    DependsOn  = '[ooNetFramework]Install472'
                 }
             }
         }
