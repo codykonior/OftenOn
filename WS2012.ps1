@@ -677,6 +677,12 @@ Configuration WS2012 {
                     }
                 }
 
+                # ProductId is critical to get right, if it's not right then the computer will keep rebooting
+                <#
+                Get-ChildItem -Path 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall' | 
+                    Where-Object { $_.Property -contains 'DisplayName' -and $_.GetValue('DisplayName') -like "*17.9*" } | 
+                    ForEach-Object { $_.GetValue('BundleProviderKey') }
+                #>
                 xPackage 'SSMS179' {
                     Name = 'SSMS179'
                     Path = "$resourceLocation\SSMS-Setup-ENU.exe"
