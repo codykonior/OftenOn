@@ -20,24 +20,45 @@
 
             FullyQualifiedDomainName          = 'lab.com'
             DomainName                        = 'LAB'
+
+            Role = @{ }
         }
+
+        <#
+            Configuration options
+
+            NodeName                # String
+            Network                 # Array of Hashtable
+                                        The script will add arrays ..\Lability_SwitchName and ..\Lability_MACAddress
+                                        SwitchName, NetAdapterName, IPAddress/CIDR, DnsServerAddress, DefaultGatewayAddress
+            Role                    # Hashtable
+                DomainController    # Empty Hashtable
+                DomainMember        # Empty Hashtable
+                Router              # Empty Hashtable
+                Workstation         # Empty Hashtable
+                Cluster             # Hashtable
+                                        Name, StaticAddress/CIDR, IgnoreNetwork/CIDR (heartbeat adapter)
+                SqlServer           # Hashtable
+                                        InstanceName, Features, SourcePath
+                AvailabilityGroup   # Hashtable
+                                        Name, ListenerName, IPAddress/SubnetMask
+        #>
 
         @{
             NodeName           = 'CHDC01'
+            Lability_BootOrder = 1
 
-            # Script will add Lability_SwitchName @() and Lability_MACAddress @()
             Network            = @(
                 @{ SwitchName = 'CHICAGO';    NetAdapterName = 'CHICAGO';    IPAddress = '10.0.0.2/24';  DnsServerAddress = '127.0.0.1'; DefaultGatewayAddress = "10.0.0.1"; }
-            )
-
-            Lability_Resource  = @(
-                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix',
-                'SSMS179', 'NetFx472'
             )
 
             Role               = @{
                 DomainController = @{ }
             }
+
+            Lability_Resource  = @(
+                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SSMS179', 'NetFx472'
+            )
         }
 
         @{
@@ -63,10 +84,9 @@
 
         @{
             NodeName           = 'WORK01'
-            Lability_BootOrder = 2
 
             Network            = @(
-                @{ SwitchName = 'CHICAGO';    NetAdapterName = 'CHICAGO';    IPAddress = '10.0.0.3/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.0.1'; }
+                @{ SwitchName = 'CHICAGO';    NetAdapterName = 'CHICAGO';    IPAddress = '10.0.0.3/24';  DnsServerAddress = '10.0.0.2';  efaultGatewayAddress = '10.0.0.1'; }
             )
 
             Role               = @{
@@ -77,7 +97,7 @@
 
         @{
             NodeName           = 'SEC1N1'
-            Lability_BootOrder = 2
+            Lability_BootOrder = 3
 
             Network            = @(
                 @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.11/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.1.1'; }
@@ -94,6 +114,7 @@
 
         @{
             NodeName = 'SEC1N2'
+            Lability_BootOrder = 3
 
             Network  = @(
                 @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.12/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.1.1'; }
@@ -110,6 +131,7 @@
 
         @{
             NodeName = 'SEC1N3'
+            Lability_BootOrder = 3
 
             Network  = @(
                 @{ SwitchName = 'SEATTLE';    NetAdapterName = 'SEATTLE';    IPAddress = '10.0.1.13/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.1.1'; }
@@ -126,6 +148,7 @@
 
         @{
             NodeName = 'DAC1N1'
+            Lability_BootOrder = 4
 
             Network  = @(
                 @{ SwitchName = 'DALLAS';    NetAdapterName = 'DALLAS';    IPAddress = '10.0.2.11/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.2.1'; }
@@ -142,6 +165,7 @@
 
         @{
             NodeName = 'DAC1N2'
+            Lability_BootOrder = 4
 
             Network  = @(
                 @{ SwitchName = 'DALLAS';    NetAdapterName = 'DALLAS';    IPAddress = '10.0.2.12/24';  DnsServerAddress = '10.0.0.2';  DefaultGatewayAddress = '10.0.2.1'; }
@@ -159,9 +183,9 @@
 
     NonNodeData = @{
         Lability = @{
+            # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
+            # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
-                # will hang because DSC doesn't complete.
                 @{ Name = 'ComputerManagementDsc'; RequiredVersion = '5.2.0.0'; }
                 @{ Name = 'NetworkingDsc'; RequiredVersion = '6.1.0.0'; }
                 @{ Name = 'xActiveDirectory'; RequiredVersion = '2.21.0.0'; }
@@ -177,7 +201,7 @@
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
             )
 
-            # Can be included with Lability_Module
+            # These non-DSC modules are copied over to the VMs for general purpose use.
             Module = @(
                 @{ Name = 'Cim'; }
                 @{ Name = 'DbData'; }
@@ -193,11 +217,11 @@
             Network     = @(
                 # You'll get this error if you change a switch type:
                 # WARNING: [1:51:28 AM] DSC resource 'Set-VMTargetResource' failed with errror 'Sequence contains more than one element'.
-                @{ Name = 'CHICAGO'; Type = 'Internal'; }
-                @{ Name = 'SEATTLE'; Type = 'Internal'; }
+                @{ Name = 'CHICAGO';    Type = 'Internal'; }
+                @{ Name = 'SEATTLE';    Type = 'Internal'; }
                 @{ Name = 'SEATTLE_HB'; Type = 'Private'; }
-                @{ Name = 'DALLAS'; Type = 'Internal'; }
-                @{ Name = 'DALLAS_HB'; Type = 'Private'; }
+                @{ Name = 'DALLAS';     Type = 'Internal'; }
+                @{ Name = 'DALLAS_HB';  Type = 'Private'; }
             )
 
             Media       = @(
@@ -220,6 +244,11 @@
                             # Filename = 'W2K12-KB3191565-x64.msu'
                             # Checksum = 'E978C87841BAED49FB68206DF5E1DF9C'
                             Uri = 'https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu'
+                        }
+                        @{
+                            # Failover Cluster Manager hotfix (without this, it will have errors when you update to certain .NET versions)
+                            Id = 'Windows8-RT-KB2803748-x64.msu'
+                            Uri = 'https://download.microsoft.com/download/9/7/C/97CB21BF-FA24-46C7-BE44-88E7EE934841/Windows8-RT-KB2803748-x64.msu'
                         }
                     )
                     CustomData      = @{
