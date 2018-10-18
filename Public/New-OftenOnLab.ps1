@@ -1,6 +1,8 @@
 function New-OftenOnLab {
     [CmdletBinding()]
     param(
+        [switch] $SkipConfiguration,
+        [switch] $SkipStart
     )
 
     <#
@@ -12,6 +14,12 @@ function New-OftenOnLab {
     $configurationData = Get-OftenOnLabConfiguration
     OftenOn -ConfigurationData $configurationData -OutputPath "$PSScriptRoot\..\MOF"
 
-    $administrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
-    Start-LabConfiguration -ConfigurationData $configurationData -IgnorePendingReboot -Credential $administrator -NoSnapshot -Path "$PSScriptRoot\..\MOF"
+    if (!$SkipConfiguration) {
+        $administrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        Start-LabConfiguration -ConfigurationData $configurationData -IgnorePendingReboot -Credential $administrator -NoSnapshot -Path "$PSScriptRoot\..\MOF"
+
+        if (!$SkipStart) {
+            Start-OftenOnLab
+        }
+    }
 }
