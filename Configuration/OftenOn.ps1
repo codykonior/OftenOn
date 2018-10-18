@@ -1,5 +1,6 @@
 Configuration OftenOn {
     param (
+        $CustomResourcePath
     )
 
     #region Resources
@@ -13,9 +14,10 @@ Configuration OftenOn {
     Import-DscResource -ModuleName xSystemSecurity
     Import-DscResource -ModuleName xWinEventLog
 
-    Import-DscResource -ModuleName C:\Git\xFailOverCluster # Fixes retries
-    Import-DscResource -ModuleName C:\Git\SqlServerDsc # Fixes MatchDatabaseOwner
-    Import-DscResource -ModuleName C:\Git\xPSDesiredStateConfiguration # Fixes misnamed variable
+    # These have fixes in the dev branches but the changes are not to parameters so any version here will do
+    Import-DscResource -ModuleName SqlServerDsc
+    Import-DscResource -ModuleName xFailOverCluster
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration
 
     # This is a composite resource and doesn't need to be on the destination machine
     Import-DscResource -ModuleName OftenOn

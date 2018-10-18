@@ -1,5 +1,5 @@
 function New-OftenOnCompositeResource {
-    [CmdletBiding()]
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]

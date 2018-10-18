@@ -169,13 +169,12 @@
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
                 @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
-                # @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\DscResources\xDscResources\xFailOverCluster'; }
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\xFailOverCluster'; }
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; }
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\SqlServerDsc'; }
-                # @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; Provider = 'FileSystem'; Path = 'C:\Git\xPSDesiredStateConfiguration'; }
                 @{ Name = 'xWinEventLog'; RequiredVersion = '1.2.0.0'; }
+
+                # These have fixes in the dev branch, the first is absolutely required the others are just helpful
+                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
             )
 
             # Can be included with Lability_Module
