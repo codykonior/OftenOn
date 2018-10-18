@@ -400,8 +400,13 @@ Configuration OftenOn {
                             Name                 = $node.Role.AvailabilityGroup.Name
                             InstanceName         = $node.Role.SQLServer.InstanceName
                             ServerName           = $node.NodeName
-                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership'
+                            AvailabilityMode     = $node.Role.AvailabilityGroup.AvailabilityMode
+                            FailoverMode         = $node.Role.AvailabilityGroup.FailoverMode
+                            ConnectionModeInPrimaryRole  = 'AllowAllConnections'
+                            ConnectionModeInSecondaryRole = 'AllowAllConnections'
+
                             PsDscRunAsCredential = $localAdministrator
+                            DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership'
                         }
 
                         $completeListenerList = $AllNodes | Where-Object { $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.Role.AvailabilityGroup.IPAddress } | Select-Object -Unique
@@ -499,6 +504,11 @@ Configuration OftenOn {
                             InstanceName         = $node.Role.SQLServer.InstanceName
                             PrimaryReplicaServerName   = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
                             PrimaryReplicaInstanceName = $node.Role.SQLServer.InstanceName
+                            AvailabilityMode           = $node.Role.AvailabilityGroup.AvailabilityMode
+                            FailoverMode               = $node.Role.AvailabilityGroup.FailoverMode
+                            ConnectionModeInPrimaryRole   = 'AllowAllConnections'
+                            ConnectionModeInSecondaryRole = 'AllowAllConnections'
+
                             DependsOn            = "[WaitForAll]WaitFor$($node.Role.AvailabilityGroup.ListenerName)"
                             PsDscRunAsCredential = $localAdministrator
                         }
