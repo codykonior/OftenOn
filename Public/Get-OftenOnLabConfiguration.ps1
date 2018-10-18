@@ -1,6 +1,6 @@
 function Get-OftenOnLabConfiguration {
     [CmdletBinding()]
-    param(        
+    param(
     )
 
     #region Always-run, manipulate configuration data encryption information
@@ -51,5 +51,5 @@ function Get-OftenOnLabConfiguration {
     }
     #endregion
 
-    $configurationData
+    $configurationData | Add-Member -MemberType ScriptMethod -Name ToString -Value { Convert-HashtableToString $this } -Force -PassThru
 }
