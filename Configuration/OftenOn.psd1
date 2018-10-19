@@ -57,7 +57,7 @@
             }
 
             Lability_Resource  = @(
-                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SSMS179', 'NetFx472', 'Windows8-RT-KB2803748-x64'
+                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SSMS179', 'NetFx472'
             )
         }
 
@@ -246,6 +246,11 @@
                             # Checksum = 'E978C87841BAED49FB68206DF5E1DF9C'
                             Uri = 'https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu'
                         }
+                        @{
+                            # Failover Cluster Manager hotfix (without this, it will have errors when you update to certain .NET versions)
+                            Id  = 'Windows8-RT-KB2803748-x64.msu'
+                            Uri = 'https://download.microsoft.com/download/9/7/C/97CB21BF-FA24-46C7-BE44-88E7EE934841/Windows8-RT-KB2803748-x64.msu'
+                        }
                     )
                     CustomData      = @{
                         CustomBootStrap        = @(
@@ -296,13 +301,6 @@
                     Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Uri      = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Checksum = '87450CFA175585B23A76BBD7052EE66B'
-                }
-                @{
-                    # Failover Cluster Manager hotfix (without this, it will have errors when you update to certain .NET versions)
-                    Id  = 'Windows8-RT-KB2803748-x64'
-                    Filename = 'Windows8-RT-KB2803748-x64.msu'
-                    Uri = 'https://download.microsoft.com/download/9/7/C/97CB21BF-FA24-46C7-BE44-88E7EE934841/Windows8-RT-KB2803748-x64.msu'
-                    Checksum = 'E243BD42F17728B664455B061C51766B'
                 }
             )
         }

@@ -201,6 +201,9 @@ Configuration OftenOn {
                     ResourceName = '[xADUser]CreateLocalAdministrator'
                     NodeName = $domainController.$($node.DomainName)
 
+                    # Otherwise you'll wait for life
+                    PsDscRunAsCredential = $domainAdministrator
+
                     # 30 Minutes
                     RetryIntervalSec = 15
                     RetryCount       = 120
@@ -521,12 +524,6 @@ Configuration OftenOn {
         #endregion
 
         $resourceLocation = "\\$($domainController.$($node.DomainName))\Resources"
-
-        xHotfix 'InstallClusterManagerHotfix' {
-            Path = "$resourceLocation\Windows8-RT-KB2803748-x64.msu"
-            Id = 'KB2803748'
-            Ensure = 'Present'
-        }
 
         #region Workstation
         if ($node.ContainsKey('Role')) {
