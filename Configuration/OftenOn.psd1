@@ -194,6 +194,7 @@
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
                 @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
                 @{ Name = 'xWinEventLog'; RequiredVersion = '1.2.0.0'; }
+                @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.7.0.0'; }
 
                 # These have fixes in the dev branch, the first is absolutely required the others are just helpful
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }

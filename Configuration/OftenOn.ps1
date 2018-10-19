@@ -13,6 +13,7 @@ Configuration OftenOn {
     Import-DscResource -ModuleName xSmbShare
     Import-DscResource -ModuleName xSystemSecurity
     Import-DscResource -ModuleName xWinEventLog
+    Import-DscResource -ModuleName xWindowsUpdate
     # These have fixes in the dev branches but the changes are not to parameters so any version here will do
     Import-DscResource -ModuleName SqlServerDsc
     Import-DscResource -ModuleName xFailOverCluster
