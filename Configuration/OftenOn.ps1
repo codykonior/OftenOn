@@ -246,6 +246,7 @@ Configuration OftenOn {
                         RetryIntervalSec = 15
                         RetryCount       = 120
 
+                        PsDscRunAsCredential = $domainAdministrator
                         # If RSAT-Clustering is not installed the cluster can not be created
                         DependsOn        = '[WindowsFeatureSet]All', '[Computer]Rename'
                     }
@@ -473,6 +474,8 @@ Configuration OftenOn {
                             NodeName = $completeReplicaList
                             RetryCount = 120
                             RetryIntervalSec = 15
+
+                            PsDscRunAsCredential = $localAdministrator
                             DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)"
                         }
 
