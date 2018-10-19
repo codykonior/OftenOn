@@ -12,6 +12,7 @@ TODO
     Create MSA accounts
         Add SecurityPolicyDsc permissions
         Create RDCMan
+    Set up read routing.
 
     # Give two options, either IP Forwarding (no WAN) or
     Install-RemoteAccess -VpnType Vpn

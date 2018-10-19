@@ -197,8 +197,8 @@
 
                 # These have fixes in the dev branch, the first is absolutely required the others are just helpful
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
