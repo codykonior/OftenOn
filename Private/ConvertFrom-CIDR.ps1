@@ -6,6 +6,7 @@ function ConvertFrom-CIDR {
         [string] $IPAddress
     )
 
+    [void] ($IPAddress -match "(.*)\/(\d+)")
     $ip = [IPAddress] $Matches[1]
     $suffix = [int] $Matches[2]
     $mask = ("1" * $suffix) + ("0" * (32 - $suffix))

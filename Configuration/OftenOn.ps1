@@ -519,11 +519,17 @@ Configuration OftenOn {
         }
         #endregion
 
+        $resourceLocation = "\\$($domainController.$($node.DomainName))\Resources"
+
+        xHotfix 'InstallClusterManagerHotfix' {
+            Path = "$resourceLocation\Windows8-RT-KB2803748-x64.msu"
+            Id = 'KB2803748'
+            Ensure = 'Present'
+        }
+
         #region Workstation
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('Workstation')) {
-                $resourceLocation = "\\$($domainController.$($node.DomainName))\Resources"
-
                 ooNetFramework 'Install472' {
                     ResourceLocation = "$resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe"
                 }

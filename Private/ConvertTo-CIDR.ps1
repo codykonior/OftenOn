@@ -9,6 +9,7 @@ function ConvertTo-CIDR {
 
     $ip = [IPAddress] $IPAddress
     $mask = [IPAddress] $SubnetMask
+    [void] ($mask.IPAddressToString -match '(.*)\.(.*)\.(.*)\.(.*)')
     $suffix = ""
     $Matches[1..4] | ForEach-Object {
         $suffix += [Convert]::ToString([int] $_, 2) + ("0" * (8 - [Convert]::ToString([int] $_, 2).Length))
