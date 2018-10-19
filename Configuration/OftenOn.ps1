@@ -207,6 +207,8 @@ Configuration OftenOn {
                     # 30 Minutes
                     RetryIntervalSec = 15
                     RetryCount       = 120
+
+                    DependsOn = '[Computer]Rename'
                 }
 
                 Group 'AddLocalAdministratorToAdministratorsGroup' {
