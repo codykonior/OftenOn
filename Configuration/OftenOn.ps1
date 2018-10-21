@@ -46,6 +46,11 @@ Configuration OftenOn {
         }
         #endregion
 
+        TimeZone 'TimeZone' {
+            IsSingleInstance = 'Yes'
+            TimeZone = (Get-TimeZone).StandardName
+        }
+
         ooDscLog 'EnableDscLog' {
         }
 

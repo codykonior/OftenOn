@@ -3,7 +3,7 @@ Configuration ooNetwork {
         [Parameter(Mandatory)]
         $Node
     )
-    
+
     if ($node.ContainsKey('Network')) {
         for ($i = 0; $i -lt $node.Network.Count; $i++) {
             $network = $node.Network[$i]
@@ -31,11 +31,22 @@ Configuration ooNetwork {
                 }
             }
 
+            <#
+                If Address isn't specified the adapter is changed to DHCP. I noticed on
+                the WAN adapter if you don't do this, it somehow picks up 127.0.0.1 and
+                so fails to route the DC out to the internet.
+            #>
             if ($network.ContainsKey('DnsServerAddress')) {
                 DnsServerAddress "SetDnsServerAddress$($network.NetAdapterName)" {
                     AddressFamily  = 'IPv4'
                     InterfaceAlias = $network.NetAdapterName
-                    Address        = $network.DnsServerAddress
+                    Address = $network.DnsServerAddress
+                    DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
+                }
+            } else {
+                DnsServerAddress "SetDnsServerAddress$($network.NetAdapterName)" {
+                    AddressFamily  = 'IPv4'
+                    InterfaceAlias = $network.NetAdapterName
                     DependsOn = "[NetAdapterName]Rename$($network.NetAdapterName)"
                 }
             }
@@ -48,4 +59,3 @@ Configuration ooNetwork {
         }
     }
 }
-
