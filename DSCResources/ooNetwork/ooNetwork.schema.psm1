@@ -32,9 +32,9 @@ Configuration ooNetwork {
             }
 
             <#
-                If Address isn't specified the adapter is changed to DHCP. I noticed on
-                the WAN adapter if you don't do this, it somehow picks up 127.0.0.1 and
-                so fails to route the DC out to the internet.
+                If Address isn't specified the adapter is changed to DHCP. I noticed
+                some adapters will default to 127.0.0.1 for reasons unknown unless
+                they are forced to DHCP like this.
             #>
             if ($network.ContainsKey('DnsServerAddress')) {
                 DnsServerAddress "SetDnsServerAddress$($network.NetAdapterName)" {

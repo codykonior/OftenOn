@@ -55,8 +55,8 @@
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.1/24'; } # DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.1/24'; } # DnsServerAddress = '127.0.0.1'; }
 
-                # If the Dns isn't set then this will break all the other servers and stop them from querying, unless recursive DNS is disabled
-                @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; } # DnsServerAddress = '127.0.0.1'; }
+                # Dns must point to itself so it can still resolve inner addresses
+                @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; DnsServerAddress = '127.0.0.1'; }
             )
 
             Role               = @{

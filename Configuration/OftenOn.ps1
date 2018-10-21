@@ -119,14 +119,6 @@ Configuration OftenOn {
                 }
                 #endregion
 
-                #region Disable DNS forwarding, this stops other machines from resolving internet addresses
-                xDnsServerSetting 'DisableDnsForwarding' {
-                    Name = 'DNS'
-                    NoRecursion = $true
-                    DependsOn = '[xADDomain]Create'
-                }
-                #endregion
-
                 #region Create Users/Groups
                 xADUser 'CreateUserSQLEngineService' {
                     # Make sure the UserName is a straight username because the DSC adds @DomainName onto the end.
