@@ -222,7 +222,7 @@
                     Checksum        = '8503997171F731D9BD1CB0B0EDC31F3D'
                     Description     = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
                     MediaType       = 'ISO'
-                    ImageName       = 'Windows Server 2012 SERVERSTANDARD'
+                    ImageName       = 2 # This shows differently as 'Windows Server 2012 Standard Evaluation (Server with a GUI)' or on LTSB as 'Windows Server 2012 SERVERSTANDARD'
                     OperatingSystem = 'Windows'
                     Hotfixes        = @(
                         @{
