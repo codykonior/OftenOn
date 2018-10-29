@@ -9,7 +9,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = '.\ooRouter.schema.psm1'
+RootModule = 'ooRouter.schema.psm1'
 
 # Version number of this module.
 ModuleVersion = '1.0'
@@ -81,7 +81,7 @@ VariablesToExport = '*'
 AliasesToExport = @()
 
 # DSC resources to export from this module
-# DscResourcesToExport = @()
+DscResourcesToExport = @('ooRouter')
 
 # List of all modules packaged with this module
 # ModuleList = @()

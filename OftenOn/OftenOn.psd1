@@ -12,7 +12,7 @@
 RootModule = 'OftenOn.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.2'
+ModuleVersion = '1.0.3'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -83,7 +83,16 @@ RequiredModules = @(
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Convert-HashtableToString', 'Get-OftenOnLabConfiguration', 'New-OftenOnCompositeResource', 'New-OftenOnLab', 'Remove-OftenOnLab', 'Repair-OftenOnRemoteDesktop', 'Start-OftenOnLab', 'Stop-OftenOnLab')
+FunctionsToExport = @(
+    'Convert-HashtableToString',
+    'Get-OftenOnLabConfiguration',
+    'New-OftenOnCompositeResource',
+    'New-OftenOnLab',
+    'Remove-OftenOnLab',
+    'Repair-OftenOnRemoteDesktop',
+    'Start-OftenOnLab',
+    'Stop-OftenOnLab'
+    )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -95,7 +104,7 @@ VariablesToExport = '*'
 AliasesToExport = @()
 
 # DSC resources to export from this module
-DscResourcesToExport = @('ooDscLog', 'ooManagementStudio', 'ooNetFramework', 'ooNetwork', 'ooRegistry', 'ooRemoteDesktop', 'ooRouter', 'ooTemp')
+DscResourcesToExport = @()
 
 # List of all modules packaged with this module
 # ModuleList = @()
