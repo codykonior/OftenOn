@@ -97,7 +97,7 @@ Configuration OftenOn {
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('Router')) {
                 ooRouter 'EnableRouter' {
-                    DependsOn "[ooNetwork]RenameNetwork"
+                    DependsOn = "[ooNetwork]RenameNetwork"
                 }
             }
         }
