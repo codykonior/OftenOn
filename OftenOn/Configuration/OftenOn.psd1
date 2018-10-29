@@ -173,9 +173,9 @@
             # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
             # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '5.2.0.0'; }
+                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '6.0.0.0'; }
                 @{ Name = 'NetworkingDsc'; RequiredVersion = '6.1.0.0'; }
-                @{ Name = 'xActiveDirectory'; RequiredVersion = '2.21.0.0'; }
+                @{ Name = 'xActiveDirectory'; RequiredVersion = '2.22.0.0'; }
                 @{ Name = 'xDnsServer'; RequiredVersion = '1.11.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
@@ -184,9 +184,9 @@
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.7.0.0'; }
 
                 # These have fixes in the dev branch, the first is absolutely required the others are just helpful
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.10.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
+                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.11.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.0.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.1.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
@@ -222,7 +222,7 @@
                     Checksum        = '8503997171F731D9BD1CB0B0EDC31F3D'
                     Description     = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
                     MediaType       = 'ISO'
-                    ImageName       = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+                    ImageName       = 'Windows Server 2012 SERVERSTANDARD'
                     OperatingSystem = 'Windows'
                     Hotfixes        = @(
                         @{
