@@ -1,5 +1,6 @@
 function ConvertTo-CIDR {
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param (
         [Parameter(Mandatory)]
         [string] $IPAddress,

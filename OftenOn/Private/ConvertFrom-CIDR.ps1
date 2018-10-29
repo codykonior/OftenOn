@@ -1,5 +1,6 @@
 function ConvertFrom-CIDR {
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param (
         [Parameter(Mandatory)]
         [ValidateScript( { $_ -match "(.*)\/(\d+)" })]

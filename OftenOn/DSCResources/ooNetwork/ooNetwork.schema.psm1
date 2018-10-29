@@ -1,5 +1,5 @@
 Configuration ooNetwork {
-    param(
+    param (
         [Parameter(Mandatory)]
         $Node
     )

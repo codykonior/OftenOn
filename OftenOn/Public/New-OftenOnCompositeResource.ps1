@@ -1,6 +1,6 @@
 function New-OftenOnCompositeResource {
     [CmdletBinding()]
-    param(
+    param (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         $ResourceName

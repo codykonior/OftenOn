@@ -1,6 +1,6 @@
 function Start-OftenOnLab {
     [CmdletBinding()]
-    param(
+    param (
     )
 
     Start-Lab -ConfigurationData (Get-OftenOnLabConfiguration)

@@ -1,6 +1,6 @@
 function Repair-OftenOnRemoteDesktop {
     [CmdletBinding()]
-    param(
+    param (
     )
 
     #region Apply a local RDP fix so that it can connect to unpatched RDP servers such as will be in our VMs.

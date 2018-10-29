@@ -1,6 +1,6 @@
 function Stop-OftenOnLab {
     [CmdletBinding()]
-    param(
+    param (
     )
 
     Stop-Lab -ConfigurationData (Get-OftenOnLabConfiguration) -ErrorAction:Continue

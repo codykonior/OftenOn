@@ -1,6 +1,6 @@
 function Remove-OftenOnLab {
     [CmdletBinding()]
-    param(
+    param (
         [switch] $MasterVirtualHardDisk
     )
 

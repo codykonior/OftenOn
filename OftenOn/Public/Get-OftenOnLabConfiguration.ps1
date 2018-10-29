@@ -1,6 +1,6 @@
 function Get-OftenOnLabConfiguration {
     [CmdletBinding()]
-    param(
+    param (
     )
 
     #region Always-run, manipulate configuration data encryption information

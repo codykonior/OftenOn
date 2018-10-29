@@ -1,5 +1,7 @@
 Configuration ooNetFramework {
-    param(
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars')]
+    param (
         [Parameter(Mandatory)]
         [string] $ResourceLocation
     )

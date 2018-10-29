@@ -1,6 +1,7 @@
 function New-OftenOnLab {
     [CmdletBinding()]
-    param(
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingConvertToSecureStringWithPlainText')]
+    param (
         [switch] $SkipConfiguration,
         [switch] $SkipStart
     )
