@@ -182,10 +182,10 @@
                 @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
                 @{ Name = 'xWinEventLog'; RequiredVersion = '1.2.0.0'; }
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.7.0.0'; }
+                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.11.0.0'; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; }
 
-                # These have fixes in the dev branch, the first is absolutely required the others are just helpful
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.11.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.4.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "dev"; }
+                # This has critical fixes for read only routing
                 @{ Name = 'SqlServerDsc'; RequiredVersion = '12.1.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
             )
 
