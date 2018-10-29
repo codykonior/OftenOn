@@ -112,7 +112,7 @@ Configuration OftenOn {
                 #region Rename the computer
                 Computer 'Rename' {
                     Name = $node.NodeName
-                    DependsOn "[ooNetwork]RenameNetwork"
+                    DependsOn = "[ooNetwork]RenameNetwork"
                 }
                 #endregion
 
