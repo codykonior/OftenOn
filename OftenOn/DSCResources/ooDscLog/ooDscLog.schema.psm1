@@ -1,4 +1,6 @@
 Configuration ooDscLog {
+    Import-DscResource -ModuleName xWinEventLog
+
     # 1 hour is about 1MB so this gives you two days worth
     # LogMode cannot be changed to Cicular on these unfortunately
 

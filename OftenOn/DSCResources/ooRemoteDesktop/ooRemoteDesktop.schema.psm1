@@ -1,4 +1,7 @@
 Configuration ooRemoteDesktop {
+    Import-DscResource -ModuleName NetworkingDsc
+    Import-DscResource -ModuleName xRemoteDesktopAdmin
+
     # Enable the service
     xRemoteDesktopAdmin 'EnableRemoteDesktopService' {
         Ensure             = 'Present'
@@ -36,4 +39,3 @@ Configuration ooRemoteDesktop {
         }
     }
 }
-

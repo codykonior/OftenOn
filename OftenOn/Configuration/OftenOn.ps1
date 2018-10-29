@@ -8,18 +8,13 @@ Configuration OftenOn {
     #region Resources
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName ComputerManagementDsc
-    Import-DscResource -ModuleName NetworkingDsc
     Import-DscResource -ModuleName xActiveDirectory
     Import-DscResource -ModuleName xDnsServer
-    Import-DscResource -ModuleName xRemoteDesktopAdmin
     Import-DscResource -ModuleName xSmbShare
-    Import-DscResource -ModuleName xSystemSecurity
-    Import-DscResource -ModuleName xWinEventLog
     Import-DscResource -ModuleName xWindowsUpdate
     # These have fixes in the dev branches but the changes are not to parameters so any version here will do
     Import-DscResource -ModuleName SqlServerDsc
     Import-DscResource -ModuleName xFailOverCluster
-    Import-DscResource -ModuleName xPSDesiredStateConfiguration
     # This is a composite resource and doesn't need to be on the destination machine
     Import-DscResource -ModuleName OftenOn
     #endregion

@@ -1,4 +1,6 @@
 Configuration ooTemp {
+    Import-DscResource -ModuleName xSystemSecurity
+
     #region Add a C:\Temp
     File 'CreateTempDirectory' {
         DestinationPath = 'C:\Temp'
@@ -14,4 +16,3 @@ Configuration ooTemp {
     }
     #endregion
 }
-
