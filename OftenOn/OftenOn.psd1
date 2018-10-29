@@ -12,7 +12,7 @@
 RootModule = 'OftenOn.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.1'
+ModuleVersion = '1.0.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -51,7 +51,21 @@ Description = 'Build Windows 2012 SQL 2012 multi-subnet five node AG labs with o
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @('Lability')
+RequiredModules = @(
+    'Lability',
+    'ComputerManagementDsc',
+    'NetworkingDsc',
+    'xActiveDirectory',
+    'xDnsServer',
+    'xRemoteDesktopAdmin',
+    'xSmbShare',
+    'xSystemSecurity',
+    'xWinEventLog',
+    'xWindowsUpdate',
+    'SqlServerDsc',
+    'xFailOverCluster',
+    'xPSDesiredStateConfiguration'
+    )
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
