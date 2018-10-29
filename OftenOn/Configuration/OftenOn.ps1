@@ -43,25 +43,31 @@ Configuration OftenOn {
         }
         #endregion
 
-        TimeZone 'TimeZone' {
-            IsSingleInstance = 'Yes'
-            TimeZone = (Get-TimeZone).StandardName
-        }
-
         ooDscLog 'EnableDscLog' {
         }
 
+        TimeZone 'SetTimeZone' {
+            IsSingleInstance = 'Yes'
+            TimeZone = (Get-TimeZone).StandardName
+
+            DependsOn = '[ooDscLog]EnableDscLog'
+        }
+
         ooRegistry 'SetRegistry' {
+            DependsOn = '[TimeZone]SetTimeZone'
         }
 
         ooRemoteDesktop 'EnableRemoteDesktop' {
+            DependsOn = '[TimeZone]SetTimeZone'
         }
 
         ooTemp 'CreateTempDirectory' {
+            DependsOn = '[TimeZone]SetTimeZone'
         }
 
-        ooNetwork 'RenameNetworks' {
+        ooNetwork 'RenameNetwork' {
             Node = $node
+            DependsOn = '[TimeZone]SetTimeZone'
         }
 
         #region Add basic Windows features depending on Role
@@ -80,6 +86,8 @@ Configuration OftenOn {
         WindowsFeatureSet "All" {
             Name   = $windowsFeatures
             Ensure = 'Present'
+
+            DependsOn = '[TimeZone]SetTimeZone'
         }
         #endregion
         #       ^-- DependsOn 'WindowsFeatureSet[All]'
@@ -89,6 +97,7 @@ Configuration OftenOn {
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('Router')) {
                 ooRouter 'EnableRouter' {
+                    DependsOn "[ooNetwork]RenameNetwork"
                 }
             }
         }
@@ -103,6 +112,7 @@ Configuration OftenOn {
                 #region Rename the computer
                 Computer 'Rename' {
                     Name = $node.NodeName
+                    DependsOn "[ooNetwork]RenameNetwork"
                 }
                 #endregion
 
@@ -113,6 +123,16 @@ Configuration OftenOn {
                     SafemodeAdministratorPassword = $safemodeAdministrator
 
                     DependsOn                     = '[WindowsFeatureSet]All'
+                }
+
+                # If ADWS isn't started some resources will fail to run (even though they shouldn't)
+                Service 'EnableADService' {
+                    Name = 'ADWS'
+                    StartupType = 'Automatic'
+                    Ensure = 'Present'
+                    State = 'Running'
+
+                    DependsOn = '[xADDomain]Create'
                 }
                 #endregion
 
@@ -178,6 +198,8 @@ Configuration OftenOn {
                     # 30 Minutes
                     RetryIntervalSec     = 15
                     RetryCount           = 120
+
+                    DependsOn = "[ooNetwork]RenameNetwork"
                 }
                 #endregion
 
