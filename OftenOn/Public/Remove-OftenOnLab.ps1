@@ -4,9 +4,8 @@ function Remove-OftenOnLab {
         [switch] $MasterVirtualHardDisk
     )
 
-    Remove-Item "$PSScriptRoot\..\MOF\*"
+    Remove-Item "$PSScriptRoot\..\MOF\*.mof"
     Remove-LabConfiguration -ConfigurationData (Get-OftenOnLabConfiguration) -ErrorAction:Continue -Confirm:$false
-    # Remove-Item C:\Lability\VMVirtualHardDisks\*
 
     if ($MasterVirtualHardDisk) {
         Remove-Item "$((Get-LabHostDefault).ParentVhdPath)\*.*"
