@@ -35,7 +35,7 @@ function New-OftenOnLab {
         if (!(Test-LabHostConfiguration -IgnorePendingReboot)) {
             "This is the first run, executing Start-LabHostCpnfiguration to enable Lability prerequisites which are installed to C:\Lability"
             Start-LabHostConfiguration -IgnorePendingReboot
-            "If you see errors after this, try rebooting"
+            Write-Error "Start-LabHostConfiguration has completed once. You MUST reboot now before continuing."
         }
 
         $administrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
