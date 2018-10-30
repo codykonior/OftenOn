@@ -56,6 +56,6 @@ It's also loaded with all my other PowerShell modules.
 [1]: Images/oftenon.ai.svg
 [3]: CHANGELOG.md
 
-[11]: /images/general/oftenon1.gif
-[12]: /images/general/oftenon2.gif
-[13]: /images/general/oftenon3.gif
+[11]: Images/oftenon1.gif
+[12]: Images/oftenon2.gif
+[13]: Images/oftenon3.gif
