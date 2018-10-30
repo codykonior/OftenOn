@@ -2,6 +2,21 @@ build: false
 
 test_script:
   - ps: |
+      Install-Module Lability -Force -AllowClobber
+      Install-Module ComputerManagementDsc -Force -AllowClobber
+      Install-Module NetworkingDsc -Force -AllowClobber
+      Install-Module xActiveDirectory -Force -AllowClobber
+      Install-Module xDnsServer -Force -AllowClobber
+      Install-Module xRemoteDesktopAdmin -Force -AllowClobber
+      Install-Module xSmbShare -Force -AllowClobber
+      Install-Module xSystemSecurity -Force -AllowClobber
+      Install-Module xWinEventLog -Force -AllowClobber
+      Install-Module xWindowsUpdate -Force -AllowClobber
+      Install-Module SqlServerDsc -Force -AllowClobber
+      Install-Module xFailOverCluster -Force -AllowClobber
+      Install-Module xPSDesiredStateConfiguration -Force -AllowClobber
+
+      Install-Module Pester -Force -AllowClobber
       Install-Module PSScriptAnalyzer -Force -AllowClobber
 
       $env:PSModulePath = "$((Get-Item .).FullName)\;$($env:PSModulePath)"
