@@ -61,7 +61,7 @@
 
             Role               = @{
                 DomainController = @{ }
-                Router = @{ }
+                Router           = @{ }
             }
 
             Lability_Resource  = @(
@@ -191,15 +191,18 @@
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
             Module      = @(
+                @{ Name = 'Pester'; }
+                @{ Name = 'PoshRSJob'; }
+                @{ Name = 'SqlServer'; }
+
                 @{ Name = 'Cim'; }
                 @{ Name = 'DbData'; }
+                @{ Name = 'DbSmo'; }
                 @{ Name = 'Disposable'; }
                 @{ Name = 'Error'; }
                 @{ Name = 'Jojoba'; }
                 @{ Name = 'ParseSql'; }
                 @{ Name = 'Performance'; }
-                @{ Name = 'PoshRSJob'; }
-                @{ Name = 'SqlServer'; }
             )
 
             Network     = @(

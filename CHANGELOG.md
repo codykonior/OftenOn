@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - None.
 
+
+## [1.0.8] - 2018-10-31
+### Added
+- Pester and DbSmo modules copied to servers.
+
 ## [1.0.8] - 2018-10-30
 ### Changed
 - If `Test-LabHostConfiguration` fails then run `StartLabHostConfiguration` then
