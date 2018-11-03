@@ -24,7 +24,11 @@ function New-OftenOnLab {
 
     # https://johnlouros.com/blog/enabling-strong-cryptography-for-all-dot-net-applications
     if (!([Net.ServicePointManager]::SecurityProtocol -band [System.Net.SecurityProtocolType]::Tls12)) {
-        $warning = @()
+        Write-Warning 'Enabling TLS protocols during this session for GitHub downloads as SchUseStrongCrypto is not enabled'
+        [Net.ServicePointManager]::SecurityProtocol = 'Tls', 'Tls11', 'Tls12'
+    }
+
+    $warning = @()
         $warning += 'When using NET 4.6.1 you may get download errors from GitHub because TLS 1.2 is disabled by default. If this'
         $warning += 'happens to you enable strong crypto, restart your PowerShell session, and try again.'
         $warning += 'Set-ItemProperty -Path ''HKLM:\SOFTWARE\Wow6432Node\Microsoft\.NetFramework\v4.0.30319'' -Name ''SchUseStrongCrypto'' -Value ''1'' -Type DWord'
