@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - None.
 
+## [1.0.12] - 2018-11-03
+### Fixes
+- Typo from previous version.
+
 ## [1.0.11] - 2018-11-02
 ### Changed
 - Enable the TLS 1.2 in the session by default if it's not set. This is easier.

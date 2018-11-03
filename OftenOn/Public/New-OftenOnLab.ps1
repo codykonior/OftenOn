@@ -28,14 +28,6 @@ function New-OftenOnLab {
         [Net.ServicePointManager]::SecurityProtocol = 'Tls', 'Tls11', 'Tls12'
     }
 
-    $warning = @()
-        $warning += 'When using NET 4.6.1 you may get download errors from GitHub because TLS 1.2 is disabled by default. If this'
-        $warning += 'happens to you enable strong crypto, restart your PowerShell session, and try again.'
-        $warning += 'Set-ItemProperty -Path ''HKLM:\SOFTWARE\Wow6432Node\Microsoft\.NetFramework\v4.0.30319'' -Name ''SchUseStrongCrypto'' -Value ''1'' -Type DWord'
-
-        Write-Warning ($warning -join [Environment]::NewLine)
-    }
-
     <#
         It's important the configuration data is only retrieved once here because it contains some
         random MAC addresses, and these must be the same between compiling the MOF and starting the
