@@ -30,6 +30,8 @@ Configuration OftenOn {
         # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @lab.com
         $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2018!' | ConvertTo-SecureString -AsPlainText -Force))
         $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        # This isn't a domain login
+        $systemAdministrator = New-Object System.Management.Automation.PSCredential("sa", ('System2018!' | ConvertTo-SecureString -AsPlainText -Force))
 
         #region Local Configuration Manager settings
         LocalConfigurationManager {
@@ -342,6 +344,8 @@ Configuration OftenOn {
                     Action = 'Install'
                     SourcePath = $node.Role.SqlServer.SourcePath
                     Features = $node.Role.SqlServer.Features
+                    SecurityMode = 'Sql'
+                    SAPwd = $systemAdministrator
                     SQLSvcAccount = $sqlEngineService
                     SQLSysAdminAccounts = $localAdministrator.UserName
                     UpdateEnabled = 'False'

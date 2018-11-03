@@ -7,8 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - None.
 
+## [1.0.10] - 2018-11-02
+### Added
+- HackSql PowerShell module.
+- 10s delay between booting each VM so this can run on 16GB laptops easier.
+- Warning if you don't have TLS 1.2 enabled as it results in GitHub download
+  errors.
 
-## [1.0.8] - 2018-10-31
+## [1.0.9] - 2018-11-01
+### Added
+- Enable Mixed mode authentication by default.
+
+## [1.0.9] - 2018-10-31
 ### Added
 - Pester and DbSmo modules copied to servers.
 

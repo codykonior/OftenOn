@@ -12,7 +12,8 @@
                 @{ Generation = 'VHDX'; MaximumSizeBytes = 127GB; }
             )
             Lability_GuestIntegrationServices = $true
-
+            # Wait 10s between each machine start. This requires less memory up front for 16GB laptops.
+            Lability_BootDelay                = 10
             # Encryption information (the script will translate the environment variable)
             CertificateFile                   = '$env:ALLUSERSPROFILE\Lability\Certificates\LabClient.cer'
             Thumbprint                        = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
@@ -200,6 +201,7 @@
                 @{ Name = 'DbSmo'; }
                 @{ Name = 'Disposable'; }
                 @{ Name = 'Error'; }
+                @{ Name = 'HackSql'; }
                 @{ Name = 'Jojoba'; }
                 @{ Name = 'ParseSql'; }
                 @{ Name = 'Performance'; }
