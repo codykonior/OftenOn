@@ -15,7 +15,7 @@ Configuration ooManagementStudio {
     xPackage 'SSMS1791' {
         Name      = 'SSMS1791'
         Path      = $ResourceLocation
-        ProductId = '12162f80-7d10-4451-bb4d-f6e00e3c9b09'
+        ProductId = '91a1b895-c621-4038-b34a-01e7affbcb6b'
         Arguments = '/install /quiet'
     }
 }
