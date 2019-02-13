@@ -6,17 +6,17 @@ Configuration OftenOn {
     )
 
     #region Resources
-    Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName ComputerManagementDsc
-    Import-DscResource -ModuleName xActiveDirectory
-    Import-DscResource -ModuleName xDnsServer
-    Import-DscResource -ModuleName xSmbShare
-    Import-DscResource -ModuleName xWindowsUpdate
+    Import-DscResource -ModuleName PSDesiredStateConfiguration -ModuleVersion 1.1
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 6.1.0.0
+    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 2.23.0.0
+    Import-DscResource -ModuleName xDnsServer -ModuleVersion 1.11.0.0
+    Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.1.0.0
+    Import-DscResource -ModuleName xWindowsUpdate -Moduleversion 2.7.0.0
     # These have fixes in the dev branches but the changes are not to parameters so any version here will do
-    Import-DscResource -ModuleName SqlServerDsc
-    Import-DscResource -ModuleName xFailOverCluster
+    Import-DscResource -ModuleName SqlServerDsc -Moduleversion 12.2.0.0
+    Import-DscResource -ModuleName xFailOverCluster -Moduleversion 1.12.0.0
     # This is a composite resource and doesn't need to be on the destination machine
-    Import-DscResource -ModuleName OftenOn
+    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.0.13
     #endregion
 
     $clusterOrder = @{}
@@ -557,7 +557,7 @@ Configuration OftenOn {
                     ResourceLocation = "$resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe"
                 }
 
-                ooManagementStudio 'Install179' {
+                ooManagementStudio 'Install1791' {
                     ResourceLocation = "$resourceLocation\SSMS-Setup-ENU.exe"
                     DependsOn  = '[ooNetFramework]Install472'
                 }

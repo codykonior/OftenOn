@@ -3,7 +3,7 @@ Configuration ooNetwork {
         [Parameter(Mandatory)]
         $Node
     )
-    Import-DscResource -ModuleName NetworkingDsc
+    Import-DscResource -ModuleName NetworkingDsc -ModuleVersion 6.3.0.0
 
     if ($node.ContainsKey('Network')) {
         for ($i = 0; $i -lt $node.Network.Count; $i++) {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - None.
 
+## [1.0.13] - 2019-02-13
+### Changed
+- Updated required version of modules, and give more errors upon load if the
+  modules on disk are different to what is expected.
+- Update to use SSMS 17.9.1.
+
 ## [1.0.12] - 2018-11-03
 ### Fixes
 - Typo from previous version.

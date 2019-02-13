@@ -40,7 +40,7 @@ Password Local2018!
 The VMs built are as follows:
 
 - CHDC01 the domain controller in the Chicago subnet that also does routing for other subnets.
-- CHWK01 a workstation in Chicago with .NET 4.7.2 and SSMS 17.9.
+- CHWK01 a workstation in Chicago with .NET 4.7.2 and SSMS 17.9.1.
 - SEC1N1 SEC1N2 SEC1N3 are three nodes of the C1 cluster in the Seattle subnet.
 - DAC1N1 DAC1N2 are two nodes of the C1 cluster in the Dallas subnet.
 

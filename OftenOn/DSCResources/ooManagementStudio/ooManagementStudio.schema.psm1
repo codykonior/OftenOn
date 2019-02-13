@@ -3,7 +3,7 @@ Configuration ooManagementStudio {
         [Parameter(Mandatory)]
         [string] $ResourceLocation
     )
-    Import-DscResource -ModuleName xPSDesiredStateConfiguration
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
     <#
         ProductId is critical to get right and changes each version. If it's wrong the computer will keep rebooting.
@@ -12,10 +12,10 @@ Configuration ooManagementStudio {
                 Where-Object { $_.Property -contains 'DisplayName' -and $_.GetValue('DisplayName') -like "*17.9*" } |
                 ForEach-Object { $_.GetValue('BundleProviderKey') }
     #>
-    xPackage 'SSMS179' {
-        Name = 'SSMS179'
-        Path = $ResourceLocation
-        ProductId = 'a0010c7f-d2e9-486b-a658-a1a1106847da'
+    xPackage 'SSMS1791' {
+        Name      = 'SSMS1791'
+        Path      = $ResourceLocation
+        ProductId = '12162f80-7d10-4451-bb4d-f6e00e3c9b09'
         Arguments = '/install /quiet'
     }
 }

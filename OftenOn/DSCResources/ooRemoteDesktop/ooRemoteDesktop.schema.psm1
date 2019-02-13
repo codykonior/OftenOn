@@ -1,6 +1,6 @@
 Configuration ooRemoteDesktop {
-    Import-DscResource -ModuleName NetworkingDsc
-    Import-DscResource -ModuleName xRemoteDesktopAdmin
+    Import-DscResource -ModuleName NetworkingDsc -ModuleVersion 6.3.0.0
+    Import-DscResource -ModuleName xRemoteDesktopAdmin -ModuleVersion 1.1.0.0
 
     # Enable the service
     xRemoteDesktopAdmin 'EnableRemoteDesktopService' {
@@ -20,7 +20,7 @@ Configuration ooRemoteDesktop {
 
     # Bulk-enable firewall exceptions for File and Printer sharing (needed to RDP from your host)
     Script 'EnableFileAndPrinterSharing' {
-        GetScript = {
+        GetScript  = {
             if (Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' }) {
                 @{ Result = "false"; }
             } else {
@@ -34,7 +34,7 @@ Configuration ooRemoteDesktop {
                 $true
             }
         }
-        SetScript = {
+        SetScript  = {
             Get-NetFirewallRule -DisplayGroup 'File and Printer Sharing' | Where-Object { $_.Enabled -eq 'False' } | Set-NetFirewallRule -Enabled True
         }
     }
