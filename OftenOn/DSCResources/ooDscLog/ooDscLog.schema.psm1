@@ -1,21 +1,21 @@
 Configuration ooDscLog {
-    Import-DscResource -ModuleName xWinEventLog -ModuleVersion 1.2.0.0
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 6.2.0.0
 
     # 1 hour is about 1MB so this gives you two days worth
     # LogMode cannot be changed to Cicular on these unfortunately
 
-    xWinEventLog "AlterDSCOperationalLog" {
+    WindowsEventLog "AlterDSCOperationalLog" {
         LogName            = "Microsoft-Windows-DSC/Operational"
         MaximumSizeInBytes = 48MB
     }
 
-    xWinEventLog "EnableDSCAnalyticLog" {
+    WindowsEventLog "EnableDSCAnalyticLog" {
         LogName            = "Microsoft-Windows-DSC/Analytic"
         MaximumSizeInBytes = 48MB
         IsEnabled          = $true
     }
 
-    xWinEventLog "EnableDSCDebugLog" {
+    WindowsEventLog "EnableDSCDebugLog" {
         LogName            = "Microsoft-Windows-DSC/Debug"
         MaximumSizeInBytes = 48MB
         IsEnabled          = $true

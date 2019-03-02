@@ -10,7 +10,6 @@ test_script:
       Install-Module xRemoteDesktopAdmin -Force -AllowClobber
       Install-Module xSmbShare -Force -AllowClobber
       Install-Module xSystemSecurity -Force -AllowClobber
-      Install-Module xWinEventLog -Force -AllowClobber
       Install-Module xWindowsUpdate -Force -AllowClobber
       Install-Module SqlServerDsc -Force -AllowClobber
       Install-Module xFailOverCluster -Force -AllowClobber

@@ -181,7 +181,6 @@
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
                 @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
-                @{ Name = 'xWinEventLog'; RequiredVersion = '1.2.0.0'; }
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.7.0.0'; }
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.12.0.0'; }
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.5.0.0'; }
