@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - None.
 
+## [1.0.14] - 2019-02-27
+### Fixed
+- LCM DebugMode set to ForceModuleImport. This will massively speed up setup
+  by not caching DSC responses from resources, which slows down joining the
+  domain and setting up the cluster.
+
+### Changed
+- DSC resource module version number updates.
+- Don't quit when the DSC modules are wrong. This is so you can still use
+  Remove-OftenOnLab when things are out of date.
+
 ## [1.0.13] - 2019-02-13
 ### Changed
 - Updated required version of modules, and give more errors upon load if the
@@ -14,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update to use SSMS 17.9.1.
 
 ## [1.0.12] - 2018-11-03
-### Fixes
+### Fixed
 - Typo from previous version.
 
 ## [1.0.11] - 2018-11-02

@@ -1,8 +1,6 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$abort = $false
-
 <#
 Any modules we specify to be used with
 #>
@@ -10,10 +8,8 @@ $configurationData = Import-PowerShellDataFile -Path "$PSScriptRoot\Configuratio
 foreach ($dscResource in $configurationData.NonNodeData.Lability.DSCResource) {
     [array] $modules = Get-Module $dscResource.Name -ListAvailable | Sort-Object Version -Descending
     if (!($dscResource.ContainsKey("RequiredVersion"))) {
-        $abort = $true
         Write-Warning ".\Configuration\OftenOn.psd1 requires $($dscResource.Name) but does not have a RequiredVersion"
     } elseif ($dscResource.RequiredVersion -ne $modules[0].Version) {
-        $abort = $true
         Write-Warning ".\Configuration\OftenOn.psd1 requires $($dscResource.Name) $($dscResource.RequiredVersion) but $($modules[0].Version) is the newest"
     }
 }
@@ -35,7 +31,6 @@ Get-ChildItem $PSScriptRoot -Recurse -File | ForEach-Object {
                 }
                 if ($modules.Version -notcontains [version] $Matches[2]) {
                     # Not having the referenced version on disk is catastrophic
-                    $abort = $true
                     Write-Warning "$fileName requires $($Matches[1]) $($Matches[2]) but it does not exist"
                 }
             } elseif ($Matches.Count -eq 2) {
@@ -47,20 +42,14 @@ Get-ChildItem $PSScriptRoot -Recurse -File | ForEach-Object {
 
                     # Multiple versions on disk and nothing specified is catastrophic
                     if ($modules.Count -ne 1) {
-                        $abort = $true
                         Write-Warning "$fileName requires $($Matches[1]) but multiple versions exist and $($modules[0].Version) is the newest"
                     }
                 }
             } else {
-                $abort = $true
                 Write-Warning "Unknown number of matches when searching for broken Import-DscResource references"
             }
         }
     }
-}
-
-if ($abort) {
-    Write-Error "DSC Modules are out of sync and this should be resolved before continuing"
 }
 
 Get-ChildItem $PSScriptRoot *.ps1 -Exclude *.Tests.ps1 -Recurse | ForEach-Object {
