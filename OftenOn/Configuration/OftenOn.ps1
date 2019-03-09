@@ -16,7 +16,7 @@ Configuration OftenOn {
     Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 12.3.0.0
     Import-DscResource -ModuleName xFailOverCluster -ModuleVersion 1.12.0.0
     # This is a composite resource and doesn't need to be on the destination machine
-    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.0.14
+    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.0.15
     #endregion
 
     $clusterOrder = @{}
@@ -196,7 +196,7 @@ Configuration OftenOn {
                 # and in the computer rename. If you do have a WAN link and disable forwarding
                 # then you MUST use the short domain name otherwise the domain isn't found.
                 # However it will then break. So not being able to use a full one indicates
-                # another issue in your setpu.
+                # another issue in your setup.
                 xWaitForADDomain 'Create' {
                     DomainName           = $node.FullyQualifiedDomainName
                     DomainUserCredential = $domainAdministrator

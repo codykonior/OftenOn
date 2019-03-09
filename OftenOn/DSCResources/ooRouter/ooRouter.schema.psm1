@@ -1,6 +1,6 @@
 Configuration ooRouter {
     Script 'EnableRouting' {
-        GetScript = {
+        GetScript  = {
             if (Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' }) {
                 @{ Result = "false"; }
             } else {
@@ -14,9 +14,8 @@ Configuration ooRouter {
                 $true
             }
         }
-        SetScript = {
+        SetScript  = {
             Get-NetIPInterface | Where-Object { $_.Forwarding -ne 'Enabled' } | Set-NetIPInterface -Forwarding Enabled
         }
     }
 }
-

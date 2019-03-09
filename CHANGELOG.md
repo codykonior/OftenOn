@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - None.
 
+## [1.0.15] - 2019-03-09
+### Changed
+- Internet Explorer Enhanced Security Configuration is disabled by default.
+
 ## [1.0.14] - 2019-02-27
 ### Fixed
 - LCM DebugMode set to ForceModuleImport. This will massively speed up setup

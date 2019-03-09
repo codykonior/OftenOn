@@ -1,31 +1,29 @@
+# TODO
+
+Nodes really need internet access.
+
+Try removing the MaxCacheTTL etc and instead use xDnsServer.
 
 Add node to cluster can have an error which triggers a 15 minute wait.
 
-TODO
-    Use Test-LabHostConfiguration
-    Would it save time to install SQL while waiting for the domain to join? Change SQL to use AD accounts.
-    Stop the SQL Server AG install unless all nodes are joined (it may fail if the second subnet of nodes isn't in first)
-    Set up WSUS registry keys. Set up WSUS server
-    Format D:
-    Create MSA accounts
-        Add SecurityPolicyDsc permissions
-        Create RDCMan
-    Set up read routing.
+Set up read routing list (needs SqlServerDsc merge first)
 
-    # Give two options, either IP Forwarding (no WAN) or
-    Install-RemoteAccess -VpnType Vpn
-    &netsh routing ip nat install
-    $ExternalInterface = 'WAN'
-    &netsh routing ip nat add interface $ExternalInterface
-    &netsh routing ip nat set interface $ExternalInterface mode=full
-    ^-- This seems to be enough even with IP forwarding disabled, also gives NAT
-    But then you need to enable recursion, and add a forwarder to 1.1.1.1
-    # $InternalInterface1 = 'LAN1'
-    # $InternalInterface2 = 'LAN2'
-    # cmd.exe /c 'netsh routing ip nat add interface $InternalInterface1'
-    # cmd.exe /c 'netsh routing ip nat add interface $InternalInterface2'
-    # xDnsServerForwarder "WAN Forwarder" {
-    #     IsSingleInstance = "Yes";
-    #     IPAddresses = "1.1.1.1";
-    #     # DependsOn = '[WindowsFeature][DNS]';
-    # }
+Add a command to snapshot OftenOnLab, and restore the snapshot, based on Lability stuff
+    Checkpoint-OftenOnLab
+    Reset-OftenOnLab
+
+Would it save time to install SQL while waiting for the domain to join? Change SQL to use AD accounts?
+
+Stop the SQL Server AG install unless all nodes are joined (it may fail if the second subnet of nodes isn't in first)
+
+Set up WSUS registry keys. Set up WSUS server.
+    https://www.rootusers.com/install-and-configure-windows-server-update-services-wsus/
+    https://devblogs.microsoft.com/scripting/installing-wsus-on-windows-server-2012/
+    https://github.com/PowerShell/xWindowsUpdate
+
+Format D: for SQL
+
+Create MSA accounts
+    Add SecurityPolicyDsc permissions
+
+Create RDCMan file
