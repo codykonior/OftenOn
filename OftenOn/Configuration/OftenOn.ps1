@@ -135,6 +135,30 @@ Configuration OftenOn {
                     DependsOn                     = '[WindowsFeatureSet]All'
                 }
 
+                #region Create an AD lookup, just makes nslookup work nicer
+                # This should really be done for all networks and computers but...
+                xDnsServerADZone 'AddReverseZone'
+                {
+                    Name = '0.0.10.in-addr.arpa'
+                    DynamicUpdate = 'Secure'
+                    ReplicationScope = 'Forest'
+
+                    Ensure = 'Present'
+                    DependsOn = '[xADDomain]Create'
+                }
+
+                xDnsRecord 'AddReverseZoneLookup'
+                {
+                    Name = '1.0.0.10.in-addr.arpa'
+                    Target = 'CHDC01.lab.com'
+                    Zone = '0.0.10.in-addr.arpa'
+                    Type = 'PTR'
+
+                    Ensure = 'Present'
+                    DependsOn = '[xDnsServerADZone]AddReverseZone'
+                }
+                #endregion
+
                 # If ADWS isn't started some resources will fail to run (even though they shouldn't)
                 Service 'EnableADService' {
                     Name = 'ADWS'
