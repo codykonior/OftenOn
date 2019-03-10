@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stop-OftenOnLab has a new -TurnOff parameter which is faster.
 - Remove-OftenOnLab now uses Stop-OftenLab -TurnOff and so runs faster.
 
+### Broken
+- The DC WAN adapter is now broken and has no internet access. I don't know why.
+
 ## [1.0.14] - 2019-02-27
 ### Fixed
 - LCM DebugMode set to ForceModuleImport. This will massively speed up setup
