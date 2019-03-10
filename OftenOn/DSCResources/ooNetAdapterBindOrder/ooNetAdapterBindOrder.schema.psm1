@@ -1,6 +1,9 @@
 Configuration ooNetAdapterBindOrder {
     <#
     Bind, Route, and Export should possibly be changed on these services:
+        Tcpip
+        TCPIP6
+
         LanmanServer
         LanmanWorkstation
         lltdio
@@ -9,10 +12,12 @@ Configuration ooNetAdapterBindOrder {
         NetBT
         RasPppoe
         rspndr
-        Tcpip
-        TCPIP6
 
-    Currently I only do Bind and Tcpip.
+    Currently I only do Tcpip / Bind.
+
+    The problem with doing TCPIP6 is that there are lots of GUIDs that don't
+    have a matching entry in Win32_NetworkAdapter and I don't want to move
+    them about.
 
     To do the others needs more analysis and some better pattern matching to
     extract the relevant GUID.
@@ -27,7 +32,7 @@ Configuration ooNetAdapterBindOrder {
 
                 $binding = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Linkage").Bind
                 foreach ($bind in $binding) {
-                    $adapter = Get-CimInstance -ClassName Win32_NetworkAdapter | Where-Object { $_.GUID -eq $bind.Split("\")[2] }
+                    $adapter = Get-CimInstance -ClassName Win32_NetworkAdapter | Where-Object { $_.GUID -eq $bind.Replace("`"", "").Replace("\Device\", "").Replace("Tcpip_", "").Replace("Tcpip6_", "") }
                     [PSCustomObject] @{
                         Binding = $bind
                         Name    = if ($adapter) { $adapter.NetConnectionId }
@@ -57,7 +62,7 @@ Configuration ooNetAdapterBindOrder {
 
                 $binding = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Linkage").Bind
                 foreach ($bind in $binding) {
-                    $adapter = Get-CimInstance -ClassName Win32_NetworkAdapter | Where-Object { $_.GUID -eq $bind.Split("\")[2] }
+                    $adapter = Get-CimInstance -ClassName Win32_NetworkAdapter | Where-Object { $_.GUID -eq $bind.Replace("`"", "").Replace("\Device\", "").Replace("Tcpip_", "").Replace("Tcpip6_", "") }
                     [PSCustomObject] @{
                         Binding = $bind
                         Name    = if ($adapter) { $adapter.NetConnectionId }
@@ -81,7 +86,7 @@ Configuration ooNetAdapterBindOrder {
 
                 $binding = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Linkage").Bind
                 foreach ($bind in $binding) {
-                    $adapter = Get-CimInstance -ClassName Win32_NetworkAdapter | Where-Object { $_.GUID -eq $bind.Split("\")[2] }
+                    $adapter = Get-CimInstance -ClassName Win32_NetworkAdapter | Where-Object { $_.GUID -eq $bind.Replace("`"", "").Replace("\Device\", "").Replace("Tcpip_", "").Replace("Tcpip6_", "") }
                     [PSCustomObject] @{
                         Binding = $bind
                         Name    = if ($adapter) { $adapter.NetConnectionId }
