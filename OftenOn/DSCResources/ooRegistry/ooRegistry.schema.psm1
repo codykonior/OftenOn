@@ -33,4 +33,12 @@ Configuration ooRegistry {
         ValueData = '0'
         ValueType = 'DWord'
     }
+
+    Registry 'DisableInternetExplorerFirstRun' {
+        Ensure    = 'Present'
+        Key       = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\Main}'
+        ValueName = 'DisableFirstRunCustomize'
+        ValueData = '1'
+        ValueType = 'DWord'
+    }
 }
