@@ -1,4 +1,23 @@
 Configuration ooNetAdapterBindOrder {
+    <#
+    Bind, Route, and Export should possibly be changed on these services:
+        LanmanServer
+        LanmanWorkstation
+        lltdio
+        Ndisuio
+        NetBIOS
+        NetBT
+        RasPppoe
+        rspndr
+        Tcpip
+        TCPIP6
+
+    Currently I only do Bind and Tcpip.
+
+    To do the others needs more analysis and some better pattern matching to
+    extract the relevant GUID.
+    #>
+
     Script 'EnableBinding' {
         GetScript  = {
             function Get-NetAdapterBindOrder {

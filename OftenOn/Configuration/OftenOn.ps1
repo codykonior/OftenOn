@@ -25,13 +25,13 @@ Configuration OftenOn {
 
     Node $AllNodes.NodeName {
         # When building the domain the UserName is ignored. But the domain part of the username is required to use the credential to add computers to the domain.
-        $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2018!' | ConvertTo-SecureString -AsPlainText -Force))
-        $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2019!' | ConvertTo-SecureString -AsPlainText -Force))
+        $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2019!' | ConvertTo-SecureString -AsPlainText -Force))
         # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @lab.com
-        $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2018!' | ConvertTo-SecureString -AsPlainText -Force))
-        $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2019!' | ConvertTo-SecureString -AsPlainText -Force))
+        $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2019!' | ConvertTo-SecureString -AsPlainText -Force))
         # This isn't a domain login
-        $systemAdministrator = New-Object System.Management.Automation.PSCredential("sa", ('System2018!' | ConvertTo-SecureString -AsPlainText -Force))
+        $systemAdministrator = New-Object System.Management.Automation.PSCredential("sa", ('System2019!' | ConvertTo-SecureString -AsPlainText -Force))
 
         #region Local Configuration Manager settings
         LocalConfigurationManager {

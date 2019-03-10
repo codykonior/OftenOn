@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.15] - 2019-03-09
 ### Changed
 - Internet Explorer Enhanced Security Configuration is disabled by default.
+- Passwords end with 2019 instead of 2018.
 
 ### Fixed
 - Network bind order for the domain controller changed to prefer CHICAGO.

@@ -35,7 +35,7 @@ Then remote in yourself! Remote Desktop from your machine should work to the sho
 not work on some configurations.
 
 Username LAB\LocalAdministrator
-Password Local2018!
+Password Local2019!
 
 The VMs built are as follows:
 
