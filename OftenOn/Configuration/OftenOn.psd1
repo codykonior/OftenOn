@@ -245,8 +245,13 @@
                         }
                     )
                     CustomData      = @{
+                        # The first line is part of any bootstrap, but the second line also schedules it to run on start.
+                        # Sometimes when Windows starts (during the build) it takes forever to resume configuration DSC.
+                        # This gives it a little kick in the pants (though I guess could also break something if it was
+                        # being configured in DSC at exactly the wrong time).
                         CustomBootStrap        = @(
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306'
+                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
+                            'schtasks /create /tn "BootStrap" /tr "cmd.exe /c """Powershell.exe -Command %SYSTEMDRIVE%\BootStrap\BootStrap.ps1""" >> %SYSTEMDRIVE%\BootStrap\BootStrap.log" /sc "ONSTART" /sd "01/01/2099" /st "00:00" /ru "System"'
                         )
                         WindowsOptionalFeature = @(
                             'NetFx3',
