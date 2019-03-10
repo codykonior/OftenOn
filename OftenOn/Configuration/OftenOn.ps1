@@ -114,10 +114,15 @@ Configuration OftenOn {
 
                 # These execute in sequence
 
+                # region Set network adapter binding order
+                ooNetAdapterBindOrder 'Set' {
+                    DependsOn = "[ooNetwork]RenameNetwork"
+                }
+
                 #region Rename the computer
                 Computer 'Rename' {
                     Name = $node.NodeName
-                    DependsOn = "[ooNetwork]RenameNetwork"
+                    DependsOn = "[ooNetAdapterBindOrder]Set"
                 }
                 #endregion
 

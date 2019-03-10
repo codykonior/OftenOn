@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Internet Explorer Enhanced Security Configuration is disabled by default.
 
+### Fixed
+- Network bind order for the domain controller changed to prefer CHICAGO.
+  Anecdotally (on one test) this has sped up domain creation and how fast
+  members pick up the new domain also.
+
+### Added
+- Stop-OftenOnLab has a new -TurnOff parameter which is faster.
+- Remove-OftenOnLab now uses Stop-OftenLab -TurnOff and so runs faster.
+
 ## [1.0.14] - 2019-02-27
 ### Fixed
 - LCM DebugMode set to ForceModuleImport. This will massively speed up setup

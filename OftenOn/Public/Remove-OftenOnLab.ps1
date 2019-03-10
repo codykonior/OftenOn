@@ -4,6 +4,8 @@ function Remove-OftenOnLab {
         [switch] $MasterVirtualHardDisk
     )
 
+    Stop-OftenOnLab -TurnOff
+
     Remove-Item "$PSScriptRoot\..\MOF\*.mof"
     Remove-LabConfiguration -ConfigurationData (Get-OftenOnLabConfiguration) -ErrorAction:Continue -Confirm:$false
 
