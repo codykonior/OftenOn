@@ -114,15 +114,10 @@ Configuration OftenOn {
 
                 # These execute in sequence
 
-                # region Set network adapter binding order
-                ooNetAdapterBindOrder 'Set' {
-                    DependsOn = "[ooNetwork]RenameNetwork"
-                }
-
                 #region Rename the computer
                 Computer 'Rename' {
                     Name = $node.NodeName
-                    DependsOn = "[ooNetAdapterBindOrder]Set"
+                    DependsOn = "[ooNetwork]RenameNetwork"
                 }
                 #endregion
 
@@ -219,6 +214,14 @@ Configuration OftenOn {
                     DependsOn = '[xADDomain]Create'
                 }
                 #endregion
+
+                # Use CloudFlare to service DNS requests as we don't know what
+                # Hyper-V would use otherwise
+                xDnsServerForwarder "WAN Forwarder" {
+                    IsSingleInstance = "Yes";
+                    IPAddresses = "1.1.1.1";
+                    DependsOn = '[xSmbShare]CreateTemp';
+                }
             } elseif ($node.Role.ContainsKey('DomainMember')) {
                 #region Wait for Active Directory
                 # If you don't have a WAN link, the fully qualified domain name works here

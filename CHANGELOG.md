@@ -11,11 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Internet Explorer Enhanced Security Configuration is disabled by default.
 - Passwords end with 2019 instead of 2018.
+- All nodes now have internet access that go through the router/NAT on the
+  DC. This is set up on the DC *after* the domain has been created. Doing
+  this before the domain has been created stops it from being created and
+  stops nodes from joining.
 
-### Fixed
-- Network bind order for the domain controller changed to prefer CHICAGO.
-  Anecdotally (on one test) this has sped up domain creation and how fast
-  members pick up the new domain also.
+### Notes
+- After ISOs and others have been downloaded once, this now builds the lab
+  in 56 minutes on my laptop. Here's the timing.
+
+  00 minutes - MOFs compile and VMs get created.
+  05 minutes - VMs start. CHDC01 domain creation starts.
+  20 minutes - CHDC01 reboots followed by all other nodes as the pick up
+               the new domain. SQL installs start.
+  55 minutes - Finished.
+
 
 ### Added
 - Stop-OftenOnLab has a new -TurnOff parameter which is faster.
