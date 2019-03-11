@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- None.
+### Fixed
+-  The new bootstrap scheduled task removes itself once DSC reports that it is
+   complete. This prevents any of your own customisations from possibly being
+   overwritten on a later reboot.
 
 ## [1.0.15] - 2019-03-09
 ### Changed
@@ -15,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   DC. This is set up on the DC *after* the domain has been created. Doing
   this before the domain has been created stops it from being created and
   stops nodes from joining.
+- There's a scheduled task which re-applies the Bootstrap DSC configuration
+  on every boot. This is to make the initial configuration go faster and
+  also results in better capturing of errors to the text logs.
 
 ### Notes
 - After ISOs and others have been downloaded once, this now builds the lab
@@ -25,7 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   20 minutes - CHDC01 reboots followed by all other nodes as the pick up
                the new domain. SQL installs start.
   55 minutes - Finished.
-
 
 ### Added
 - Stop-OftenOnLab has a new -TurnOff parameter which is faster.
