@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.0.16] - 2019-04-03
+### Changed
+- VM startup memory reduced to 1GB so that builds are more consistent on a
+  16GB laptop. This means BootOrder and BootDelay was no longer needed.
+
 ### Fixed
 -  The new bootstrap scheduled task removes itself once DSC reports that it is
    complete. This prevents any of your own customisations from possibly being
@@ -38,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Broken
 - The DC WAN adapter is now broken and has no internet access. I don't know why.
+
 
 ## [1.0.14] - 2019-02-27
 ### Fixed

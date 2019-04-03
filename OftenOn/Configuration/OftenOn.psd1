@@ -5,15 +5,14 @@
 
             # VM settings
             Lability_ProcessorCount           = 2
-            Lability_StartupMemory            = 2GB
+            Lability_StartupMemory            = 1GB
             Lability_Media                    = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
             # Additional hard disk drive
             Lability_HardDiskDrive            = @(
                 @{ Generation = 'VHDX'; MaximumSizeBytes = 127GB; }
             )
             Lability_GuestIntegrationServices = $true
-            # Wait 10s between each machine start. This requires less memory up front for 16GB laptops.
-            Lability_BootDelay                = 10
+
             # Encryption information (the script will translate the environment variable)
             CertificateFile                   = '$env:ALLUSERSPROFILE\Lability\Certificates\LabClient.cer'
             Thumbprint                        = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
@@ -46,10 +45,9 @@
         #>
 
         @{
-            NodeName           = 'CHDC01'
-            Lability_BootOrder = 1
+            NodeName          = 'CHDC01'
 
-            Network            = @(
+            Network           = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
@@ -60,12 +58,12 @@
                 @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; DnsServerAddress = '127.0.0.1'; }
             )
 
-            Role               = @{
+            Role              = @{
                 DomainController = @{ }
                 Router           = @{ }
             }
 
-            Lability_Resource  = @(
+            Lability_Resource = @(
                 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SSMS1791', 'NetFx472'
             )
         }
@@ -84,15 +82,14 @@
         }
 
         @{
-            NodeName           = 'SEC1N1'
-            Lability_BootOrder = 3
+            NodeName = 'SEC1N1'
 
-            Network            = @(
+            Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.11/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.11/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
-            Role               = @{
+            Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
@@ -101,15 +98,14 @@
         }
 
         @{
-            NodeName           = 'SEC1N2'
-            Lability_BootOrder = 3
+            NodeName = 'SEC1N2'
 
-            Network            = @(
+            Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.12/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.12/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
-            Role               = @{
+            Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
@@ -118,15 +114,14 @@
         }
 
         @{
-            NodeName           = 'SEC1N3'
-            Lability_BootOrder = 3
+            NodeName = 'SEC1N3'
 
-            Network            = @(
+            Network  = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.13/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.13/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
-            Role               = @{
+            Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
@@ -135,15 +130,14 @@
         }
 
         @{
-            NodeName           = 'DAC1N1'
-            Lability_BootOrder = 4
+            NodeName = 'DAC1N1'
 
-            Network            = @(
+            Network  = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.11/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.11/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
-            Role               = @{
+            Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
@@ -152,15 +146,14 @@
         }
 
         @{
-            NodeName           = 'DAC1N2'
-            Lability_BootOrder = 4
+            NodeName = 'DAC1N2'
 
-            Network            = @(
+            Network  = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.12/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.12/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
-            Role               = @{
+            Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
