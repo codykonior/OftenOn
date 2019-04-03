@@ -12,9 +12,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   16GB laptop. This means BootOrder and BootDelay was no longer needed.
 
 ### Fixed
--  The new bootstrap scheduled task removes itself once DSC reports that it is
-   complete. This prevents any of your own customisations from possibly being
-   overwritten on a later reboot.
+- The new bootstrap scheduled task removes itself once DSC reports that it is
+  complete. This prevents any of your own customisations from possibly being
+  overwritten on a later reboot.
+- WAN adapter.
+
+### Broken
+- Desired state is never reached on CHDC01.
+
+ VERBOSE: [CHDC01]:
+ [[DnsServerAddress]SetDnsServerAddressDALLAS_HB::[ooNetwork]RenameNetwork]
+ Test-TargetResource: DNS server addresses are not correct.
+ Expected "", actual "127.0.0.1".
+
 
 ## [1.0.15] - 2019-03-09
 ### Changed
@@ -44,7 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Broken
 - The DC WAN adapter is now broken and has no internet access. I don't know why.
-
 
 ## [1.0.14] - 2019-02-27
 ### Fixed
