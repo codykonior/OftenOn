@@ -177,9 +177,9 @@
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.12.0.0'; }
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.6.0.0'; }
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.3.0.0'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.4.0.0'; }
 
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.3.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.4.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
