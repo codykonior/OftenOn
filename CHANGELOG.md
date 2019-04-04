@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.17] - 2019-04-04
+### Changed
+- Updated for latest DSC Resource Kit release.
+
 ## [1.0.16] - 2019-04-03
 ### Changed
 - VM startup memory reduced to 1GB so that builds are more consistent on a

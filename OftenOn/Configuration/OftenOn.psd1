@@ -167,20 +167,19 @@
             # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
             # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '6.2.0.0'; }
-                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.0.0.0'; }
-                @{ Name = 'xActiveDirectory'; RequiredVersion = '2.24.0.0'; }
+                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '6.3.0.0'; }
+                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.1.0.0'; }
+                @{ Name = 'xActiveDirectory'; RequiredVersion = '2.25.0.0'; }
                 @{ Name = 'xDnsServer'; RequiredVersion = '1.11.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
-                @{ Name = 'xSmbShare'; RequiredVersion = '2.1.0.0'; }
+                @{ Name = 'xSmbShare'; RequiredVersion = '2.2.0.0'; }
                 @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
-                @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.7.0.0'; }
+                @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.12.0.0'; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.5.0.0'; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.6.0.0'; }
                 @{ Name = 'SqlServerDsc'; RequiredVersion = '12.3.0.0'; }
 
-                # This has critical fixes for read only routing but is not up to date
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.1.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.3.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
