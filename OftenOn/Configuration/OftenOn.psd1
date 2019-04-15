@@ -193,7 +193,6 @@
                 @{ Name = 'DbSmo'; }
                 @{ Name = 'Disposable'; }
                 @{ Name = 'Error'; }
-                @{ Name = 'HackSql'; }
                 @{ Name = 'Jojoba'; }
                 @{ Name = 'ParseSql'; }
                 @{ Name = 'Performance'; }
