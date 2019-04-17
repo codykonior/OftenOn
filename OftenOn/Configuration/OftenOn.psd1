@@ -196,6 +196,9 @@
                 @{ Name = 'Jojoba'; }
                 @{ Name = 'ParseSql'; }
                 @{ Name = 'Performance'; }
+
+                @{ Name = 'dbatools'; }
+                @{ Name = 'dbachecks'; }
             )
 
             Network     = @(
