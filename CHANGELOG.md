@@ -1,5 +1,4 @@
 # Changelog
-
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -7,52 +6,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.20] - 2019-04-17
-
-### Changed
-
-- Include dbatools and dbachecks modules.
-- Improve module load time.
-
-### Fixed
-
-- Changelog syntax passes VS Code markdown linter.
-
 ## [1.0.19] - 2019-04-15
-
 ### Removed
-
 - HackSql module is no longer installed by default in VMs as it can be flagged
   as an unwanted program by AV.
 
 ## [1.0.18] - 2019-04-04
-
 ### Changed
-
 - Updated for latest DSC Resource Kit release.
 
 ## [1.0.17] - 2019-04-04
-
 ### Changed
-
 - Updated for latest DSC Resource Kit release.
 
 ## [1.0.16] - 2019-04-03
-
 ### Changed
-
 - VM startup memory reduced to 1GB so that builds are more consistent on a
   16GB laptop. This means BootOrder and BootDelay was no longer needed.
 
 ### Fixed
-
 - The new bootstrap scheduled task removes itself once DSC reports that it is
   complete. This prevents any of your own customisations from possibly being
   overwritten on a later reboot.
 - WAN adapter.
 
 ### Broken
-
 - Desired state is never reached on CHDC01.
 
  VERBOSE: [CHDC01]:
@@ -60,10 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  Test-TargetResource: DNS server addresses are not correct.
  Expected "", actual "127.0.0.1".
 
+
 ## [1.0.15] - 2019-03-09
-
 ### Changed
-
 - Internet Explorer Enhanced Security Configuration is disabled by default.
 - Passwords end with 2019 instead of 2018.
 - All nodes now have internet access that go through the router/NAT on the
@@ -75,7 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   also results in better capturing of errors to the text logs.
 
 ### Notes
-
 - After ISOs and others have been downloaded once, this now builds the lab
   in 56 minutes on my laptop. Here's the timing.
 
@@ -86,73 +62,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   55 minutes - Finished.
 
 ### Added
-
 - Stop-OftenOnLab has a new -TurnOff parameter which is faster.
 - Remove-OftenOnLab now uses Stop-OftenLab -TurnOff and so runs faster.
 
 ### Broken
-
 - The DC WAN adapter is now broken and has no internet access. I don't know why.
 
 ## [1.0.14] - 2019-02-27
-
 ### Fixed
-
 - LCM DebugMode set to ForceModuleImport. This will massively speed up setup
   by not caching DSC responses from resources, which slows down joining the
   domain and setting up the cluster.
 
 ### Changed
-
 - DSC resource module version number updates.
 - Don't quit when the DSC modules are wrong. This is so you can still use
   Remove-OftenOnLab when things are out of date.
 
 ## [1.0.13] - 2019-02-13
-
 ### Changed
-
 - Updated required version of modules, and give more errors upon load if the
   modules on disk are different to what is expected.
 - Update to use SSMS 17.9.1.
 
 ## [1.0.12] - 2018-11-03
-
 ### Fixed
-
 - Typo from previous version.
 
 ## [1.0.11] - 2018-11-02
-
 ### Changed
-
 - Enable the TLS 1.2 in the session by default if it's not set. This is easier.
 
 ## [1.0.10] - 2018-11-02
-
 ### Added
-
 - HackSql PowerShell module.
 - 10s delay between booting each VM so this can run on 16GB laptops easier.
 - Warning if you don't have TLS 1.2 enabled as it results in GitHub download
   errors.
 
 ## [1.0.9] - 2018-11-01
-
 ### Added
-
 - Enable Mixed mode authentication by default.
 
 ## [1.0.9] - 2018-10-31
-
 ### Added
-
 - Pester and DbSmo modules copied to servers.
 
 ## [1.0.8] - 2018-10-30
-
 ### Changed
-
 - If `Test-LabHostConfiguration` fails then run `StartLabHostConfiguration` then
   exit with an error. This is to force a reboot because it's too easy to continue
   at this stage and get more insidious errors.
