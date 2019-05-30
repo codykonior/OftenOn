@@ -64,7 +64,7 @@
             }
 
             Lability_Resource = @(
-                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SSMS1791', 'NetFx472'
+                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SSMS1791', 'SSMS1800', 'NetFx472'
             )
         }
 
@@ -160,6 +160,102 @@
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.2.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
+
+        #region Windows 2016 SQL 2017
+        <#
+            Add Lability_Media
+            Change C1 to C2
+            Change AG1 to AG2
+            Removed ,SSMS,SSMS_ADV
+            Change SQLServer2012 to SQLServer2017
+            Add 1 to third subnet of StaticAddress and IPAddress
+        #>
+
+        @{
+            NodeName       = 'SEC2N1'
+            Lability_Media = '2016_x64_Standard_EN_Eval'
+
+            Network        = @(
+                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.111/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.111/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+            )
+
+            Role           = @{
+                DomainMember      = @{ }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
+            }
+        }
+
+        @{
+            NodeName       = 'SEC2N2'
+            Lability_Media = '2016_x64_Standard_EN_Eval'
+
+            Network        = @(
+                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.112/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.112/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+            )
+
+            Role           = @{
+                DomainMember      = @{ }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
+            }
+        }
+
+        @{
+            NodeName       = 'SEC2N3'
+            Lability_Media = '2016_x64_Standard_EN_Eval'
+
+            Network        = @(
+                @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.113/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
+                @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.113/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
+            )
+
+            Role           = @{
+                DomainMember      = @{ }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
+            }
+        }
+
+        @{
+            NodeName       = 'DAC2N1'
+            Lability_Media = '2016_x64_Standard_EN_Eval'
+
+            Network        = @(
+                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.111/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.111/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
+            )
+
+            Role           = @{
+                DomainMember      = @{ }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
+            }
+        }
+
+        @{
+            NodeName       = 'DAC2N2'
+            Lability_Media = '2016_x64_Standard_EN_Eval'
+
+            Network        = @(
+                @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.112/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
+                @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.112/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
+            )
+
+            Role           = @{
+                DomainMember      = @{ }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
+            }
+        }
+        #endregion Windows 2016 SQL 2017
     )
 
     NonNodeData = @{
@@ -167,19 +263,19 @@
             # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
             # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '6.3.0.0'; }
-                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.1.0.0'; }
-                @{ Name = 'xActiveDirectory'; RequiredVersion = '2.25.0.0'; }
-                @{ Name = 'xDnsServer'; RequiredVersion = '1.11.0.0'; }
+                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '6.4.0.0'; }
+                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.2.0.0'; }
+                @{ Name = 'xActiveDirectory'; RequiredVersion = '2.26.0.0'; }
+                @{ Name = 'xDnsServer'; RequiredVersion = '1.12.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.2.0.0'; }
                 @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.12.0.0'; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.6.0.0'; }
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.4.0.0'; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.7.0.0'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; }
 
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.4.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
@@ -256,7 +352,7 @@
             Resource    = @(
                 @{
                     Id       = 'SQLServer2012'
-                    Filename = 'SQLFULL_ENU.ISO'
+                    Filename = 'SQLFULL_ENU.iso'
                     Uri      = 'https://download.microsoft.com/download/4/C/7/4C7D40B9-BCF8-4F8A-9E76-06E9B92FE5AE/ENU/SQLFULL_ENU.iso'
                     Checksum = 'C44C1869A7657001250EF8FAD4F636D3'
                     Expand   = $true
@@ -281,15 +377,28 @@
                 }
                 @{
                     Id       = 'SSMS1791'
-                    Filename = 'SSMS-Setup-ENU.exe'
+                    Filename = 'SSMS-Setup-ENU-17.9.1.exe'
                     Uri      = 'https://download.microsoft.com/download/D/D/4/DD495084-ADA7-4827-ADD3-FC566EC05B90/SSMS-Setup-ENU.exe'
                     Checksum = '826BB5D7B783DCB9FB4194F326106850'
+                }
+                @{
+                    Id       = 'SSMS1800'
+                    Filename = 'SSMS-Setup-ENU-18.0.0.exe'
+                    Uri      = 'https://download.microsoft.com/download/5/4/E/54EC1AD8-042C-4CA3-85AB-BA307CF73710/SSMS-Setup-ENU.exe'
+                    Checksum = '2FE1A67317AC4DE9669283817167D516'
                 }
                 @{
                     Id       = 'NetFx472'
                     Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Uri      = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Checksum = '87450CFA175585B23A76BBD7052EE66B'
+                }
+                @{
+                    Id       = 'SQLServer2017'
+                    Filename = 'SQLServer2017-x64-ENU.iso'
+                    Uri      = 'https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SQLServer2017-x64-ENU.iso'
+                    Checksum = 'C44C1869A7657001250EF8FAD4F636D3'
+                    Expand   = $true
                 }
             )
         }
