@@ -64,7 +64,7 @@
             }
 
             Lability_Resource = @(
-                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SSMS1791', 'SSMS1800', 'NetFx472'
+                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU14', 'SSMS1791', 'SSMS1800', 'NetFx472'
             )
         }
 
@@ -222,6 +222,7 @@
             }
         }
 
+        <#
         @{
             NodeName       = 'DAC2N1'
             Lability_Media = '2016_x64_Standard_EN_Eval'
@@ -255,6 +256,7 @@
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
+        #>
         #endregion Windows 2016 SQL 2017
     )
 
@@ -273,9 +275,9 @@
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.12.0.0'; }
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.7.0.0'; }
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; }
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; }
 
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "readonlyrouting"; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "upgrade"; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
@@ -374,6 +376,12 @@
                     Filename = 'SQLServer2012-KB4091266-x64.exe'
                     Uri      = 'http://download.microsoft.com/download/3/D/9/3D95BF50-AED7-44A6-863B-BC7DC7C722CE/SQLServer2012-KB4091266-x64.exe'
                     Checksum = '54AF3D25BA0254440340E86320441A94'
+                }
+                @{
+                    Id       = 'SQLServer2017CU14'
+                    Filename = 'sqlserver2017-kb4484710-x64_59015db5853814c7f2ac24cd4722c0eae771829f.exe'
+                    Uri      = 'http://download.windowsupdate.com/d/msdownload/update/software/updt/2019/03/sqlserver2017-kb4484710-x64_59015db5853814c7f2ac24cd4722c0eae771829f.exe'
+                    Checksum = '06563732B4F3532D84D6F7E5D969F638'
                 }
                 @{
                     Id       = 'SSMS1791'

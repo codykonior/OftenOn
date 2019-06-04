@@ -383,8 +383,8 @@ Configuration OftenOn {
                     SAPwd = $systemAdministrator
                     SQLSvcAccount = $sqlEngineService
                     SQLSysAdminAccounts = $localAdministrator.UserName
-                    UpdateEnabled = 'False'
-
+                    UpdateEnabled = 'True'
+                    UpdateSource = '\\CHDC01\Resources'
                     DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
                 }
 

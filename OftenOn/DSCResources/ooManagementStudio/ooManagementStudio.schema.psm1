@@ -12,6 +12,13 @@ Configuration ooManagementStudio {
                 Where-Object { $_.Property -contains 'DisplayName' -and $_.GetValue('DisplayName') -like "*17.9*" } |
                 ForEach-Object { $_.GetValue('BundleProviderKey') }
     #>
+    xPackage 'SSMS1791' {
+        Name      = 'SSMS1791'
+        Path      = $ResourceLocation
+        ProductId = '91a1b895-c621-4038-b34a-01e7affbcb6b'
+        Arguments = '/install /quiet'
+    }
+
     xPackage 'SSMS1800' {
         Name      = 'SSMS1800'
         Path      = $ResourceLocation
