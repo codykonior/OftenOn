@@ -92,7 +92,7 @@
             Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
@@ -108,7 +108,7 @@
             Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
@@ -124,7 +124,7 @@
             Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
@@ -140,7 +140,7 @@
             Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.2.31/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
@@ -156,7 +156,7 @@
             Role     = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT,SSMS,ADV_SSMS'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.2.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
@@ -183,7 +183,7 @@
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
@@ -200,11 +200,12 @@
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
 
+        <#
         @{
             NodeName       = 'SEC2N3'
             Lability_Media = '2016_x64_Standard_EN_Eval'
@@ -217,12 +218,12 @@
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
+        #>
 
-        <#
         @{
             NodeName       = 'DAC2N1'
             Lability_Media = '2016_x64_Standard_EN_Eval'
@@ -235,11 +236,12 @@
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = "10.0.12.0/24"; }
-                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
 
+        <#
         @{
             NodeName       = 'DAC2N2'
             Lability_Media = '2016_x64_Standard_EN_Eval'
