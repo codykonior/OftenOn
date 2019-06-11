@@ -12,6 +12,7 @@
                 @{ Generation = 'VHDX'; MaximumSizeBytes = 127GB; }
             )
             Lability_GuestIntegrationServices = $true
+            Lability_BootOrder                = 2
 
             # Encryption information (the script will translate the environment variable)
             CertificateFile                   = '$env:ALLUSERSPROFILE\Lability\Certificates\LabClient.cer'
@@ -45,10 +46,14 @@
         #>
 
         @{
-            NodeName          = 'CHDC01'
-            Lability_Media    = '2016_x64_Standard_EN_Eval'
+            NodeName           = 'CHDC01'
+            Lability_Media     = '2016_x64_Standard_EN_Eval'
 
-            Network           = @(
+            # This is done because if the servers come up without the DC on WS2016 the network cards can change to "Public"
+            Lability_BootOrder = 1
+            Lability_BootDelay = 60
+
+            Network            = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.1/24'; DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.1/24'; DnsServerAddress = '127.0.0.1'; }
@@ -59,12 +64,12 @@
                 @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; DnsServerAddress = '127.0.0.1'; }
             )
 
-            Role              = @{
+            Role               = @{
                 DomainController = @{ }
                 Router           = @{ }
             }
 
-            Lability_Resource = @(
+            Lability_Resource  = @(
                 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU14', 'SSMS1791', 'SSMS1800', 'NetFx472'
             )
         }
