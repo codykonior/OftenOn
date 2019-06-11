@@ -14,14 +14,14 @@ Configuration ooManagementStudio {
     #>
     xPackage 'SSMS1791' {
         Name      = 'SSMS1791'
-        Path      = $ResourceLocation
+        Path      = "$ResourceLocation\SSMS-Setup-ENU-17.9.1.exe"
         ProductId = '91a1b895-c621-4038-b34a-01e7affbcb6b'
         Arguments = '/install /quiet'
     }
 
     xPackage 'SSMS1800' {
         Name      = 'SSMS1800'
-        Path      = $ResourceLocation
+        Path      = "$ResourceLocation\SSMS-Setup-ENU-18.0.0.exe"
         ProductId = '2d54e901-e51d-41e2-8161-2adaa6a700d6'
         Arguments = '/install /quiet'
     }

@@ -44,7 +44,7 @@ The VMs built are as follows:
 - SEC1N1 SEC1N2 SEC1N3 are three nodes of the C1 cluster in the Seattle subnet.
 - DAC1N1 DAC1N2 are two nodes of the C1 cluster in the Dallas subnet.
 
-The C1 cluster has an Availability Group (AG1), a listener (AG1L), and a database (DummyAG1). It's all sync'd to Dallas and ready
+The C1 cluster has an Availability Group (AG1), a listener (AG1L), and a database (AG1DBx). It's all sync'd to Dallas and ready
 to failover for your testing!
 
 All VMs have WMF 5.1 installed. There's a couple resources (like SQL patches and the .NET 4.7.2 updater) on \\CHDC01\Resources.

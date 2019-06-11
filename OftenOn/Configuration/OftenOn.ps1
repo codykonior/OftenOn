@@ -130,6 +130,12 @@ Configuration OftenOn {
                     DependsOn                     = '[WindowsFeatureSet]All'
                 }
 
+                #region Set Time Sync (required for Windows Server 2016 Hyper-V clients to work)
+                ooTime 'SetTime' {
+                    DependsOn = '[xADDomain]Create'
+                }
+                #endregion
+
                 #region Create an AD lookup, just makes nslookup work nicer
                 # This should really be done for all networks and computers but...
                 xDnsServerADZone 'AddReverseZone'
@@ -505,22 +511,26 @@ Configuration OftenOn {
                             DependsOn = "[SqlAg]CreateAvailabilityGroup$($node.Role.AvailabilityGroup.Name)"
                         }
 
-                        SqlDatabase "CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)" {
-                            Ensure       = 'Present'
-                            ServerName   = $node.NodeName
-                            InstanceName = $node.Role.SQLServer.InstanceName
-                            Name         = "Dummy$($node.Role.AvailabilityGroup.Name)"
-                            PsDscRunAsCredential = $localAdministrator
-                            DependsOn = '[SqlSetup]InstallSQLServer'
+                        1..4 | ForEach-Object {
+                            SqlDatabase "CreateDatabase$($node.Role.AvailabilityGroup.Name)Db$_" {
+                                Ensure       = 'Present'
+                                ServerName   = $node.NodeName
+                                InstanceName = $node.Role.SQLServer.InstanceName
+                                Name         = "$($node.Role.AvailabilityGroup.Name)Db$_"
+                                PsDscRunAsCredential = $localAdministrator
+                                DependsOn = '[SqlSetup]InstallSQLServer'
+                            }
                         }
 
-                        SqlDatabaseRecoveryModel "SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)" {
-                            Name         = "Dummy$($node.Role.AvailabilityGroup.Name)"
-                            RecoveryModel        = 'Full'
-                            ServerName           = $node.NodeName
-                            InstanceName         = $node.Role.SQLServer.InstanceName
-                            PsDscRunAsCredential = $localAdministrator
-                            DependsOn = "[SqlDatabase]CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)"
+                        1..4 | ForEach-Object {
+                            SqlDatabaseRecoveryModel "SetDatabaseRecoveryModel$($node.Role.AvailabilityGroup.Name)Db$_" {
+                                Name         = "$($node.Role.AvailabilityGroup.Name)Db$_"
+                                RecoveryModel        = 'Full'
+                                ServerName           = $node.NodeName
+                                InstanceName         = $node.Role.SQLServer.InstanceName
+                                PsDscRunAsCredential = $localAdministrator
+                                DependsOn = "[SqlDatabase]CreateDatabase$($node.Role.AvailabilityGroup.Name)Db$_"
+                            }
                         }
 
                         $completeReplicaList = $AllNodes | Where-Object { $_.NodeName -ne $node.NodeName -and $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.NodeName }
@@ -533,15 +543,19 @@ Configuration OftenOn {
                             RetryIntervalSec = 15
 
                             PsDscRunAsCredential = $localAdministrator
-                            DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)"
+                            DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModel$($node.Role.AvailabilityGroup.Name)Db4"
                         }
 
                         # This really needs wait for all replicas to be added
                         # This will give an error if you use MatchDatabaseOwner on SQL 2012
-                        SqlAGDatabase "AddDatabaseTo$($node.Role.AvailabilityGroup.Name)" {
+                        $databaseNames = 1..4 | ForEach-Object {
+                            "$($node.Role.AvailabilityGroup.Name)Db$_"
+                        }
+
+                        SqlAGDatabase "Add$($node.Role.AvailabilityGroup.Name)Database" {
                             AvailabilityGroupName   = $node.Role.AvailabilityGroup.Name
                             BackupPath              = '\\CHDC01\Temp' # TODO: Remove this
-                            DatabaseName            = "Dummy$($node.Role.AvailabilityGroup.Name)"
+                            DatabaseName            = $databaseNames
                             ServerName              = $node.NodeName
                             InstanceName            = $node.Role.SQLServer.InstanceName
                             Ensure                  = 'Present'
@@ -592,8 +606,8 @@ Configuration OftenOn {
                     ResourceLocation = "$resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe"
                 }
 
-                ooManagementStudio 'Install1800' {
-                    ResourceLocation = "$resourceLocation\SSMS-Setup-ENU-18.0.0.exe"
+                ooManagementStudio 'InstallManagementStudio' {
+                    ResourceLocation = $resourceLocation
                     DependsOn  = '[ooNetFramework]Install472'
                 }
             }
