@@ -47,7 +47,7 @@
 
         @{
             NodeName           = 'CHDC01'
-            Lability_Media     = '2016_x64_Standard_EN_Eval'
+            Lability_Media     = 'Windows Server 2016 Standard 64bit English Evaluation'
 
             # This is done because if the servers come up without the DC on WS2016 the network cards can change to "Public"
             Lability_BootOrder = 1
@@ -76,7 +76,7 @@
 
         @{
             NodeName       = 'CHWK01'
-            Lability_Media = '2016_x64_Standard_EN_Eval'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
             Network        = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.3/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
@@ -180,7 +180,7 @@
 
         @{
             NodeName       = 'SEC2N1'
-            Lability_Media = '2016_x64_Standard_EN_Eval'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
             Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.111/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
@@ -197,7 +197,7 @@
 
         @{
             NodeName       = 'SEC2N2'
-            Lability_Media = '2016_x64_Standard_EN_Eval'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
             Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.112/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
@@ -214,7 +214,7 @@
 
         @{
             NodeName       = 'SEC2N3'
-            Lability_Media = '2016_x64_Standard_EN_Eval'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
             Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.113/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
@@ -224,14 +224,14 @@
             Role           = @{
                 DomainMember = @{ }
                 Cluster      = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
-                SqlServer    = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                SqlServer    = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 # AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
 
         @{
             NodeName       = 'DAC2N1'
-            Lability_Media = '2016_x64_Standard_EN_Eval'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
             Network        = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.111/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
@@ -248,7 +248,7 @@
 
         @{
             NodeName       = 'DAC2N2'
-            Lability_Media = '2016_x64_Standard_EN_Eval'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
             Network        = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.112/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
@@ -258,7 +258,7 @@
             Role           = @{
                 DomainMember = @{ }
                 Cluster      = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = "10.0.12.0/24"; }
-                SqlServer    = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
+                SqlServer    = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE,REPLICATION,FULLTEXT'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 # AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
@@ -345,13 +345,41 @@
                         # being configured in DSC at exactly the wrong time).
                         CustomBootStrap        = @(
                             'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'schtasks /create /tn "BootStrap" /tr "cmd.exe /c Powershell.exe -Command %SYSTEMDRIVE%\BootStrap\BootStrap.ps1 >> %SYSTEMDRIVE%\BootStrap\BootStrap.log" /sc "ONSTART" /ru "System" /f',
-                            'if (Test-DscConfiguration) { schtasks /delete /tn "BootStrap" /f }'
+                            'schtasks /create /tn "BootStrap" /tr "Powershell.exe %SYSTEMDRIVE%\BootStrap\BootStrap.ps1 >> %SYSTEMDRIVE%\BootStrap\BootStrap_ONSTART.log" /sc "ONSTART" /ru "System" /f'
+                            # schtasks /delete /tn "BootStrap" /f
                         )
                         WindowsOptionalFeature = @(
                             'NetFx3',
                             'TelnetClient'
                         )
+                    }
+                }
+                @{
+                    Id              = 'Windows Server 2016 Standard 64bit English Evaluation'
+                    Filename        = '14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO'
+                    Architecture    = 'x64'
+                    Uri             = 'http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO'
+                    Checksum        = '70721288BBCDFE3239D8F8C0FAE55F1F'
+                    Description     = 'Windows Server 2016 Standard 64bit English Evaluation'
+                    MediaType       = 'ISO'
+                    ImageName       = 2
+                    OperatingSystem = 'Windows'
+                    Hotfixes        = @()
+                    CustomData      = @{
+                        # The first line is part of any bootstrap, but the second line also schedules it to run on start.
+                        # Sometimes when Windows starts (during the build) it takes forever to resume configuration DSC.
+                        # This gives it a little kick in the pants (though I guess could also break something if it was
+                        # being configured in DSC at exactly the wrong time).
+                        CustomBootStrap        = @(
+                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
+                            'schtasks /create /tn "BootStrap" /tr "Powershell.exe %SYSTEMDRIVE%\BootStrap\BootStrap.ps1 >> %SYSTEMDRIVE%\BootStrap\BootStrap_ONSTART.log" /sc "ONSTART" /ru "System" /f'
+                            # schtasks /delete /tn "BootStrap" /f
+                        )
+                        WindowsOptionalFeature = @(
+                            'NetFx3',
+                            'TelnetClient'
+                        )
+                        MinimumDismVersion     = "10.0.0.0"
                     }
                 }
             )
@@ -399,6 +427,12 @@
                     Filename = 'SSMS-Setup-ENU-18.0.0.exe'
                     Uri      = 'https://download.microsoft.com/download/5/4/E/54EC1AD8-042C-4CA3-85AB-BA307CF73710/SSMS-Setup-ENU.exe'
                     Checksum = '2FE1A67317AC4DE9669283817167D516'
+                }
+                @{
+                    Id       = 'SSMS1810'
+                    Filename = 'SSMS-Setup-ENU-18.1.0.exe'
+                    Uri      = 'https://download.microsoft.com/download/0/1/5/015ECB20-6206-4500-B73C-F3405553445A/SSMS-Setup-ENU.exe'
+                    Checksum = 'A092948409260FB68F72858337043E5C'
                 }
                 @{
                     Id       = 'NetFx472'

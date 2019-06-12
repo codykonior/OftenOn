@@ -12,17 +12,10 @@ Configuration ooManagementStudio {
                 Where-Object { $_.Property -contains 'DisplayName' -and $_.GetValue('DisplayName') -like "*17.9*" } |
                 ForEach-Object { $_.GetValue('BundleProviderKey') }
     #>
-    xPackage 'SSMS1791' {
-        Name      = 'SSMS1791'
-        Path      = "$ResourceLocation\SSMS-Setup-ENU-17.9.1.exe"
-        ProductId = '91a1b895-c621-4038-b34a-01e7affbcb6b'
-        Arguments = '/install /quiet'
-    }
-
-    xPackage 'SSMS1800' {
-        Name      = 'SSMS1800'
-        Path      = "$ResourceLocation\SSMS-Setup-ENU-18.0.0.exe"
-        ProductId = '2d54e901-e51d-41e2-8161-2adaa6a700d6'
+    xPackage 'SSMS1810' {
+        Name      = 'SSMS1810'
+        Path      = "$ResourceLocation\SSMS-Setup-ENU-18.1.0.exe"
+        ProductId = '1643af48-a2d8-4806-847c-8d565a9af98a'
         Arguments = '/install /quiet'
     }
 }
