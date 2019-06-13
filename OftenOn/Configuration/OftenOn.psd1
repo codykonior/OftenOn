@@ -282,7 +282,7 @@
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.7.0.0'; }
                 # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; }
 
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; Provider = 'GitHub'; Owner = "codykonior"; Branch = "upgrade"; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; Provider = 'GitHub'; Owner = "PowerShell"; Branch = "dev"; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
