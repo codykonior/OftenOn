@@ -18,15 +18,69 @@ SQL 2012 on Windows 2012 and a second cluster of SQL 2017 on Windows 2016 with n
 #>
 
 function Set-OftenOnLab {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "Default")]
     param (
-        [hashtable] $Cluster1 = @{
-            Windows           = '2012'
-            SQL               = '2012'
-            AvailabilityGroup = $true
-        },
+        [Parameter(ParameterSetName = 'Default')]
+        [ValidateSet('Simple', 'CrossClusterMigration', 'Upgrade', 'DAG')]
+        $ConfigurationName = 'Default',
+
+        [Parameter(ParameterSetName = 'Detailed')]
+        [hashtable] $Cluster1,
+        [Parameter(ParameterSetName = 'Detailed')]
         [hashtable] $Cluster2
     )
+
+    if ($PSCmdlet.ParameterSetName -eq 'Default') {
+        Write-Verbose "Setting configuration to $ConfigurationName"
+        switch ($ConfigurationName) {
+            'Default' {
+                $Cluster1 = @{
+                    Windows           = '2012'
+                    SQL               = '2012'
+                    AvailabilityGroup = $true
+                }
+                $Cluster2 = $null
+            }
+            'CrossClusterMigration' {
+                $Cluster1 = @{
+                    Windows           = '2012'
+                    SQL               = '2012'
+                    AvailabilityGroup = $true
+                }
+                $Cluster2 = @{
+                    Windows           = '2016'
+                    SQL               = '2012'
+                    AvailabilityGroup = $false
+                }
+            }
+            'Upgrade' {
+                $Cluster1 = @{
+                    Windows           = '2012'
+                    SQL               = '2012'
+                    AvailabilityGroup = $true
+                }
+                $Cluster2 = @{
+                    Windows           = '2016'
+                    SQL               = '2017'
+                    AvailabilityGroup = $false
+                }
+            }
+            'DAG' {
+                $Cluster1 = @{
+                    Windows           = '2012'
+                    SQL               = '2017'
+                    AvailabilityGroup = $true
+                }
+                $Cluster2 = @{
+                    Windows           = '2016'
+                    SQL               = '2017'
+                    AvailabilityGroup = $false
+                }
+            }
+        }
+    } else {
+        Write-Verbose "Using custom Cluster1 and Cluster2 configurations"
+    }
 
     $configurationData = Import-Metadata "$PSScriptRoot\..\Configuration\OftenOn_Template.psd1" -Ordered
 
