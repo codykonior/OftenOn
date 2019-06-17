@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   only really interested in migration scenarios where SQL is on Windows 2012.
 - The domain LAB is now called OFTENON. This bears no relation to any .com of
   the same name.
+- SSMS 18.1.0 is installed by default. The previous two are still available.
+- 4 databases are added to the Availability Group by default.
 
 ### Fixed
 - Internet access for machines inside the domain. This is critical for time sync
