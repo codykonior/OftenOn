@@ -6,6 +6,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2019-06-17
+### Added
+- Set-OftenOnLab can be used to alter what configuration New-OftenOnLab will
+  create. Options are:
+    Default (SQL 2012 on Windows 2012)
+    CrossClusterMigration (2x clusters of SQL 2012 on Windows 2012)
+    Upgrade (SQL 2012 on Windows 2012 and SQL 2017 on Windows 2016)
+    DAG (SQL 2017 on Windows 2012 and SQL 2017 on Windows 2017)
+- Windows 2016 support.
+
+### Changed
+- SQL patches are applied by default because a lot of the migrations require
+  them.
+- CHDC01 and CHWK01 are now Windows 2016. This makes life easier as we are
+  only really interested in migration scenarios where SQL is on Windows 2012.
+- The domain LAB is now called OFTENON. This bears no relation to any .com of
+  the same name.
+
+### Fixed
+- Internet access for machines inside the domain. This is critical for time sync
+  which is critical for Windows 2016 support.
+  If it doesn't work for you and you're on an old Windows 10 version like 1607,
+  modify your Default Switch in Hyper-V manager to be an External switch. On
+  newer Windows 10 it should just work without this.
+
 ## [1.0.21] - 2019-04-18
 ### Fixed
 - Revert broken version.
