@@ -10,9 +10,10 @@ function Test-OftenOnLab {
     <#
     Any modules we specify to be used with
     #>
-    $configurationData = Import-PowerShellDataFile -Path "$PSScriptRoot\Configuration\OftenOn.psd1"
+    $configurationData = Import-PowerShellDataFile -Path "$PSScriptRoot\..\Configuration\OftenOn.psd1"
     foreach ($dscResource in $configurationData.NonNodeData.Lability.DSCResource) {
-        [array] $modules = Get-Module $dscResource.Name -ListAvailable | Sort-Object Version -Descending
+        Write-Verbose "Testing DSC configuration reference for module $($dscResource.Name)"
+        [array] $modules = Get-Module $dscResource.Name -ListAvailable -Verbose:$false | Sort-Object Version -Descending
         if (!($dscResource.ContainsKey("RequiredVersion"))) {
             Write-Warning ".\Configuration\OftenOn.psd1 requires $($dscResource.Name) but does not have a RequiredVersion"
         } elseif ($dscResource.RequiredVersion -ne $modules[0].Version) {
@@ -20,14 +21,16 @@ function Test-OftenOnLab {
         }
     }
 
-    Get-ChildItem $PSScriptRoot -Recurse -File | ForEach-Object {
+    Get-ChildItem $PSScriptRoot\.. -Recurse -File | ForEach-Object {
         $fileName = $PSItem
         $content = Get-Content $fileName.FullName
 
         foreach ($line in $content) {
             if ($line -match "\s+Import-DscResource\s+-ModuleName\s+(.*)\s+-ModuleVersion\s+(.*)" -or
                 $line -match "\s+Import-DscResource\s+-ModuleName\s+(.*)") {
-                [array] $modules = Get-Module -ListAvailable $Matches[1] | Sort-Object Version -Descending
+                Write-Verbose "Testing DSC resource reference for $($Matches[1])"
+
+                [array] $modules = Get-Module -ListAvailable $Matches[1] -Verbose:$false | Sort-Object Version -Descending
 
                 if ($Matches.Count -eq 3) {
                     # ModuleName and ModuleVersion match
