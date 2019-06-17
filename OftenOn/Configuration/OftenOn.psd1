@@ -19,8 +19,8 @@
             Thumbprint                        = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
             PSDscAllowDomainUser              = $true
 
-            FullyQualifiedDomainName          = 'lab.com'
-            DomainName                        = 'LAB'
+            FullyQualifiedDomainName          = 'oftenon.com'
+            DomainName                        = 'OFTENON'
 
             Role                              = @{ }
         }

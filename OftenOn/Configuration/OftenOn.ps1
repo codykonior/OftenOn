@@ -33,7 +33,7 @@ Configuration OftenOn {
         # When building the domain the UserName is ignored. But the domain part of the username is required to use the credential to add computers to the domain.
         $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2019!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2019!' | ConvertTo-SecureString -AsPlainText -Force))
-        # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @lab.com
+        # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @oftenon.com
         $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2019!' | ConvertTo-SecureString -AsPlainText -Force))
         $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2019!' | ConvertTo-SecureString -AsPlainText -Force))
         # This isn't a domain login
@@ -157,7 +157,7 @@ Configuration OftenOn {
                 xDnsRecord 'AddReverseZoneLookup'
                 {
                     Name = '1.0.0.10.in-addr.arpa'
-                    Target = 'CHDC01.lab.com'
+                    Target = 'CHDC01.oftenon.com'
                     Zone = '0.0.10.in-addr.arpa'
                     Type = 'PTR'
 

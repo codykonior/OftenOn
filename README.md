@@ -34,7 +34,7 @@ destroyed and competely recreated takes 45-60 minutes. You'll know it's done whe
 Then remote in yourself! Remote Desktop from your machine should work to the short computer names (e.g. CHDC01) via IPv6 but it may
 not work on some configurations.
 
-Username LAB\LocalAdministrator
+Username OFTENON\LocalAdministrator
 Password Local2019!
 
 The VMs built are as follows:
