@@ -10,6 +10,10 @@ function Set-OftenOnLab {
         [ValidateSet('Default', 'CrossClusterMigration', 'Upgrade', 'DAG')]
         [string] $ConfigurationName = 'Default',
 
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Detailed')]
+        [string] $WorkstationCode,
+
         [Parameter(ParameterSetName = 'Detailed')]
         [hashtable] $Cluster1,
         [Parameter(ParameterSetName = 'Detailed')]
@@ -71,6 +75,17 @@ function Set-OftenOnLab {
     }
 
     $configurationData = Import-PowerShellDataFile "$PSScriptRoot\..\Configuration\OftenOn_Template.psd1"
+    if ($WorkstationCode) {
+        if (-not (Test-Path $WorkstationCode)) {
+            Write-Error "$WorkstationCode does not exist"
+        }
+        $configurationData.NonNodeData.Lability.Resource += @{ Id = 'WorkstationCode'; IsLocal = $true; Filename = $WorkstationCode; DestinationPath = 'C:\Program Files\WindowsPowerShell\Modules'; }
+        $node = $configurationData.AllNodes | Where-Object { $_.NodeName -eq 'CHWK01' }
+        if (!$node.psobject.Properties["Lability_Resource"]) {
+            $node.Lability_Resource = @{ }
+        }
+        $node.Lability_Resource = 'WorkstationCode'
+    }
 
     if ($Cluster1) {
         $windows = if ($Cluster1.Windows -eq '2012') {
