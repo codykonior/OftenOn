@@ -82,9 +82,9 @@ function Set-OftenOnLab {
         $configurationData.NonNodeData.Lability.Resource += @{ Id = 'WorkstationCode'; IsLocal = $true; Filename = $WorkstationCode; DestinationPath = '\Program Files\WindowsPowerShell\Modules'; }
         $node = $configurationData.AllNodes | Where-Object { $_.NodeName -eq 'CHWK01' }
         if (!$node.psobject.Properties["Lability_Resource"]) {
-            $node.Lability_Resource = @{ }
+            $node.Lability_Resource = @()
         }
-        $node.Lability_Resource = 'WorkstationCode'
+        $node.Lability_Resource += 'WorkstationCode'
     }
 
     if ($Cluster1) {
