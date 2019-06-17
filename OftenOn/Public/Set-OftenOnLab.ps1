@@ -20,9 +20,9 @@ SQL 2012 on Windows 2012 and a second cluster of SQL 2017 on Windows 2016 with n
 function Set-OftenOnLab {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     param (
-        [Parameter(ParameterSetName = 'Default')]
-        [ValidateSet('Simple', 'CrossClusterMigration', 'Upgrade', 'DAG')]
-        $ConfigurationName = 'Default',
+        [Parameter(ParameterSetName = 'Default', Position = 1)]
+        [ValidateSet('Default', 'CrossClusterMigration', 'Upgrade', 'DAG')]
+        [string] $ConfigurationName = 'Default',
 
         [Parameter(ParameterSetName = 'Detailed')]
         [hashtable] $Cluster1,
@@ -117,7 +117,7 @@ function Set-OftenOnLab {
     if ($Cluster2) {
         $windows = if ($Cluster2.Windows -eq '2012') {
             'Windows Server 2012 Standard Evaluation (Server with a GUI)'
-        } elseif ($Cluster1.Windows -eq '2016') {
+        } elseif ($Cluster2.Windows -eq '2016') {
             'Windows Server 2016 Standard 64bit English Evaluation'
         } else {
             Write-Error "Unknown Windows version $($Cluster2.Windows)"
@@ -128,7 +128,7 @@ function Set-OftenOnLab {
 
         $sql = if ($Cluster2.SQL -eq '2012') {
             '\\CHDC01\Resources\SQLServer2012'
-        } elseif ($Cluster1.SQL -eq '2017') {
+        } elseif ($Cluster2.SQL -eq '2017') {
             '\\CHDC01\Resources\SQLServer2017'
         } else {
             Write-Error "Unknown SQL version $($Cluster1.SQL)"

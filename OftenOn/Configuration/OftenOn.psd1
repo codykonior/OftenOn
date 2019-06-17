@@ -368,7 +368,7 @@
         OperatingSystem = 'Windows'
         Hotfixes = @()
         CustomData = @{
-          CustomBootStrap = @('Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306','schtasks /create /tn "BootStrap" /tr "Powershell.exe %SYSTEMDRIVE%\BootStrap\BootStrap.ps1 >> %SYSTEMDRIVE%\BootStrap\BootStrap_ONSTART.log" /sc "ONSTART" /ru "System" /f')
+          CustomBootStrap = @()
           WindowsOptionalFeature = @('NetFx3','TelnetClient')
           MinimumDismVersion = '10.0.0.0'
         }
