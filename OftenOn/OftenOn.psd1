@@ -12,7 +12,7 @@
     RootModule           = 'OftenOn.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.0.21'
+    ModuleVersion        = '1.1.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -30,7 +30,7 @@
     Copyright            = '(c) 2018 Cody Konior. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description          = 'Build Windows 2012 SQL 2012 multi-subnet five node AG labs with one command using Hyper-V and DSC'
+    Description          = 'Build one or two Windows 2012/2016 SQL 2012/2017 multi-subnet five node AG labs with one command using Hyper-V and DSC'
 
     # Minimum version of the Windows PowerShell engine required by this module
     # PowerShellVersion = ''
@@ -54,6 +54,7 @@
     RequiredModules      = @(
         'Lability',
         'ComputerManagementDsc',
+        'Configuration',
         'NetworkingDsc',
         'xActiveDirectory',
         'xDnsServer',
@@ -91,6 +92,7 @@
         'Remove-OftenOnLab',
         'Restore-OftenOnLab',
         'Repair-OftenOnRemoteDesktop',
+        'Set-OftenOnLab',
         'Start-OftenOnLab',
         'Stop-OftenOnLab'
     )
