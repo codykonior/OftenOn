@@ -54,7 +54,6 @@
     RequiredModules      = @(
         'Lability',
         'ComputerManagementDsc',
-        'Configuration',
         'NetworkingDsc',
         'xActiveDirectory',
         'xDnsServer',

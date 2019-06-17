@@ -1,19 +1,5 @@
 <#
 
-.EXAMPLE
-Set-OftenOnLab -Cluster1 @{ Windows = '2012'; SQL = '2012'; AvailabilityGroup = $true; }
-
-Original configuration (SQL 2012 on Windows 2012)
-
-.EXAMPLE
-Set-OftenOnLab -Cluster2 @{ Windows = '2012'; SQL = '2012'; AvailabilityGroup = $false; }
-
-SQL 2012 on Windows 2012 and a second cluster of SQL 2012 on Windows 2012 with no AG.
-
-.EXAMPLE
-Set-OftenOnLab -Cluster2 @{ Windows = '2016'; SQL = '2017'; AvailabilityGroup = $false; }
-
-SQL 2012 on Windows 2012 and a second cluster of SQL 2017 on Windows 2016 with no AG.
 
 #>
 
@@ -58,6 +44,7 @@ function Set-OftenOnLab {
                     Windows           = '2012'
                     SQL               = '2012'
                     AvailabilityGroup = $true
+                    Patch             = $true
                 }
                 $Cluster2 = @{
                     Windows           = '2016'
@@ -70,6 +57,7 @@ function Set-OftenOnLab {
                     Windows           = '2012'
                     SQL               = '2017'
                     AvailabilityGroup = $true
+                    Patch             = $true
                 }
                 $Cluster2 = @{
                     Windows           = '2016'
@@ -82,7 +70,7 @@ function Set-OftenOnLab {
         Write-Verbose "Using custom Cluster1 and Cluster2 configurations"
     }
 
-    $configurationData = Import-Metadata "$PSScriptRoot\..\Configuration\OftenOn_Template.psd1" -Ordered
+    $configurationData = Import-PowerShellDataFile "$PSScriptRoot\..\Configuration\OftenOn_Template.psd1"
 
     if ($Cluster1) {
         $windows = if ($Cluster1.Windows -eq '2012') {
@@ -146,5 +134,5 @@ function Set-OftenOnLab {
         $configurationData.AllNodes = $configurationData.AllNodes | Where-Object { -not $_.Role.Contains("Cluster") -or $_.Role.Cluster.Name -ne "C2" }
     }
 
-    Export-Metadata "$PSScriptRoot\..\Configuration\OftenOn.psd1" -InputObject $configurationData
+    Convert-HashtableToString $configurationData | Set-Content "$PSScriptRoot\..\Configuration\OftenOn.psd1"
 }
