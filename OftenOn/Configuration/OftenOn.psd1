@@ -51,7 +51,7 @@
 
             # This is done because if the servers come up without the DC on WS2016 the network cards can change to "Public"
             Lability_BootOrder = 1
-            Lability_BootDelay = 60
+            Lability_BootDelay = 120
 
             Network            = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1'; }
