@@ -290,7 +290,7 @@
                 @{ Name = 'SqlServer'; RequiredVersion = '21.1.18121'; }
 
                 @{ Name = 'Cim'; RequiredVersion = '1.6.2'; }
-                @{ Name = 'DbData'; RequiredVersion = '2.0.6'; }
+                @{ Name = 'DbData'; RequiredVersion = '2.0.7'; }
                 @{ Name = 'DbSmo'; RequiredVersion = '1.5.1'; }
                 @{ Name = 'Disposable'; RequiredVersion = '1.5.1'; }
                 @{ Name = 'Error'; RequiredVersion = '1.5.1'; }
