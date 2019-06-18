@@ -285,18 +285,18 @@
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
             Module      = @(
-                @{ Name = 'Pester'; }
-                @{ Name = 'PoshRSJob'; }
-                @{ Name = 'SqlServer'; }
+                @{ Name = 'Pester'; RequiredVersion = '4.8.1'; }
+                @{ Name = 'PoshRSJob'; RequiredVersion = '1.7.4.4'; }
+                @{ Name = 'SqlServer'; RequiredVersion = '21.1.18121'; }
 
-                @{ Name = 'Cim'; }
-                @{ Name = 'DbData'; }
-                @{ Name = 'DbSmo'; }
-                @{ Name = 'Disposable'; }
-                @{ Name = 'Error'; }
-                @{ Name = 'Jojoba'; }
-                @{ Name = 'ParseSql'; }
-                @{ Name = 'Performance'; }
+                @{ Name = 'Cim'; RequiredVersion = '1.6.1'; }
+                @{ Name = 'DbData'; RequiredVersion = '2.0.5'; }
+                @{ Name = 'DbSmo'; RequiredVersion = '1.5.0'; }
+                @{ Name = 'Disposable'; RequiredVersion = '1.5.0'; }
+                @{ Name = 'Error'; RequiredVersion = '1.5.0'; }
+                @{ Name = 'Jojoba'; RequiredVersion = '4.1.2'; }
+                @{ Name = 'ParseSql'; RequiredVersion = '1.1.0'; }
+                @{ Name = 'Performance'; RequiredVersion = '1.5.0'; }
             )
 
             Network     = @(

@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the same name.
 - SSMS 18.1.0 is installed by default. The previous two are still available.
 - 4 databases are added to the Availability Group by default.
+- Added version numbers to some non-DSC modules which are copied in. This is
+  because Lability is caching the old versions.
 
 ### Fixed
 - Internet access for machines inside the domain. This is critical for time sync
