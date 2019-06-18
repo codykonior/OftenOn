@@ -40,6 +40,8 @@ SQL2012 to SQL2017 and then setting up a Distributed Availability Group to migra
 - `DAG` is a WS2012 and SQL2017 cluster, with a second WS2016 and SQL2017 cluster. You can use this to practice just setting up
 a Distributed Availability Group and migrating from one cluster to another.
 
+It also takes an optional `-ModulePath`. You can point this to a folder and the contents will be copied into C:\Program Files\WindowsPowerShell on the workstation machine. This is a quick way to get your own code into there.
+
 Then execute `New-OftenOnLab`.
 
 It takes time on the first run to download about 10GB of Evaluation ISOs from Microsoft. After this though each time the lab is

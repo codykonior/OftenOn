@@ -10,9 +10,11 @@ function Set-OftenOnLab {
         [ValidateSet('Default', 'CrossClusterMigration', 'Upgrade', 'DAG')]
         [string] $ConfigurationName = 'Default',
 
+        # This can be used to pass a directory (like C:\Blah\Modules) and this
+        # entire thing will be copied into C:\Program Files\WindowsPowerShell
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Detailed')]
-        [string] $WorkstationCode,
+        [string] $ModulePath,
 
         [Parameter(ParameterSetName = 'Detailed')]
         [hashtable] $Cluster1,
@@ -75,16 +77,16 @@ function Set-OftenOnLab {
     }
 
     $configurationData = Import-PowerShellDataFile "$PSScriptRoot\..\Configuration\OftenOn_Template.psd1"
-    if ($WorkstationCode) {
-        if (-not (Test-Path $WorkstationCode)) {
-            Write-Error "$WorkstationCode does not exist"
+    if ($ModulePath) {
+        if (-not (Test-Path $ModulePath)) {
+            Write-Error "$ModulePath does not exist"
         }
-        $configurationData.NonNodeData.Lability.Resource += @{ Id = 'WorkstationCode'; IsLocal = $true; Filename = $WorkstationCode; DestinationPath = '\Program Files\WindowsPowerShell'; }
+        $configurationData.NonNodeData.Lability.Resource += @{ Id = 'ModulePath'; IsLocal = $true; Filename = $ModulePath; DestinationPath = '\Program Files\WindowsPowerShell'; }
         $node = $configurationData.AllNodes | Where-Object { $_.NodeName -eq 'CHWK01' }
         if (!$node.psobject.Properties["Lability_Resource"]) {
             $node.Lability_Resource = @()
         }
-        $node.Lability_Resource += 'WorkstationCode'
+        $node.Lability_Resource += 'ModulePath'
     }
 
     if ($Cluster1) {
