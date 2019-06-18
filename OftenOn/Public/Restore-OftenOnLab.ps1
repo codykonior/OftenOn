@@ -5,5 +5,5 @@ function Restore-OftenOnLab {
         $SnapshotName = 'Default'
     )
 
-    Restore-Lab -ConfigurationData (Get-OftenOnLabConfiguration) -SnapshotName $SnapshotName
+    Restore-Lab -ConfigurationData (Get-OftenOnLabConfiguration) -SnapshotName $SnapshotName -Confirm:$false
 }

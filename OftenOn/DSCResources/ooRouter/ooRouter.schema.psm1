@@ -1,18 +1,20 @@
 Configuration ooRouter {
     Script 'EnableRouting' {
         GetScript  = {
+            $result = $true
+
             if ((Get-RemoteAccess).VpnStatus -ne 'Installed') {
-                @{ Result = "false"; }
+                $result = $false
             }
             $nat = &netsh routing ip nat show global
             if ($nat -like 'No information found*') {
-                @{ Result = "false"; }
+                $result = $false
             }
 
             $ExternalInterface = 'WAN'
             $wan = &netsh routing ip nat show interface $ExternalInterface
             if ($wan -like 'No information found*') {
-                @{ Result = "false"; }
+                $result = $false
             }
             <#
             Get-NetAdapter | Where-Object { $_.Name -ne 'WAN' -and $_.Name -notlike '*_HB' } | ForEach-Object {
@@ -22,7 +24,7 @@ Configuration ooRouter {
                 }
             }
             #>
-            @{ Result = "true"; }
+            @{ Result = $result; }
         }
         TestScript = {
             if ((Get-RemoteAccess).VpnStatus -ne 'Installed') {

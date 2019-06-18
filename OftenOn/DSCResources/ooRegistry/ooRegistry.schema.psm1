@@ -41,4 +41,14 @@ Configuration ooRegistry {
         ValueData = '1'
         ValueType = 'DWord'
     }
+
+    # When the network location awareness service starts up before the domain starts (especially on Windows 2016),
+    # the network adapters get changed to public instead of domain, and then everything fails
+    Registry 'EnableNetworkLocationAwarenessServiceDelayedStart' {
+        Ensure    = 'Present'
+        Key       = 'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\nlasvc'
+        ValueName = 'DelayedAutoStart'
+        ValueData = '1'
+        ValueType = 'DWord'
+    }
 }

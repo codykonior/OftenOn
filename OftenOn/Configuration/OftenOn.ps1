@@ -7,27 +7,33 @@ Configuration OftenOn {
 
     #region Resources
     Import-DscResource -ModuleName PSDesiredStateConfiguration -ModuleVersion 1.1
-    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 6.3.0.0
-    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 2.25.0.0
-    Import-DscResource -ModuleName xDnsServer -ModuleVersion 1.11.0.0
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 6.4.0.0
+    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 2.26.0.0
+    Import-DscResource -ModuleName xDnsServer -ModuleVersion 1.12.0.0
     Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.2.0.0
     Import-DscResource -ModuleName xWindowsUpdate -ModuleVersion 2.8.0.0
     # These have fixes in the dev branches but the changes are not to parameters so any version here will do
-    Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 12.4.0.0
+    Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 12.5.0.0
     Import-DscResource -ModuleName xFailOverCluster -ModuleVersion 1.12.0.0
     # This is a composite resource and doesn't need to be on the destination machine
-    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.0.21
+    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.1.0
     #endregion
 
-    $clusterOrder = @{}
-    $availabilityReplicaOrder = @{}
     $domainController = @{}
+    $clusterOrder = @{}
+
+    $availabilityReplicaOrder = @{}
+    $availabilityGroups = $AllNodes | Where-Object { $_.Role.ContainsKey('AvailabilityGroup') } | Group-Object { $_.Role.AvailabilityGroup.Name }
+    foreach ($availabilityGroup in $availabilityGroups) {
+        $availabilityReplicaOrder.($availabilityGroup.Name) = [array] $availabilityGroup.Group.NodeName
+        $availabilityReplicaOrder.($availabilityGroup.Name) += $availabilityGroup.Group.NodeName
+    }
 
     Node $AllNodes.NodeName {
         # When building the domain the UserName is ignored. But the domain part of the username is required to use the credential to add computers to the domain.
         $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2019!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2019!' | ConvertTo-SecureString -AsPlainText -Force))
-        # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @lab.com
+        # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @oftenon.com
         $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2019!' | ConvertTo-SecureString -AsPlainText -Force))
         $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2019!' | ConvertTo-SecureString -AsPlainText -Force))
         # This isn't a domain login
@@ -130,6 +136,12 @@ Configuration OftenOn {
                     DependsOn                     = '[WindowsFeatureSet]All'
                 }
 
+                #region Set Time Sync (required for Windows Server 2016 Hyper-V clients to work)
+                ooTime 'SetTime' {
+                    DependsOn = '[xADDomain]Create'
+                }
+                #endregion
+
                 #region Create an AD lookup, just makes nslookup work nicer
                 # This should really be done for all networks and computers but...
                 xDnsServerADZone 'AddReverseZone'
@@ -145,7 +157,7 @@ Configuration OftenOn {
                 xDnsRecord 'AddReverseZoneLookup'
                 {
                     Name = '1.0.0.10.in-addr.arpa'
-                    Target = 'CHDC01.lab.com'
+                    Target = 'CHDC01.oftenon.com'
                     Zone = '0.0.10.in-addr.arpa'
                     Type = 'PTR'
 
@@ -383,8 +395,8 @@ Configuration OftenOn {
                     SAPwd = $systemAdministrator
                     SQLSvcAccount = $sqlEngineService
                     SQLSysAdminAccounts = $localAdministrator.UserName
-                    UpdateEnabled = 'False'
-
+                    UpdateEnabled = 'True'
+                    UpdateSource = '\\CHDC01\Resources'
                     DependsOn = "[xCluster]AddNodeToCluster$($cluster.Name)"
                 }
 
@@ -453,23 +465,45 @@ Configuration OftenOn {
                 }
 
                 if ($node.Role.ContainsKey("AvailabilityGroup")) {
-                    if (!$availabilityReplicaOrder.ContainsKey($node.Role.AvailabilityGroup.Name)) {
-                        $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name) = [array] $node.NodeName
+                    $availabilityGroupReplicaOrder = $availabilityReplicaOrder.($node.Role.AvailabilityGroup.Name)
 
+                    if ($availabilityGroupReplicaOrder[0] -eq $node.NodeName) {
                         # Create the availability group on the instance tagged as the primary replica
                         SqlAG "CreateAvailabilityGroup$($node.Role.AvailabilityGroup.Name)" {
                             Ensure               = 'Present'
                             Name                 = $node.Role.AvailabilityGroup.Name
                             InstanceName         = $node.Role.SQLServer.InstanceName
                             ServerName           = $node.NodeName
-                            AvailabilityMode     = $node.Role.AvailabilityGroup.AvailabilityMode
-                            FailoverMode         = $node.Role.AvailabilityGroup.FailoverMode
+                            AvailabilityMode     = 'SynchronousCommit'
+                            FailoverMode         = 'Automatic'
                             ConnectionModeInPrimaryRole  = 'AllowAllConnections'
                             ConnectionModeInSecondaryRole = 'AllowAllConnections'
 
                             PsDscRunAsCredential = $localAdministrator
                             DependsOn            = '[SqlServerPermission]AddPermissionsForAGMembership'
                         }
+
+                        SqlAGReplica "CreateAvailabilityGroup$($node.Role.AvailabilityGroup.Name)ReplicaSettings" {
+                            Ensure               = 'Present'
+                            AvailabilityGroupName = $node.Role.AvailabilityGroup.Name
+
+                            Name                 = $node.NodeName # X\X format
+                            ServerName           = $node.NodeName
+                            InstanceName         = $node.Role.SQLServer.InstanceName
+                            PrimaryReplicaServerName   = $availabilityReplicaOrder.$($node.Role.AvailabilityGroup.Name)[0]
+                            PrimaryReplicaInstanceName = $node.Role.SQLServer.InstanceName
+
+                            # AvailabilityMode           = $node.Role.AvailabilityGroup.AvailabilityMode
+                            # FailoverMode               = $node.Role.AvailabilityGroup.FailoverMode
+                            # ConnectionModeInPrimaryRole   = 'AllowAllConnections'
+                            # ConnectionModeInSecondaryRole = 'AllowAllConnections'
+
+                            ReadOnlyRoutingConnectionUrl = "tcp://$($node.NodeName):1433"
+
+                            DependsOn            = "[SqlAG]CreateAvailabilityGroup$($node.Role.AvailabilityGroup.Name)"
+                            PsDscRunAsCredential = $localAdministrator
+                        }
+
 
                         $completeListenerList = $AllNodes | Where-Object { $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.Role.AvailabilityGroup.IPAddress } | Select-Object -Unique
 
@@ -505,22 +539,26 @@ Configuration OftenOn {
                             DependsOn = "[SqlAg]CreateAvailabilityGroup$($node.Role.AvailabilityGroup.Name)"
                         }
 
-                        SqlDatabase "CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)" {
-                            Ensure       = 'Present'
-                            ServerName   = $node.NodeName
-                            InstanceName = $node.Role.SQLServer.InstanceName
-                            Name         = "Dummy$($node.Role.AvailabilityGroup.Name)"
-                            PsDscRunAsCredential = $localAdministrator
-                            DependsOn = '[SqlSetup]InstallSQLServer'
+                        1..4 | ForEach-Object {
+                            SqlDatabase "CreateDatabase$($node.Role.AvailabilityGroup.Name)DB$_" {
+                                Ensure       = 'Present'
+                                ServerName   = $node.NodeName
+                                InstanceName = $node.Role.SQLServer.InstanceName
+                                Name         = "$($node.Role.AvailabilityGroup.Name)DB$_"
+                                PsDscRunAsCredential = $localAdministrator
+                                DependsOn = '[SqlSetup]InstallSQLServer'
+                            }
                         }
 
-                        SqlDatabaseRecoveryModel "SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)" {
-                            Name         = "Dummy$($node.Role.AvailabilityGroup.Name)"
-                            RecoveryModel        = 'Full'
-                            ServerName           = $node.NodeName
-                            InstanceName         = $node.Role.SQLServer.InstanceName
-                            PsDscRunAsCredential = $localAdministrator
-                            DependsOn = "[SqlDatabase]CreateDatabaseDummy$($node.Role.AvailabilityGroup.Name)"
+                        1..4 | ForEach-Object {
+                            SqlDatabaseRecoveryModel "SetDatabaseRecoveryModel$($node.Role.AvailabilityGroup.Name)DB$_" {
+                                Name         = "$($node.Role.AvailabilityGroup.Name)DB$_"
+                                RecoveryModel        = 'Full'
+                                ServerName           = $node.NodeName
+                                InstanceName         = $node.Role.SQLServer.InstanceName
+                                PsDscRunAsCredential = $localAdministrator
+                                DependsOn = "[SqlDatabase]CreateDatabase$($node.Role.AvailabilityGroup.Name)DB$_"
+                            }
                         }
 
                         $completeReplicaList = $AllNodes | Where-Object { $_.NodeName -ne $node.NodeName -and $_.ContainsKey('Role') -and $_.Role.ContainsKey('AvailabilityGroup') -and $_.Role.AvailabilityGroup.Name -eq $node.Role.AvailabilityGroup.Name } | ForEach-Object { $_.NodeName }
@@ -533,15 +571,19 @@ Configuration OftenOn {
                             RetryIntervalSec = 15
 
                             PsDscRunAsCredential = $localAdministrator
-                            DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModelDummy$($node.Role.AvailabilityGroup.Name)"
+                            DependsOn = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModel$($node.Role.AvailabilityGroup.Name)DB4"
                         }
 
                         # This really needs wait for all replicas to be added
                         # This will give an error if you use MatchDatabaseOwner on SQL 2012
-                        SqlAGDatabase "AddDatabaseTo$($node.Role.AvailabilityGroup.Name)" {
+                        $databaseNames = 1..4 | ForEach-Object {
+                            "$($node.Role.AvailabilityGroup.Name)DB$_"
+                        }
+
+                        SqlAGDatabase "Add$($node.Role.AvailabilityGroup.Name)Database" {
                             AvailabilityGroupName   = $node.Role.AvailabilityGroup.Name
                             BackupPath              = '\\CHDC01\Temp' # TODO: Remove this
-                            DatabaseName            = "Dummy$($node.Role.AvailabilityGroup.Name)"
+                            DatabaseName            = $databaseNames
                             ServerName              = $node.NodeName
                             InstanceName            = $node.Role.SQLServer.InstanceName
                             Ensure                  = 'Present'
@@ -572,6 +614,7 @@ Configuration OftenOn {
                             FailoverMode               = $node.Role.AvailabilityGroup.FailoverMode
                             ConnectionModeInPrimaryRole   = 'AllowAllConnections'
                             ConnectionModeInSecondaryRole = 'AllowAllConnections'
+                            ReadOnlyRoutingConnectionUrl = "tcp://$($node.NodeName):1433"
 
                             DependsOn            = "[WaitForAll]WaitFor$($node.Role.AvailabilityGroup.ListenerName)"
                             PsDscRunAsCredential = $localAdministrator
@@ -592,8 +635,8 @@ Configuration OftenOn {
                     ResourceLocation = "$resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe"
                 }
 
-                ooManagementStudio 'Install1791' {
-                    ResourceLocation = "$resourceLocation\SSMS-Setup-ENU.exe"
+                ooManagementStudio 'InstallManagementStudio' {
+                    ResourceLocation = $resourceLocation
                     DependsOn  = '[ooNetFramework]Install472'
                 }
             }
