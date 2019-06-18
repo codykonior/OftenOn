@@ -79,7 +79,7 @@ function Set-OftenOnLab {
         if (-not (Test-Path $WorkstationCode)) {
             Write-Error "$WorkstationCode does not exist"
         }
-        $configurationData.NonNodeData.Lability.Resource += @{ Id = 'WorkstationCode'; IsLocal = $true; Filename = $WorkstationCode; DestinationPath = '\Program Files\WindowsPowerShell\Modules'; }
+        $configurationData.NonNodeData.Lability.Resource += @{ Id = 'WorkstationCode'; IsLocal = $true; Filename = $WorkstationCode; DestinationPath = '\Program Files\WindowsPowerShell'; }
         $node = $configurationData.AllNodes | Where-Object { $_.NodeName -eq 'CHWK01' }
         if (!$node.psobject.Properties["Lability_Resource"]) {
             $node.Lability_Resource = @()
