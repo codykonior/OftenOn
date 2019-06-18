@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2019-06-17
+### Changed
+- Updated dependent module numbers.
+
 ## [1.1.0] - 2019-06-17
 ### Added
 - Set-OftenOnLab can be used to alter what configuration New-OftenOnLab will

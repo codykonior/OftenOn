@@ -289,14 +289,14 @@
                 @{ Name = 'PoshRSJob'; RequiredVersion = '1.7.4.4'; }
                 @{ Name = 'SqlServer'; RequiredVersion = '21.1.18121'; }
 
-                @{ Name = 'Cim'; RequiredVersion = '1.6.1'; }
-                @{ Name = 'DbData'; RequiredVersion = '2.0.5'; }
-                @{ Name = 'DbSmo'; RequiredVersion = '1.5.0'; }
-                @{ Name = 'Disposable'; RequiredVersion = '1.5.0'; }
-                @{ Name = 'Error'; RequiredVersion = '1.5.0'; }
-                @{ Name = 'Jojoba'; RequiredVersion = '4.1.2'; }
-                @{ Name = 'ParseSql'; RequiredVersion = '1.1.0'; }
-                @{ Name = 'Performance'; RequiredVersion = '1.5.0'; }
+                @{ Name = 'Cim'; RequiredVersion = '1.6.2'; }
+                @{ Name = 'DbData'; RequiredVersion = '2.0.6'; }
+                @{ Name = 'DbSmo'; RequiredVersion = '1.5.1'; }
+                @{ Name = 'Disposable'; RequiredVersion = '1.5.1'; }
+                @{ Name = 'Error'; RequiredVersion = '1.5.1'; }
+                @{ Name = 'Jojoba'; RequiredVersion = '4.1.3'; }
+                @{ Name = 'ParseSql'; RequiredVersion = '1.1.1'; }
+                @{ Name = 'Performance'; RequiredVersion = '1.5.1'; }
             )
 
             Network     = @(
