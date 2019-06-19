@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.4] - 2019-06-20
+### Fixed
+- ISO checksum for SQL 2017.
+
 ## [1.1.3] - 2019-06-19
 ### Fixed
 - Re-address the NlaSvc "this network is Public" issue with a startup script.

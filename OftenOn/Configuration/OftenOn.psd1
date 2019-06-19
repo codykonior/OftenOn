@@ -446,7 +446,7 @@
                 },
                 @{
                     Expand = $true
-                    Checksum = 'C44C1869A7657001250EF8FAD4F636D3'
+                    Checksum = '334FC5F8FDD269FB2D6D5DC1FD61D1C7'
                     Filename = 'SQLServer2017-x64-ENU.iso'
                     Uri = 'https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SQLServer2017-x64-ENU.iso'
                     Id = 'SQLServer2017'
