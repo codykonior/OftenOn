@@ -3,14 +3,17 @@
         @{
             Thumbprint = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
             Lability_StartupMemory = 1073741824
+            Lability_Resource = @(
+                'NlaSvcFix',
+                'TriggerDsc'
+            )
             FullyQualifiedDomainName = 'oftenon.com'
             PSDscAllowDomainUser = $true
             Lability_ProcessorCount = 2
             Lability_GuestIntegrationServices = $true
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
             NodeName = '*'
             Role = @{}
-            Lability_BootOrder = 2
+            Lability_BootOrder = 3
             DomainName = 'OFTENON'
             CertificateFile = '$env:ALLUSERSPROFILE\Lability\Certificates\LabClient.cer'
             Lability_HardDiskDrive = @(
@@ -21,7 +24,8 @@
             )
         },
         @{
-            Lability_BootDelay = 120
+            Lability_BootDelay = 60
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
             NodeName = 'CHDC01'
             Lability_BootOrder = 1
             Role = @{
@@ -29,6 +33,8 @@
                 DomainController = @{}
             }
             Lability_Resource = @(
+                'NlaSvcFix',
+                'TriggerDsc',
                 'SQLServer2012',
                 'SQLServer2012SP4',
                 'SQLServer2012SP4GDR',
@@ -76,6 +82,10 @@
             )
         },
         @{
+            Role = @{
+                Workstation = @{}
+                DomainMember = @{}
+            }
             NodeName = 'CHWK01'
             Network = @(
                 @{
@@ -86,12 +96,13 @@
                     DefaultGatewayAddress = '10.0.0.1'
                 }
             )
-            Role = @{
-                Workstation = @{}
-                DomainMember = @{}
-            }
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
         },
         @{
+            Lability_BootDelay = 60
+            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+            NodeName = 'SEC1N1'
+            Lability_BootOrder = 2
             Role = @{
                 Cluster = @{
                     StaticAddress = '10.0.1.21/24'
@@ -112,7 +123,6 @@
                     SourcePath = '\\CHDC01\Resources\SQLServer2012'
                 }
             }
-            NodeName = 'SEC1N1'
             Network = @(
                 @{
                     DnsServerAddress = '10.0.0.1'
@@ -127,7 +137,6 @@
                     IPAddress = '10.0.11.11/24'
                 }
             )
-            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
         },
         @{
             Role = @{
@@ -286,36 +295,47 @@
         Lability = @{
             Module = @(
                 @{
+                    RequiredVersion = '4.8.1'
                     Name = 'Pester'
                 },
                 @{
+                    RequiredVersion = '1.7.4.4'
                     Name = 'PoshRSJob'
                 },
                 @{
+                    RequiredVersion = '21.1.18121'
                     Name = 'SqlServer'
                 },
                 @{
+                    RequiredVersion = '1.6.2'
                     Name = 'Cim'
                 },
                 @{
+                    RequiredVersion = '2.0.7'
                     Name = 'DbData'
                 },
                 @{
+                    RequiredVersion = '1.5.1'
                     Name = 'DbSmo'
                 },
                 @{
+                    RequiredVersion = '1.5.1'
                     Name = 'Disposable'
                 },
                 @{
+                    RequiredVersion = '1.5.1'
                     Name = 'Error'
                 },
                 @{
+                    RequiredVersion = '4.1.3'
                     Name = 'Jojoba'
                 },
                 @{
+                    RequiredVersion = '1.1.1'
                     Name = 'ParseSql'
                 },
                 @{
+                    RequiredVersion = '1.5.1'
                     Name = 'Performance'
                 }
             )
@@ -430,6 +450,18 @@
                     Filename = 'SQLServer2017-x64-ENU.iso'
                     Uri = 'https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SQLServer2017-x64-ENU.iso'
                     Id = 'SQLServer2017'
+                },
+                @{
+                    Filename = '..\Scripts\NlaSvcFix.ps1'
+                    Id = 'NlaSvcFix'
+                    IsLocal = $true
+                    DestinationPath = '\BootStrap'
+                },
+                @{
+                    Filename = '..\Scripts\TriggerDsc.ps1'
+                    Id = 'TriggerDsc'
+                    IsLocal = $true
+                    DestinationPath = '\BootStrap'
                 }
             )
             Network = @(
@@ -468,8 +500,11 @@
                             'TelnetClient'
                         )
                         CustomBootStrap = @(
+                            'NET USER Administrator /active:yes; ',
                             'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'schtasks /create /tn "BootStrap" /tr "Powershell.exe %SYSTEMDRIVE%\BootStrap\BootStrap.ps1 >> %SYSTEMDRIVE%\BootStrap\BootStrap_ONSTART.log" /sc "ONSTART" /ru "System" /f'
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
                     }
                     Description = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
@@ -495,7 +530,13 @@
                     Uri = 'http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO'
                     CustomData = @{
                         MinimumDismVersion = '10.0.0.0'
-                        CustomBootStrap = @()
+                        CustomBootStrap = @(
+                            'NET USER Administrator /active:yes; ',
+                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
+                        )
                         WindowsOptionalFeature = @(
                             'NetFx3',
                             'TelnetClient'

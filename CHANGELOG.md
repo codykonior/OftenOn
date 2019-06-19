@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2019-06-19
+### Fixed
+- Re-address the NlaSvc "this network is Public" issue with a startup script.
+- Re-address the application of DSC configuration after reboot with another
+  startup script.
+
 ## [1.1.2] - 2019-06-18
 ### Changed
 - Updated dependent module numbers.

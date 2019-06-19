@@ -16,7 +16,7 @@ Configuration OftenOn {
     Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 12.5.0.0
     Import-DscResource -ModuleName xFailOverCluster -ModuleVersion 1.12.0.0
     # This is a composite resource and doesn't need to be on the destination machine
-    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.1.2
+    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.1.3
     #endregion
 
     $domainController = @{}

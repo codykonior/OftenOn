@@ -13,6 +13,24 @@ function Get-OftenOnLabConfiguration {
     }
     #endregion
 
+    #region Always-run, update the path of the NlaSvcFix.ps1 resource
+    $nlaSvcFix = $configurationData.NonNodeData.Lability.Resource | Where-Object { $_.Id -eq 'NlaSvcFix' }
+    if ($nlaSvcFix) {
+        $nlaSvcFix.Filename = "$PSScriptRoot\$($nlaSvcFix.Filename)"
+        if (!(Test-Path $nlaSvcFix.Filename)) {
+            Write-Error "Something is wrong with $($nlaSvcFix.Filename)"
+        }
+    }
+
+    $triggerDsc = $configurationData.NonNodeData.Lability.Resource | Where-Object { $_.Id -eq 'TriggerDsc' }
+    if ($triggerDsc) {
+        $triggerDsc.Filename = "$PSScriptRoot\$($triggerDsc.Filename)"
+        if (!(Test-Path $triggerDsc.Filename)) {
+            Write-Error "Something is wrong with $($triggerDsc.Filename)"
+        }
+    }
+    #endregion
+
     #region Always-run, manipulate configuration data network information
     foreach ($node in $configurationData.AllNodes) {
         <#

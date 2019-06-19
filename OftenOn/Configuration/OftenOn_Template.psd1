@@ -6,13 +6,12 @@
             # VM settings
             Lability_ProcessorCount           = 2
             Lability_StartupMemory            = 1GB
-            Lability_Media                    = 'Windows Server 2016 Standard 64bit English Evaluation'
             # Additional hard disk drive
             Lability_HardDiskDrive            = @(
                 @{ Generation = 'VHDX'; MaximumSizeBytes = 127GB; }
             )
             Lability_GuestIntegrationServices = $true
-            Lability_BootOrder                = 2
+            Lability_BootOrder                = 3
 
             # Encryption information (the script will translate the environment variable)
             CertificateFile                   = '$env:ALLUSERSPROFILE\Lability\Certificates\LabClient.cer'
@@ -21,6 +20,11 @@
 
             FullyQualifiedDomainName          = 'oftenon.com'
             DomainName                        = 'OFTENON'
+
+            Lability_Resource                 = @(
+                'NlaSvcFix',
+                'TriggerDsc'
+            )
 
             Role                              = @{ }
         }
@@ -47,10 +51,9 @@
 
         @{
             NodeName           = 'CHDC01'
-
-            # This is done because if the servers come up without the DC on WS2016 the network cards can change to "Public"
+            Lability_Media     = 'Windows Server 2016 Standard 64bit English Evaluation'
             Lability_BootOrder = 1
-            Lability_BootDelay = 120
+            Lability_BootDelay = 60
 
             Network            = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.1/24'; DnsServerAddress = '127.0.0.1'; }
@@ -69,35 +72,38 @@
             }
 
             Lability_Resource  = @(
-                'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU14', 'SSMS1791', 'SSMS1810', 'NetFx472'
+                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU14', 'SSMS1791', 'SSMS1810', 'NetFx472'
             )
         }
 
         @{
-            NodeName = 'CHWK01'
+            NodeName       = 'CHWK01'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
-            Network  = @(
+            Network        = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.3/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
             )
 
-            Role     = @{
+            Role           = @{
                 DomainMember = @{ }
                 Workstation  = @{ }
             }
         }
 
         @{
-            NodeName       = 'SEC1N1'
-            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+            NodeName           = 'SEC1N1'
+            Lability_Media     = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+            Lability_BootOrder = 2
+            Lability_BootDelay = 60
 
-            Network        = @(
+            Network            = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.11/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.11/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
-            Role           = @{
+            Role               = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = '10.0.11.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
@@ -114,7 +120,7 @@
 
             Role           = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = '10.0.11.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
@@ -131,7 +137,7 @@
 
             Role           = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = '10.0.11.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
@@ -148,7 +154,7 @@
 
             Role           = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = '10.0.12.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.2.31/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
@@ -165,13 +171,14 @@
 
             Role           = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = '10.0.12.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2012'; }
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.2.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
 
         #region Windows 2016 SQL 2017
+
         <#
             Add Lability_Media
             Change C1 to C2
@@ -182,80 +189,87 @@
         #>
 
         @{
-            NodeName = 'SEC2N1'
+            NodeName           = 'SEC2N1'
+            Lability_Media     = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_BootOrder = 2
+            Lability_BootDelay = 60
 
-            Network  = @(
+            Network            = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.111/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.111/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
-            Role     = @{
+            Role               = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = '10.0.11.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
 
         @{
-            NodeName = 'SEC2N2'
+            NodeName       = 'SEC2N2'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
-            Network  = @(
+            Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.112/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.112/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
-            Role     = @{
+            Role           = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = '10.0.11.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
 
         @{
-            NodeName = 'SEC2N3'
+            NodeName       = 'SEC2N3'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
-            Network  = @(
+            Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.113/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.113/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
 
-            Role     = @{
+            Role           = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = "10.0.11.0/24"; }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = '10.0.11.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
 
         @{
-            NodeName = 'DAC2N1'
+            NodeName       = 'DAC2N1'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
-            Network  = @(
+            Network        = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.111/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.111/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
-            Role     = @{
+            Role           = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = '10.0.12.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
 
         @{
-            NodeName = 'DAC2N2'
+            NodeName       = 'DAC2N2'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
 
-            Network  = @(
+            Network        = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.112/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.112/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
 
-            Role     = @{
+            Role           = @{
                 DomainMember      = @{ }
-                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = "10.0.12.0/24"; }
+                Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = '10.0.12.0/24'; }
                 SqlServer         = @{ InstanceName = 'MSSQLSERVER'; Features = 'SQLENGINE'; SourcePath = '\\CHDC01\Resources\SQLServer2017'; }
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
@@ -278,9 +292,10 @@
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.12.0.0'; }
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.7.0.0'; }
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; }
 
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; Provider = 'GitHub'; Owner = "PowerShell"; Branch = "dev"; }
+                # This changes depending on whether I have pending fixes or not
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
@@ -337,14 +352,12 @@
                         }
                     )
                     CustomData      = @{
-                        # The first line is part of any bootstrap, but the second line also schedules it to run on start.
-                        # Sometimes when Windows starts (during the build) it takes forever to resume configuration DSC.
-                        # This gives it a little kick in the pants (though I guess could also break something if it was
-                        # being configured in DSC at exactly the wrong time).
                         CustomBootStrap        = @(
+                            'NET USER Administrator /active:yes; ',
                             'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'schtasks /create /tn "BootStrap" /tr "Powershell.exe %SYSTEMDRIVE%\BootStrap\BootStrap.ps1 >> %SYSTEMDRIVE%\BootStrap\BootStrap_ONSTART.log" /sc "ONSTART" /ru "System" /f'
-                            # schtasks /delete /tn "BootStrap" /f
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
                         WindowsOptionalFeature = @(
                             'NetFx3',
@@ -365,15 +378,16 @@
                     Hotfixes        = @()
                     CustomData      = @{
                         CustomBootStrap        = @(
-                            # 'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            # 'schtasks /create /tn "BootStrap" /tr "Powershell.exe %SYSTEMDRIVE%\BootStrap\BootStrap.ps1 >> %SYSTEMDRIVE%\BootStrap\BootStrap_ONSTART.log" /sc "ONSTART" /ru "System" /f'
-                            # schtasks /delete /tn "BootStrap" /f
-                        )
+                            'NET USER Administrator /active:yes; ',
+                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'                        )
                         WindowsOptionalFeature = @(
                             'NetFx3',
                             'TelnetClient'
                         )
-                        MinimumDismVersion     = "10.0.0.0"
+                        MinimumDismVersion     = '10.0.0.0'
                     }
                 }
             )
@@ -440,6 +454,18 @@
                     Uri      = 'https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SQLServer2017-x64-ENU.iso'
                     Checksum = 'C44C1869A7657001250EF8FAD4F636D3'
                     Expand   = $true
+                }
+                @{
+                    Id              = 'NlaSvcFix'
+                    IsLocal         = $true
+                    Filename        = '..\Scripts\NlaSvcFix.ps1'
+                    DestinationPath = '\BootStrap'
+                }
+                @{
+                    Id              = 'TriggerDsc'
+                    IsLocal         = $true
+                    Filename        = '..\Scripts\TriggerDsc.ps1'
+                    DestinationPath = '\BootStrap'
                 }
             )
         }
