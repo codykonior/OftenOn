@@ -282,16 +282,16 @@
             # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
             # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '6.4.0.0'; }
-                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.2.0.0'; }
-                @{ Name = 'xActiveDirectory'; RequiredVersion = '2.26.0.0'; }
-                @{ Name = 'xDnsServer'; RequiredVersion = '1.12.0.0'; }
+                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '6.5.0.0'; }
+                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.3.0.0'; }
+                @{ Name = 'xActiveDirectory'; RequiredVersion = '3.0.0.0'; }
+                @{ Name = 'xDnsServer'; RequiredVersion = '1.14.0.0'; }
                 @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.2.0.0'; }
                 @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
                 @{ Name = 'xFailOverCluster'; RequiredVersion = '1.12.0.0'; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.7.0.0'; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.9.0.0'; }
 
                 # This changes depending on whether I have pending fixes or not
                 # @{ Name = 'SqlServerDsc'; RequiredVersion = '12.5.0.0'; }

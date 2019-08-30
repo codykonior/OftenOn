@@ -7,16 +7,16 @@ Configuration OftenOn {
 
     #region Resources
     Import-DscResource -ModuleName PSDesiredStateConfiguration -ModuleVersion 1.1
-    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 6.4.0.0
-    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 2.26.0.0
-    Import-DscResource -ModuleName xDnsServer -ModuleVersion 1.12.0.0
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 6.5.0.0
+    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 3.0.0.0
+    Import-DscResource -ModuleName xDnsServer -ModuleVersion 1.14.0.0
     Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.2.0.0
     Import-DscResource -ModuleName xWindowsUpdate -ModuleVersion 2.8.0.0
     # These have fixes in the dev branches but the changes are not to parameters so any version here will do
     Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 12.5.0.0
     Import-DscResource -ModuleName xFailOverCluster -ModuleVersion 1.12.0.0
     # This is a composite resource and doesn't need to be on the destination machine
-    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.1.4
+    Import-DscResource -ModuleName OftenOn -ModuleVersion 1.1.5
     #endregion
 
     $domainController = @{}

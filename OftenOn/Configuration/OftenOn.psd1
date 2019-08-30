@@ -289,6 +289,163 @@
                 }
             )
             Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+        },
+        @{
+            Lability_BootDelay = 60
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            NodeName = 'SEC2N1'
+            Lability_BootOrder = 2
+            Role = @{
+                Cluster = @{
+                    StaticAddress = '10.0.1.121/24'
+                    IgnoreNetwork = '10.0.11.0/24'
+                    Name = 'C2'
+                }
+                DomainMember = @{}
+                SqlServer = @{
+                    InstanceName = 'MSSQLSERVER'
+                    Features = 'SQLENGINE'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                }
+            }
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'SEATTLE'
+                    SwitchName = 'SEATTLE'
+                    IPAddress = '10.0.1.111/24'
+                    DefaultGatewayAddress = '10.0.1.1'
+                },
+                @{
+                    NetAdapterName = 'SEATTLE_HB'
+                    SwitchName = 'SEATTLE_HB'
+                    IPAddress = '10.0.11.111/24'
+                }
+            )
+        },
+        @{
+            Role = @{
+                Cluster = @{
+                    StaticAddress = '10.0.1.121/24'
+                    IgnoreNetwork = '10.0.11.0/24'
+                    Name = 'C2'
+                }
+                DomainMember = @{}
+                SqlServer = @{
+                    InstanceName = 'MSSQLSERVER'
+                    Features = 'SQLENGINE'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                }
+            }
+            NodeName = 'SEC2N2'
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'SEATTLE'
+                    SwitchName = 'SEATTLE'
+                    IPAddress = '10.0.1.112/24'
+                    DefaultGatewayAddress = '10.0.1.1'
+                },
+                @{
+                    NetAdapterName = 'SEATTLE_HB'
+                    SwitchName = 'SEATTLE_HB'
+                    IPAddress = '10.0.11.112/24'
+                }
+            )
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+        },
+        @{
+            Role = @{
+                Cluster = @{
+                    StaticAddress = '10.0.1.121/24'
+                    IgnoreNetwork = '10.0.11.0/24'
+                    Name = 'C2'
+                }
+                DomainMember = @{}
+                SqlServer = @{
+                    InstanceName = 'MSSQLSERVER'
+                    Features = 'SQLENGINE'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                }
+            }
+            NodeName = 'SEC2N3'
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'SEATTLE'
+                    SwitchName = 'SEATTLE'
+                    IPAddress = '10.0.1.113/24'
+                    DefaultGatewayAddress = '10.0.1.1'
+                },
+                @{
+                    NetAdapterName = 'SEATTLE_HB'
+                    SwitchName = 'SEATTLE_HB'
+                    IPAddress = '10.0.11.113/24'
+                }
+            )
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+        },
+        @{
+            Role = @{
+                Cluster = @{
+                    StaticAddress = '10.0.2.121/24'
+                    IgnoreNetwork = '10.0.12.0/24'
+                    Name = 'C2'
+                }
+                DomainMember = @{}
+                SqlServer = @{
+                    InstanceName = 'MSSQLSERVER'
+                    Features = 'SQLENGINE'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                }
+            }
+            NodeName = 'DAC2N1'
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'DALLAS'
+                    SwitchName = 'DALLAS'
+                    IPAddress = '10.0.2.111/24'
+                    DefaultGatewayAddress = '10.0.2.1'
+                },
+                @{
+                    NetAdapterName = 'DALLAS_HB'
+                    SwitchName = 'DALLAS_HB'
+                    IPAddress = '10.0.12.111/24'
+                }
+            )
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+        },
+        @{
+            Role = @{
+                Cluster = @{
+                    StaticAddress = '10.0.2.121/24'
+                    IgnoreNetwork = '10.0.12.0/24'
+                    Name = 'C2'
+                }
+                DomainMember = @{}
+                SqlServer = @{
+                    InstanceName = 'MSSQLSERVER'
+                    Features = 'SQLENGINE'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                }
+            }
+            NodeName = 'DAC2N2'
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'DALLAS'
+                    SwitchName = 'DALLAS'
+                    IPAddress = '10.0.2.112/24'
+                    DefaultGatewayAddress = '10.0.2.1'
+                },
+                @{
+                    NetAdapterName = 'DALLAS_HB'
+                    SwitchName = 'DALLAS_HB'
+                    IPAddress = '10.0.12.112/24'
+                }
+            )
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
         }
     )
     NonNodeData = @{
@@ -341,19 +498,19 @@
             )
             DSCResource = @(
                 @{
-                    RequiredVersion = '6.4.0.0'
+                    RequiredVersion = '6.5.0.0'
                     Name = 'ComputerManagementDsc'
                 },
                 @{
-                    RequiredVersion = '7.2.0.0'
+                    RequiredVersion = '7.3.0.0'
                     Name = 'NetworkingDsc'
                 },
                 @{
-                    RequiredVersion = '2.26.0.0'
+                    RequiredVersion = '3.0.0.0'
                     Name = 'xActiveDirectory'
                 },
                 @{
-                    RequiredVersion = '1.12.0.0'
+                    RequiredVersion = '1.14.0.0'
                     Name = 'xDnsServer'
                 },
                 @{
@@ -377,7 +534,7 @@
                     Name = 'xFailOverCluster'
                 },
                 @{
-                    RequiredVersion = '8.7.0.0'
+                    RequiredVersion = '8.9.0.0'
                     Name = 'xPSDesiredStateConfiguration'
                 },
                 @{
