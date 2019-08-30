@@ -381,7 +381,7 @@
                     Name = 'xPSDesiredStateConfiguration'
                 },
                 @{
-                    RequiredVersion = '12.5.0.0'
+                    RequiredVersion = '13.1.0.0'
                     Name = 'SqlServerDsc'
                 }
             )
