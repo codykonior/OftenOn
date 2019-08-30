@@ -289,163 +289,6 @@
                 }
             )
             Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
-        },
-        @{
-            Lability_BootDelay = 60
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
-            NodeName = 'SEC2N1'
-            Lability_BootOrder = 2
-            Role = @{
-                Cluster = @{
-                    StaticAddress = '10.0.1.121/24'
-                    IgnoreNetwork = '10.0.11.0/24'
-                    Name = 'C2'
-                }
-                DomainMember = @{}
-                SqlServer = @{
-                    InstanceName = 'MSSQLSERVER'
-                    Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
-                }
-            }
-            Network = @(
-                @{
-                    DnsServerAddress = '10.0.0.1'
-                    NetAdapterName = 'SEATTLE'
-                    SwitchName = 'SEATTLE'
-                    IPAddress = '10.0.1.111/24'
-                    DefaultGatewayAddress = '10.0.1.1'
-                },
-                @{
-                    NetAdapterName = 'SEATTLE_HB'
-                    SwitchName = 'SEATTLE_HB'
-                    IPAddress = '10.0.11.111/24'
-                }
-            )
-        },
-        @{
-            Role = @{
-                Cluster = @{
-                    StaticAddress = '10.0.1.121/24'
-                    IgnoreNetwork = '10.0.11.0/24'
-                    Name = 'C2'
-                }
-                DomainMember = @{}
-                SqlServer = @{
-                    InstanceName = 'MSSQLSERVER'
-                    Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
-                }
-            }
-            NodeName = 'SEC2N2'
-            Network = @(
-                @{
-                    DnsServerAddress = '10.0.0.1'
-                    NetAdapterName = 'SEATTLE'
-                    SwitchName = 'SEATTLE'
-                    IPAddress = '10.0.1.112/24'
-                    DefaultGatewayAddress = '10.0.1.1'
-                },
-                @{
-                    NetAdapterName = 'SEATTLE_HB'
-                    SwitchName = 'SEATTLE_HB'
-                    IPAddress = '10.0.11.112/24'
-                }
-            )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
-        },
-        @{
-            Role = @{
-                Cluster = @{
-                    StaticAddress = '10.0.1.121/24'
-                    IgnoreNetwork = '10.0.11.0/24'
-                    Name = 'C2'
-                }
-                DomainMember = @{}
-                SqlServer = @{
-                    InstanceName = 'MSSQLSERVER'
-                    Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
-                }
-            }
-            NodeName = 'SEC2N3'
-            Network = @(
-                @{
-                    DnsServerAddress = '10.0.0.1'
-                    NetAdapterName = 'SEATTLE'
-                    SwitchName = 'SEATTLE'
-                    IPAddress = '10.0.1.113/24'
-                    DefaultGatewayAddress = '10.0.1.1'
-                },
-                @{
-                    NetAdapterName = 'SEATTLE_HB'
-                    SwitchName = 'SEATTLE_HB'
-                    IPAddress = '10.0.11.113/24'
-                }
-            )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
-        },
-        @{
-            Role = @{
-                Cluster = @{
-                    StaticAddress = '10.0.2.121/24'
-                    IgnoreNetwork = '10.0.12.0/24'
-                    Name = 'C2'
-                }
-                DomainMember = @{}
-                SqlServer = @{
-                    InstanceName = 'MSSQLSERVER'
-                    Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
-                }
-            }
-            NodeName = 'DAC2N1'
-            Network = @(
-                @{
-                    DnsServerAddress = '10.0.0.1'
-                    NetAdapterName = 'DALLAS'
-                    SwitchName = 'DALLAS'
-                    IPAddress = '10.0.2.111/24'
-                    DefaultGatewayAddress = '10.0.2.1'
-                },
-                @{
-                    NetAdapterName = 'DALLAS_HB'
-                    SwitchName = 'DALLAS_HB'
-                    IPAddress = '10.0.12.111/24'
-                }
-            )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
-        },
-        @{
-            Role = @{
-                Cluster = @{
-                    StaticAddress = '10.0.2.121/24'
-                    IgnoreNetwork = '10.0.12.0/24'
-                    Name = 'C2'
-                }
-                DomainMember = @{}
-                SqlServer = @{
-                    InstanceName = 'MSSQLSERVER'
-                    Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
-                }
-            }
-            NodeName = 'DAC2N2'
-            Network = @(
-                @{
-                    DnsServerAddress = '10.0.0.1'
-                    NetAdapterName = 'DALLAS'
-                    SwitchName = 'DALLAS'
-                    IPAddress = '10.0.2.112/24'
-                    DefaultGatewayAddress = '10.0.2.1'
-                },
-                @{
-                    NetAdapterName = 'DALLAS_HB'
-                    SwitchName = 'DALLAS_HB'
-                    IPAddress = '10.0.12.112/24'
-                }
-            )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
         }
     )
     NonNodeData = @{
@@ -460,19 +303,19 @@
                     Name = 'PoshRSJob'
                 },
                 @{
-                    RequiredVersion = '21.1.18121'
+                    RequiredVersion = '21.1.18147'
                     Name = 'SqlServer'
                 },
                 @{
-                    RequiredVersion = '1.6.2'
+                    RequiredVersion = '1.6.3'
                     Name = 'Cim'
                 },
                 @{
-                    RequiredVersion = '2.0.7'
+                    RequiredVersion = '2.1.8'
                     Name = 'DbData'
                 },
                 @{
-                    RequiredVersion = '1.5.1'
+                    RequiredVersion = '1.5.2'
                     Name = 'DbSmo'
                 },
                 @{
@@ -538,11 +381,8 @@
                     Name = 'xPSDesiredStateConfiguration'
                 },
                 @{
-                    Branch = 'dev'
-                    Provider = 'GitHub'
-                    Name = 'SqlServerDsc'
-                    Owner = 'PowerShell'
                     RequiredVersion = '12.5.0.0'
+                    Name = 'SqlServerDsc'
                 }
             )
             Resource = @(
