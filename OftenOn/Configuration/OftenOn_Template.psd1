@@ -304,11 +304,11 @@
                 @{ Name = 'SqlServer'; RequiredVersion = '21.1.18147'; }
 
                 @{ Name = 'Cim'; RequiredVersion = '1.6.3'; }
-                @{ Name = 'DbData'; RequiredVersion = '2.2.1'; }
+                @{ Name = 'DbData'; RequiredVersion = '2.2.2'; }
                 @{ Name = 'DbSmo'; RequiredVersion = '1.5.2'; }
                 @{ Name = 'Disposable'; RequiredVersion = '1.5.1'; }
                 @{ Name = 'Error'; RequiredVersion = '1.5.1'; }
-                @{ Name = 'Jojoba'; RequiredVersion = '4.1.4'; }
+                @{ Name = 'Jojoba'; RequiredVersion = '4.1.5'; }
                 @{ Name = 'ParseSql'; RequiredVersion = '1.1.1'; }
                 @{ Name = 'Performance'; RequiredVersion = '1.5.1'; }
             )
