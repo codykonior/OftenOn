@@ -19,7 +19,10 @@ function Set-OftenOnLab {
         [Parameter(ParameterSetName = 'Detailed')]
         [hashtable] $Cluster1,
         [Parameter(ParameterSetName = 'Detailed')]
-        [hashtable] $Cluster2
+        [hashtable] $Cluster2,
+
+        [ValidateSet("10.0", "192.168", "172.16")]
+        $Subnet  ="10.0"
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'Default') {
@@ -151,5 +154,26 @@ function Set-OftenOnLab {
         $configurationData.AllNodes = $configurationData.AllNodes | Where-Object { -not $_.Role.Contains("Cluster") -or $_.Role.Cluster.Name -ne "C2" }
     }
 
+    $areas = @()
+    $areas += ($configurationData.AllNodes | Where-Object { $_.ContainsKey("Network") }).Network
+    $areas += (($configurationData.AllNodes | Where-Object { $_.ContainsKey("Role") }).Role | Where-Object { $_.ContainsKey("Cluster") }).Cluster
+    $areas += (($configurationData.AllNodes | Where-Object { $_.ContainsKey("Role") }).Role | Where-Object { $_.ContainsKey("AvailabilityGroup") }).AvailabilityGroup
+    foreach ($network in $areas) {
+            # Necessary as it's a collection under the hood and we can't modify inside a loop
+            $keyNames = $network.Keys | ForEach-Object {
+                $_
+            }
+
+            foreach ($keyName in $keyNames) {
+                $newValue = $network.$keyName -replace "^10.0", $subnet
+                if ($network.$keyName -match "^10.0" -and $network.$keyName -ne $newValue) {
+                    "Updating $keyName from $($network.$keyName) to $newValue"
+                    $network.$keyName = $newValue
+                }
+            }
+    }
+
+
+    $global:x = $configurationData
     Convert-HashtableToString $configurationData | Set-Content "$PSScriptRoot\..\Configuration\OftenOn.psd1"
 }

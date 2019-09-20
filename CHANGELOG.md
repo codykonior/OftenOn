@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - DSC module version updates.
 
+### Added
+- Set-OftenOnLab now has a -Subnet parameter that lets you switch between the
+  default subnet of 10.0 to 192.168 or 172.16.
+
 ## [1.1.8] - 2019-09-04
 ### Fixed
 - Re-remove content from OftenOn.psm1 as I forgot it's in Test-OftenOnLab.
