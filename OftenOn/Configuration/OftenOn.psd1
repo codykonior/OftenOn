@@ -311,7 +311,7 @@
                     Name = 'Cim'
                 },
                 @{
-                    RequiredVersion = '2.2.1'
+                    RequiredVersion = '2.2.2'
                     Name = 'DbData'
                 },
                 @{
@@ -327,7 +327,7 @@
                     Name = 'Error'
                 },
                 @{
-                    RequiredVersion = '4.1.4'
+                    RequiredVersion = '4.1.5'
                     Name = 'Jojoba'
                 },
                 @{
