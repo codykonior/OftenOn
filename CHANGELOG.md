@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.13] - 2019-09-20
+### Changed
+- SSMS to 18.2 and SQL 2017 to CU16.
+
 ## [1.1.12] - 2019-09-20
 ### Changed
 - Module version updates.

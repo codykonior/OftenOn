@@ -72,7 +72,7 @@
             }
 
             Lability_Resource  = @(
-                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU14', 'SSMS1791', 'SSMS1810', 'NetFx472'
+                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU16', 'SSMS182', 'NetFx472'
             )
         }
 
@@ -418,10 +418,10 @@
                     Checksum = '54AF3D25BA0254440340E86320441A94'
                 }
                 @{
-                    Id       = 'SQLServer2017CU14'
-                    Filename = 'sqlserver2017-kb4484710-x64_59015db5853814c7f2ac24cd4722c0eae771829f.exe'
-                    Uri      = 'http://download.windowsupdate.com/d/msdownload/update/software/updt/2019/03/sqlserver2017-kb4484710-x64_59015db5853814c7f2ac24cd4722c0eae771829f.exe'
-                    Checksum = '06563732B4F3532D84D6F7E5D969F638'
+                    Id       = 'SQLServer2017CU16'
+                    Filename = 'SQLServer2017-KB4508218-x64.exe'
+                    Uri      = 'https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB4508218-x64.exe'
+                    Checksum = '47AEF22AAFF015923ABC3CDDF9B5A592'
                 }
                 @{
                     Id       = 'SSMS1791'
@@ -430,16 +430,22 @@
                     Checksum = '826BB5D7B783DCB9FB4194F326106850'
                 }
                 @{
-                    Id       = 'SSMS1800'
-                    Filename = 'SSMS-Setup-ENU-18.0.0.exe'
+                    Id       = 'SSMS180'
+                    Filename = 'SSMS-Setup-ENU-18.0.exe'
                     Uri      = 'https://download.microsoft.com/download/5/4/E/54EC1AD8-042C-4CA3-85AB-BA307CF73710/SSMS-Setup-ENU.exe'
                     Checksum = '2FE1A67317AC4DE9669283817167D516'
                 }
                 @{
-                    Id       = 'SSMS1810'
-                    Filename = 'SSMS-Setup-ENU-18.1.0.exe'
+                    Id       = 'SSMS181'
+                    Filename = 'SSMS-Setup-ENU-18.1.exe'
                     Uri      = 'https://download.microsoft.com/download/0/1/5/015ECB20-6206-4500-B73C-F3405553445A/SSMS-Setup-ENU.exe'
                     Checksum = 'A092948409260FB68F72858337043E5C'
+                }
+                @{
+                    Id       = 'SSMS182'
+                    Filename = 'SSMS-Setup-ENU-18.2.exe'
+                    Uri      = 'https://download.microsoft.com/download/2/9/C/29CC9731-CE3B-4EC8-89D8-E6B8EE88EAF5/SSMS-Setup-ENU.exe'
+                    Checksum = 'D6699E4B6E24A40F88C8D0A81792B458'
                 }
                 @{
                     Id       = 'NetFx472'
