@@ -4,6 +4,7 @@ Configuration ooRemoteDesktop {
 
     # Enable the service
     RemoteDesktopAdmin 'EnableRemoteDesktopService' {
+        IsSingleInstance   = 'Yes'
         Ensure             = 'Present'
         UserAuthentication = 'NonSecure'
     }
