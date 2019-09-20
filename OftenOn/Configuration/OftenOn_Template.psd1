@@ -305,7 +305,7 @@
 
                 @{ Name = 'Cim'; RequiredVersion = '1.6.3'; }
                 @{ Name = 'DbData'; RequiredVersion = '2.2.2'; }
-                @{ Name = 'DbSmo'; RequiredVersion = '1.5.2'; }
+                @{ Name = 'DbSmo'; RequiredVersion = '1.5.3'; }
                 @{ Name = 'Disposable'; RequiredVersion = '1.5.1'; }
                 @{ Name = 'Error'; RequiredVersion = '1.5.1'; }
                 @{ Name = 'Jojoba'; RequiredVersion = '4.1.5'; }
