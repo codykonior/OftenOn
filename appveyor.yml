@@ -7,7 +7,6 @@ test_script:
       Install-Module NetworkingDsc -Force -AllowClobber
       Install-Module xActiveDirectory -Force -AllowClobber
       Install-Module xDnsServer -Force -AllowClobber
-      Install-Module xRemoteDesktopAdmin -Force -AllowClobber
       Install-Module xSmbShare -Force -AllowClobber
       Install-Module xSystemSecurity -Force -AllowClobber
       Install-Module xWindowsUpdate -Force -AllowClobber

@@ -282,34 +282,33 @@
             # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
             # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '6.5.0.0'; }
-                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.3.0.0'; }
+                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '7.0.0.0'; }
+                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.4.0.0'; }
                 @{ Name = 'xActiveDirectory'; RequiredVersion = '3.0.0.0'; }
-                @{ Name = 'xDnsServer'; RequiredVersion = '1.14.0.0'; }
-                @{ Name = 'xRemoteDesktopAdmin'; RequiredVersion = '1.1.0.0'; }
+                @{ Name = 'xDnsServer'; RequiredVersion = '1.15.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.2.0.0'; }
                 @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.12.0.0'; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.9.0.0'; }
+                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.13.0.0'; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.10.0.0'; }
 
                 # This changes depending on whether I have pending fixes or not
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '13.1.0.0'; }
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '13.1.0.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '13.2.0.0'; }
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '13.2.0.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
             Module      = @(
-                @{ Name = 'Pester'; RequiredVersion = '4.8.1'; }
+                @{ Name = 'Pester'; RequiredVersion = '4.9.0'; }
                 @{ Name = 'PoshRSJob'; RequiredVersion = '1.7.4.4'; }
                 @{ Name = 'SqlServer'; RequiredVersion = '21.1.18147'; }
 
                 @{ Name = 'Cim'; RequiredVersion = '1.6.3'; }
-                @{ Name = 'DbData'; RequiredVersion = '2.1.8'; }
+                @{ Name = 'DbData'; RequiredVersion = '2.2.1'; }
                 @{ Name = 'DbSmo'; RequiredVersion = '1.5.2'; }
                 @{ Name = 'Disposable'; RequiredVersion = '1.5.1'; }
                 @{ Name = 'Error'; RequiredVersion = '1.5.1'; }
-                @{ Name = 'Jojoba'; RequiredVersion = '4.1.3'; }
+                @{ Name = 'Jojoba'; RequiredVersion = '4.1.4'; }
                 @{ Name = 'ParseSql'; RequiredVersion = '1.1.1'; }
                 @{ Name = 'Performance'; RequiredVersion = '1.5.1'; }
             )

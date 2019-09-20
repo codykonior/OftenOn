@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.9] - 2019-09-20
+### Changed
+- DSC module version updates.
+
 ## [1.1.8] - 2019-09-04
 ### Fixed
 - Re-remove content from OftenOn.psm1 as I forgot it's in Test-OftenOnLab.

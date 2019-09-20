@@ -1,9 +1,9 @@
 Configuration ooRemoteDesktop {
-    Import-DscResource -ModuleName NetworkingDsc -ModuleVersion 7.3.0.0
-    Import-DscResource -ModuleName xRemoteDesktopAdmin -ModuleVersion 1.1.0.0
+    Import-DscResource -ModuleName NetworkingDsc -ModuleVersion 7.4.0.0
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 7.0.0.0
 
     # Enable the service
-    xRemoteDesktopAdmin 'EnableRemoteDesktopService' {
+    RemoteDesktopAdmin 'EnableRemoteDesktopService' {
         Ensure             = 'Present'
         UserAuthentication = 'NonSecure'
     }

@@ -3,7 +3,7 @@ Configuration ooManagementStudio {
         [Parameter(Mandatory)]
         [string] $ResourceLocation
     )
-    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.9.0.0
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.10.0.0
 
     <#
         ProductId is critical to get right and changes each version. If it's wrong the computer will keep rebooting.
