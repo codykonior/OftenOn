@@ -72,7 +72,7 @@
             }
 
             Lability_Resource  = @(
-                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU16', 'SSMS182', 'NetFx472'
+                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU16', 'SSMS183', 'NetFx472'
             )
         }
 
@@ -446,6 +446,12 @@
                     Filename = 'SSMS-Setup-ENU-18.2.exe'
                     Uri      = 'https://download.microsoft.com/download/2/9/C/29CC9731-CE3B-4EC8-89D8-E6B8EE88EAF5/SSMS-Setup-ENU.exe'
                     Checksum = 'D6699E4B6E24A40F88C8D0A81792B458'
+                }
+                @{
+                    Id       = 'SSMS183'
+                    Filename = 'SSMS-Setup-ENU-18.3.exe'
+                    Uri      = 'https://download.microsoft.com/download/6/5/5/6556c017-306c-4a7c-a8a8-aa65d55ed283/SSMS-Setup-ENU.exe'
+                    Checksum = 'E6C90112B65B1E730183EA82611EBAF5'
                 }
                 @{
                     Id       = 'NetFx472'

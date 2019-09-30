@@ -41,7 +41,7 @@
                 'SQLServer2012SP4GDRHotfix',
                 'SQLServer2017',
                 'SQLServer2017CU16',
-                'SSMS182',
+                'SSMS183',
                 'NetFx472'
             )
             Network = @(
@@ -435,6 +435,12 @@
                     Filename = 'SSMS-Setup-ENU-18.2.exe'
                     Uri = 'https://download.microsoft.com/download/2/9/C/29CC9731-CE3B-4EC8-89D8-E6B8EE88EAF5/SSMS-Setup-ENU.exe'
                     Id = 'SSMS182'
+                },
+                @{
+                    Checksum = 'E6C90112B65B1E730183EA82611EBAF5'
+                    Filename = 'SSMS-Setup-ENU-18.3.exe'
+                    Uri = 'https://download.microsoft.com/download/6/5/5/6556c017-306c-4a7c-a8a8-aa65d55ed283/SSMS-Setup-ENU.exe'
+                    Id = 'SSMS183'
                 },
                 @{
                     Checksum = '87450CFA175585B23A76BBD7052EE66B'
