@@ -301,7 +301,7 @@
             Module      = @(
                 @{ Name = 'Pester'; RequiredVersion = '4.9.0'; }
                 @{ Name = 'PoshRSJob'; RequiredVersion = '1.7.4.4'; }
-                @{ Name = 'SqlServer'; RequiredVersion = '21.1.18147'; }
+                @{ Name = 'SqlServer'; RequiredVersion = '21.1.18179'; }
 
                 @{ Name = 'Cim'; RequiredVersion = '1.6.3'; }
                 @{ Name = 'DbData'; RequiredVersion = '2.2.2'; }
