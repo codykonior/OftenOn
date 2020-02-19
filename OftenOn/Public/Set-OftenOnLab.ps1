@@ -36,7 +36,7 @@ function Set-OftenOnLab {
                 }
                 $Cluster2 = $null
             }
-            'Default' {
+            'Default2017' {
                 $Cluster1 = @{
                     Windows           = '2016'
                     SQL               = '2017'

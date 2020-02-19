@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.16] - 2020-02-19
+### Fixed
+- Default2017 configuration fixed.
+
 ## [1.1.15] - 2020-02-19
 ### Changed
 - SSMS 18.4, SQL 2017 CU19, new Default2017 configuration (one SQL 2017 set

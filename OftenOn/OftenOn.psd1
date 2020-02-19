@@ -12,7 +12,7 @@
     RootModule           = 'OftenOn.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.1.15'
+    ModuleVersion        = '1.1.16'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()

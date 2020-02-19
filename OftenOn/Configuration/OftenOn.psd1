@@ -99,7 +99,7 @@
         },
         @{
             Lability_BootDelay = 60
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
             NodeName = 'SEC1N1'
             Lability_BootOrder = 2
             Role = @{
@@ -119,7 +119,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
                 }
             }
             Network = @(
@@ -155,7 +155,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
                 }
             }
             NodeName = 'SEC1N2'
@@ -173,7 +173,7 @@
                     IPAddress = '10.0.11.12/24'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
         },
         @{
             Role = @{
@@ -193,7 +193,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
                 }
             }
             NodeName = 'SEC1N3'
@@ -211,7 +211,7 @@
                     IPAddress = '10.0.11.13/24'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
         },
         @{
             Role = @{
@@ -231,7 +231,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
                 }
             }
             NodeName = 'DAC1N1'
@@ -249,7 +249,7 @@
                     IPAddress = '10.0.12.11/24'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
         },
         @{
             Role = @{
@@ -269,7 +269,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
                 }
             }
             NodeName = 'DAC1N2'
@@ -287,7 +287,7 @@
                     IPAddress = '10.0.12.12/24'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
         }
     )
     NonNodeData = @{
