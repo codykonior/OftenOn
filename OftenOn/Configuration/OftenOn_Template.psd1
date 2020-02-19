@@ -72,7 +72,7 @@
             }
 
             Lability_Resource  = @(
-                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU16', 'SSMS183', 'NetFx472'
+                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU19', 'SSMS184', 'NetFx472'
             )
         }
 
@@ -282,19 +282,19 @@
             # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
             # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '7.0.0.0'; }
+                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '8.0.0'; }
                 @{ Name = 'NetworkingDsc'; RequiredVersion = '7.4.0.0'; }
                 @{ Name = 'xActiveDirectory'; RequiredVersion = '3.0.0.0'; }
-                @{ Name = 'xDnsServer'; RequiredVersion = '1.15.0.0'; }
+                @{ Name = 'xDnsServer'; RequiredVersion = '1.16.0.0'; }
                 @{ Name = 'xSmbShare'; RequiredVersion = '2.2.0.0'; }
-                @{ Name = 'xSystemSecurity'; RequiredVersion = '1.4.0.0'; }
+                @{ Name = 'xSystemSecurity'; RequiredVersion = '1.5.0'; }
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.13.0.0'; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '8.10.0.0'; }
+                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.14.1'; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '9.0.0'; }
 
                 # This changes depending on whether I have pending fixes or not
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '13.2.0.0'; }
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '13.2.0.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '13.3.0'; }
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '13.3.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
@@ -418,10 +418,10 @@
                     Checksum = '54AF3D25BA0254440340E86320441A94'
                 }
                 @{
-                    Id       = 'SQLServer2017CU16'
-                    Filename = 'SQLServer2017-KB4508218-x64.exe'
-                    Uri      = 'https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB4508218-x64.exe'
-                    Checksum = '47AEF22AAFF015923ABC3CDDF9B5A592'
+                    Id       = 'SQLServer2017CU19'
+                    Filename = 'SQLServer2017-KB4535007-x64.exe'
+                    Uri      = 'https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB4535007-x64.exe'
+                    Checksum = '84A1EC2FF8CEB86B1AEDC613B144F4D9'
                 }
                 @{
                     Id       = 'SSMS1791'
@@ -448,10 +448,10 @@
                     Checksum = 'D6699E4B6E24A40F88C8D0A81792B458'
                 }
                 @{
-                    Id       = 'SSMS183'
-                    Filename = 'SSMS-Setup-ENU-18.3.exe'
-                    Uri      = 'https://download.microsoft.com/download/6/5/5/6556c017-306c-4a7c-a8a8-aa65d55ed283/SSMS-Setup-ENU.exe'
-                    Checksum = 'E6C90112B65B1E730183EA82611EBAF5'
+                    Id       = 'SSMS184'
+                    Filename = 'SSMS-Setup-ENU-18.4.exe'
+                    Uri      = 'https://aka.ms/ssmsfullsetup'
+                    Checksum = 'D41D8CD98F00B204E9800998ECF8427E'
                 }
                 @{
                     Id       = 'NetFx472'

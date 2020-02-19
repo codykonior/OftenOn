@@ -1,5 +1,5 @@
 Configuration ooTemp {
-    Import-DscResource -ModuleName xSystemSecurity -ModuleVersion 1.4.0.0
+    Import-DscResource -ModuleName xSystemSecurity -ModuleVersion 1.5.0
 
     #region Add a C:\Temp
     File 'CreateTempDirectory' {

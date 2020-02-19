@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.15] - 2020-02-19
+### Changed
+- SSMS 18.4, SQL 2017 CU19, new Default2017 configuration (one SQL 2017 set
+  on Windows 2016).
+- DSC resource updates.
+
 ## [1.1.14] - 2019-09-30
 ### Changed
 - SSMS 18.3

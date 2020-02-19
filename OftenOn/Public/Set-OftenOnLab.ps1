@@ -7,7 +7,7 @@ function Set-OftenOnLab {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     param (
         [Parameter(ParameterSetName = 'Default', Position = 1)]
-        [ValidateSet('Default', 'CrossClusterMigration', 'Upgrade', 'DAG')]
+        [ValidateSet('Default', 'Default2017', 'CrossClusterMigration', 'Upgrade', 'DAG')]
         [string] $ConfigurationName = 'Default',
 
         # This can be used to pass a directory (like C:\Blah\Modules) and this
@@ -22,7 +22,7 @@ function Set-OftenOnLab {
         [hashtable] $Cluster2,
 
         [ValidateSet("10.0", "192.168", "172.16")]
-        $Subnet  ="10.0"
+        $Subnet = "10.0"
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'Default') {
@@ -32,6 +32,14 @@ function Set-OftenOnLab {
                 $Cluster1 = @{
                     Windows           = '2012'
                     SQL               = '2012'
+                    AvailabilityGroup = $true
+                }
+                $Cluster2 = $null
+            }
+            'Default' {
+                $Cluster1 = @{
+                    Windows           = '2016'
+                    SQL               = '2017'
                     AvailabilityGroup = $true
                 }
                 $Cluster2 = $null
@@ -159,18 +167,18 @@ function Set-OftenOnLab {
     $areas += (($configurationData.AllNodes | Where-Object { $_.ContainsKey("Role") }).Role | Where-Object { $_.ContainsKey("Cluster") }).Cluster
     $areas += (($configurationData.AllNodes | Where-Object { $_.ContainsKey("Role") }).Role | Where-Object { $_.ContainsKey("AvailabilityGroup") }).AvailabilityGroup
     foreach ($network in $areas) {
-            # Necessary as it's a collection under the hood and we can't modify inside a loop
-            $keyNames = $network.Keys | ForEach-Object {
-                $_
-            }
+        # Necessary as it's a collection under the hood and we can't modify inside a loop
+        $keyNames = $network.Keys | ForEach-Object {
+            $_
+        }
 
-            foreach ($keyName in $keyNames) {
-                $newValue = $network.$keyName -replace "^10.0", $subnet
-                if ($network.$keyName -match "^10.0" -and $network.$keyName -ne $newValue) {
-                    "Updating $keyName from $($network.$keyName) to $newValue"
-                    $network.$keyName = $newValue
-                }
+        foreach ($keyName in $keyNames) {
+            $newValue = $network.$keyName -replace "^10.0", $subnet
+            if ($network.$keyName -match "^10.0" -and $network.$keyName -ne $newValue) {
+                "Updating $keyName from $($network.$keyName) to $newValue"
+                $network.$keyName = $newValue
             }
+        }
     }
 
 
