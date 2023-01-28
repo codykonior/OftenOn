@@ -96,6 +96,7 @@ function Set-OftenOnLab {
     }
 
     $configurationData = Import-PowerShellDataFile "$PSScriptRoot\..\Configuration\OftenOn_Template.psd1"
+
     if ($ModulePath) {
         if (-not (Test-Path $ModulePath)) {
             Write-Error "$ModulePath does not exist"
@@ -178,6 +179,22 @@ function Set-OftenOnLab {
         $configurationData.AllNodes = $configurationData.AllNodes | Where-Object { -not $_.Role.Contains("Cluster") -or $_.Role.Cluster.Name -ne "C2" }
     }
 
+    # Strip out unnecessary SQL installation media;
+    # this is because some may not be available right now.
+    foreach ($node in $configurationData.AllNodes) {
+        if ($node.ContainsKey("Lability_Resource")) {
+            $node.Lability_Resource = $node.Lability_Resource | ForEach-Object {
+                if ($_ -notlike "SQLServer*") {
+                    $_
+                } elseif ($Cluster1 -and $Cluster1.SQL -and $_ -like "SQLServer$($Cluster1.SQL)*") {
+                    $_
+                }  elseif ($Cluster2 -and $Cluster2.SQL -and $_ -like "SQLServer$($Cluster2.SQL)*") {
+                    $_
+                }       
+            }
+        }
+    }
+
     $areas = @()
     $areas += ($configurationData.AllNodes | Where-Object { $_.ContainsKey("Network") }).Network
     $areas += (($configurationData.AllNodes | Where-Object { $_.ContainsKey("Role") }).Role | Where-Object { $_.ContainsKey("Cluster") }).Cluster
@@ -197,7 +214,6 @@ function Set-OftenOnLab {
         }
     }
 
-
-    $global:x = $configurationData
+    $global:OftenOnConfigurationData = $configurationData
     Convert-HashtableToString $configurationData | Set-Content "$PSScriptRoot\..\Configuration\OftenOn.psd1"
 }
