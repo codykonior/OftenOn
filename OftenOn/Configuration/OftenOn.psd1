@@ -35,12 +35,6 @@
             Lability_Resource = @(
                 'NlaSvcFix',
                 'TriggerDsc',
-                'SQLServer2012',
-                'SQLServer2012SP4',
-                'SQLServer2012SP4GDR',
-                'SQLServer2012SP4GDRHotfix',
-                'SQLServer2017',
-                'SQLServer2017CU19',
                 'SQLServer2019',
                 'SSMS190',
                 'NetFx472'
@@ -440,15 +434,15 @@
                     Id = 'SSMS184'
                 },
                 @{
-                    Checksum = '65D034096B63C6EC9051951BCF10088C'
+                    Checksum = 'B4AC17BA2853B4A9DEF7E90A50ADC2AC'
                     Filename = 'SSMS-Setup-ENU-19.0.exe'
                     Uri = 'https://aka.ms/ssmsfullsetup'
                     Id = 'SSMS190'
                 },
                 @{
-                    Checksum = '87450CFA175585B23A76BBD7052EE66B'
-                    Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
-                    Uri = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
+                    Checksum = '4037BDDE26BF72E2CE5108CB30387BCD'
+                    Filename = 'ndp472-kb4054530-x86-x64-allos-enu.exe'
+                    Uri      = 'https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/089f837de42708daacaae7c04b7494db/ndp472-kb4054530-x86-x64-allos-enu.exe'
                     Id = 'NetFx472'
                 },
                 @{

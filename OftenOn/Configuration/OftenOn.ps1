@@ -616,7 +616,7 @@ Configuration OftenOn {
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('Workstation')) {
                 ooNetFramework 'Install472' {
-                    ResourceLocation = "$resourceLocation\NDP472-KB4054530-x86-x64-AllOS-ENU.exe"
+                    ResourceLocation = "$resourceLocation\ndp472-kb4054530-x86-x64-allos-enu.exe"
                 }
 
                 ooManagementStudio 'InstallManagementStudio' {

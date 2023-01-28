@@ -460,9 +460,9 @@
                 }
                 @{
                     Id       = 'NetFx472'
-                    Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
-                    Uri      = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
-                    Checksum = '87450CFA175585B23A76BBD7052EE66B'
+                    Filename = 'ndp472-kb4054530-x86-x64-allos-enu.exe'
+                    Uri      = 'https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/089f837de42708daacaae7c04b7494db/ndp472-kb4054530-x86-x64-allos-enu.exe'
+                    Checksum = '4037BDDE26BF72E2CE5108CB30387BCD'
                 }
                 @{
                     Id       = 'SQLServer2017'
