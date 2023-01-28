@@ -7,7 +7,7 @@ function Set-OftenOnLab {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     param (
         [Parameter(ParameterSetName = 'Default', Position = 1)]
-        [ValidateSet('Default', 'Default2017', 'CrossClusterMigration', 'Upgrade', 'DAG')]
+        [ValidateSet('Default', 'Default2017',  'Default2019', 'CrossClusterMigration', 'Upgrade', 'DAG')]
         [string] $ConfigurationName = 'Default',
 
         # This can be used to pass a directory (like C:\Blah\Modules) and this
@@ -40,6 +40,14 @@ function Set-OftenOnLab {
                 $Cluster1 = @{
                     Windows           = '2016'
                     SQL               = '2017'
+                    AvailabilityGroup = $true
+                }
+                $Cluster2 = $null
+            }
+            'Default2019' {
+                $Cluster1 = @{
+                    Windows           = '2016'
+                    SQL               = '2019'
                     AvailabilityGroup = $true
                 }
                 $Cluster2 = $null
@@ -116,6 +124,10 @@ function Set-OftenOnLab {
             '\\CHDC01\Resources\SQLServer2012'
         } elseif ($Cluster1.SQL -eq '2017') {
             '\\CHDC01\Resources\SQLServer2017'
+        } elseif ($Cluster1.SQL -eq '2019') {
+            '\\CHDC01\Resources\SQLServer2019'
+        } elseif ($Cluster1.SQL -eq '2022') {
+            '\\CHDC01\Resources\SQLServer2022'
         } else {
             Write-Error "Unknown SQL version $($Cluster1.SQL)"
         }
@@ -146,6 +158,10 @@ function Set-OftenOnLab {
             '\\CHDC01\Resources\SQLServer2012'
         } elseif ($Cluster2.SQL -eq '2017') {
             '\\CHDC01\Resources\SQLServer2017'
+        } elseif ($Cluster2.SQL -eq '2019') {
+            '\\CHDC01\Resources\SQLServer2019'
+        } elseif ($Cluster2.SQL -eq '2022') {
+            '\\CHDC01\Resources\SQLServer2022'
         } else {
             Write-Error "Unknown SQL version $($Cluster1.SQL)"
         }

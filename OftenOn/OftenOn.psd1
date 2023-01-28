@@ -55,13 +55,12 @@
         'Lability',
         'ComputerManagementDsc',
         'NetworkingDsc',
-        'xActiveDirectory',
-        'xDnsServer',
-        'xSmbShare',
-        'xSystemSecurity',
+        'ActiveDirectoryDsc',
+        'DnsServerDsc',
+        'FileSystemDsc',
         'xWindowsUpdate',
         'SqlServerDsc',
-        'xFailOverCluster',
+        'FailoverClusterDsc',
         'xPSDesiredStateConfiguration'
     )
 

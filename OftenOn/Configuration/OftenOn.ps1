@@ -7,14 +7,13 @@ Configuration OftenOn {
 
     #region Resources
     Import-DscResource -ModuleName PSDesiredStateConfiguration -ModuleVersion 1.1
-    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 8.0.0
-    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 3.0.0.0
-    Import-DscResource -ModuleName xDnsServer -ModuleVersion 1.16.0.0
-    Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.2.0.0
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 8.5.0
+    Import-DscResource -ModuleName ActiveDirectoryDsc -ModuleVersion 6.2.0
+    Import-DscResource -ModuleName DnsServerDsc -ModuleVersion 3.0.0
     Import-DscResource -ModuleName xWindowsUpdate -ModuleVersion 2.8.0.0
     # These have fixes in the dev branches but the changes are not to parameters so any version here will do
-    Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 13.3.0
-    Import-DscResource -ModuleName xFailOverCluster -ModuleVersion 1.14.1
+    Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 16.0.0
+    Import-DscResource -ModuleName FailoverClusterDsc -ModuleVersion 2.1.0
     # This is a composite resource and doesn't need to be on the destination machine
     Import-DscResource -ModuleName OftenOn -ModuleVersion 1.1.16
     #endregion
@@ -128,7 +127,7 @@ Configuration OftenOn {
                 #endregion
 
                 #region Create Domain
-                xADDomain 'Create' {
+                ADDomain 'Create' {
                     DomainName                    = $node.FullyQualifiedDomainName
                     DomainAdministratorCredential = $domainAdministrator
                     SafemodeAdministratorPassword = $safemodeAdministrator
@@ -138,19 +137,19 @@ Configuration OftenOn {
 
                 #region Set Time Sync (required for Windows Server 2016 Hyper-V clients to work)
                 ooTime 'SetTime' {
-                    DependsOn = '[xADDomain]Create'
+                    DependsOn = '[ADDomain]Create'
                 }
                 #endregion
 
                 #region Create an AD lookup, just makes nslookup work nicer
                 # This should really be done for all networks and computers but...
-                xDnsServerADZone 'AddReverseZone' {
+                DnsServerADZone 'AddReverseZone' {
                     Name             = '0.0.10.in-addr.arpa'
                     DynamicUpdate    = 'Secure'
                     ReplicationScope = 'Forest'
 
                     Ensure           = 'Present'
-                    DependsOn        = '[xADDomain]Create'
+                    DependsOn        = '[ADDomain]Create'
                 }
 
                 xDnsRecord 'AddReverseZoneLookup' {
@@ -160,7 +159,7 @@ Configuration OftenOn {
                     Type      = 'PTR'
 
                     Ensure    = 'Present'
-                    DependsOn = '[xDnsServerADZone]AddReverseZone'
+                    DependsOn = '[DnsServerADZone]AddReverseZone'
                 }
                 #endregion
 
@@ -171,66 +170,66 @@ Configuration OftenOn {
                     Ensure      = 'Present'
                     State       = 'Running'
 
-                    DependsOn   = '[xADDomain]Create'
+                    DependsOn   = '[ADDomain]Create'
                 }
                 #endregion
 
                 #region Create Users/Groups
-                xADUser 'CreateUserSQLEngineService' {
+                ADUser 'CreateUserSQLEngineService' {
                     # Make sure the UserName is a straight username because the DSC adds @DomainName onto the end.
                     DomainName  = $node.FullyQualifiedDomainName
                     UserName    = ($sqlEngineService.UserName -split '\\')[1]
                     Description = 'SQL Engine Service'
                     Password    = $sqlEngineService
                     Ensure      = 'Present'
-                    DependsOn   = '[xADDomain]Create'
+                    DependsOn   = '[ADDomain]Create'
                 }
 
-                xADUser "CreateLocalAdministrator" {
+                ADUser "CreateLocalAdministrator" {
                     DomainName  = $node.FullyQualifiedDomainName
                     UserName    = ($localAdministrator.UserName -split '\\')[1]
                     Description = 'Local Administrator'
                     Password    = $localAdministrator
                     Ensure      = 'Present'
-                    DependsOn   = '[xADDomain]Create'
+                    DependsOn   = '[ADDomain]Create'
                 }
 
                 Group 'AddLocalAdministratorToAdministratorsGroup' {
                     GroupName        = 'Administrators'
                     Ensure           = 'Present'
                     MembersToInclude = $localAdministrator.UserName
-                    DependsOn        = '[xADUser]CreateLocalAdministrator'
+                    DependsOn        = '[ADUser]CreateLocalAdministrator'
                 }
                 #endregion
 
                 #region Create a Resources and Temp share on the Domain Controller for other VMs to use
-                xSmbShare 'CreateResources' {
+                SmbShare 'CreateResources' {
                     Name       = 'Resources'
                     Ensure     = 'Present'
 
                     Path       = 'C:\Resources'
                     ReadAccess = 'Everyone'
 
-                    DependsOn  = '[xADDomain]Create'
+                    DependsOn  = '[ADDomain]Create'
                 }
 
-                xSmbShare 'CreateTemp' {
+                SmbShare 'CreateTemp' {
                     Name       = 'Temp'
                     Ensure     = 'Present'
 
                     Path       = 'C:\Temp'
                     FullAccess = 'Everyone'
 
-                    DependsOn  = '[xADDomain]Create'
+                    DependsOn  = '[ADDomain]Create'
                 }
                 #endregion
 
                 # Use CloudFlare to service DNS requests as we don't know what
                 # Hyper-V would use otherwise
-                xDnsServerForwarder "WAN Forwarder" {
+                DnsServerForwarder "WAN Forwarder" {
                     IsSingleInstance = "Yes";
                     IPAddresses      = "1.1.1.1";
-                    DependsOn        = '[xSmbShare]CreateTemp';
+                    DependsOn        = '[SmbShare]CreateTemp';
                 }
             } elseif ($node.Role.ContainsKey('DomainMember')) {
                 #region Wait for Active Directory
@@ -261,7 +260,7 @@ Configuration OftenOn {
 
                 #region Add LocalAdministrator to Administrators Group
                 WaitForAll "CreateLocalAdministrator" {
-                    ResourceName         = '[xADUser]CreateLocalAdministrator'
+                    ResourceName         = '[ADUser]CreateLocalAdministrator'
                     NodeName             = $domainController.$($node.DomainName)
 
                     # Otherwise you'll wait for life
@@ -294,7 +293,7 @@ Configuration OftenOn {
 
                 if (!$clusterOrder.ContainsKey($cluster.Name)) {
                     $clusterOrder.$($cluster.Name) = [array] $node.NodeName
-                    xCluster "AddNodeToCluster$($cluster.Name)" {
+                    Cluster "AddNodeToCluster$($cluster.Name)" {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterStaticAddress.CIDR
@@ -304,7 +303,7 @@ Configuration OftenOn {
                     }
                 } else {
                     WaitForAll "WaitForCluster$($cluster.Name)" {
-                        ResourceName         = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                        ResourceName         = "[Cluster]AddNodeToCluster$($cluster.Name)"
                         NodeName             = ($clusterOrder.$($cluster.Name))[-1]
 
                         # 30 Minutes
@@ -316,7 +315,7 @@ Configuration OftenOn {
                         DependsOn            = '[WindowsFeatureSet]All', '[Computer]Rename'
                     }
 
-                    xCluster "AddNodeToCluster$($cluster.Name)" {
+                    Cluster "AddNodeToCluster$($cluster.Name)" {
                         Name                          = $cluster.Name
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterStaticAddress.CIDR
@@ -356,26 +355,26 @@ Configuration OftenOn {
                             (Get-Cluster | Get-ClusterResource -Name $resourceName).PersistentState = 1
                         }
 
-                        DependsOn  = "[xClusterNetwork]RenameClusterNetwork$($cluster.Name)Client", "[xClusterNetwork]RenameClusterNetwork$($cluster.Name)Heartbeat"
+                        DependsOn  = "[ClusterNetwork]RenameClusterNetwork$($cluster.Name)Client", "[ClusterNetwork]RenameClusterNetwork$($cluster.Name)Heartbeat"
                     }
                 }
 
-                xClusterNetwork "RenameClusterNetwork$($cluster.Name)Client" {
+                ClusterNetwork "RenameClusterNetwork$($cluster.Name)Client" {
                     Address     = $clusterStaticAddress.NetworkID
                     AddressMask = $clusterStaticAddress.SubnetMask
                     Name        = $clusterStaticAddress.Name
                     Role        = 3 # Heartbeat and Client
 
-                    DependsOn   = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                    DependsOn   = "[Cluster]AddNodeToCluster$($cluster.Name)"
                 }
 
-                xClusterNetwork "RenameClusterNetwork$($cluster.Name)Heartbeat" {
+                ClusterNetwork "RenameClusterNetwork$($cluster.Name)Heartbeat" {
                     Address     = $clusterIgnoreNetwork.NetworkID
                     AddressMask = $clusterIgnoreNetwork.SubnetMask
                     Name        = $clusterIgnoreNetwork.Name
                     Role        = 1 # Heartbeat Only
 
-                    DependsOn   = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                    DependsOn   = "[Cluster]AddNodeToCluster$($cluster.Name)"
                 }
             }
         }
@@ -395,7 +394,7 @@ Configuration OftenOn {
                     SQLSysAdminAccounts = $localAdministrator.UserName
                     UpdateEnabled       = 'True'
                     UpdateSource        = '\\CHDC01\Resources'
-                    DependsOn           = "[xCluster]AddNodeToCluster$($cluster.Name)"
+                    DependsOn           = "[Cluster]AddNodeToCluster$($cluster.Name)"
                 }
 
                 SqlWindowsFirewall 'AddFirewallRuleSQL' {

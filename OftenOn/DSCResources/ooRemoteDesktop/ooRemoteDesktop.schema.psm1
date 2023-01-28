@@ -1,6 +1,6 @@
 Configuration ooRemoteDesktop {
-    Import-DscResource -ModuleName NetworkingDsc -ModuleVersion 7.4.0.0
-    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 8.0.0
+    Import-DscResource -ModuleName NetworkingDsc -ModuleVersion 9.0.0
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 8.5.0
 
     # Enable the service
     RemoteDesktopAdmin 'EnableRemoteDesktopService' {

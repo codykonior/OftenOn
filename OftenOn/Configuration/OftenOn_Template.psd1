@@ -72,7 +72,7 @@
             }
 
             Lability_Resource  = @(
-                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU19', 'SSMS184', 'NetFx472'
+                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU19', 'SSMS190', 'NetFx472'
             )
         }
 
@@ -282,33 +282,32 @@
             # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
             # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '8.0.0'; }
-                @{ Name = 'NetworkingDsc'; RequiredVersion = '7.4.0.0'; }
-                @{ Name = 'xActiveDirectory'; RequiredVersion = '3.0.0.0'; }
-                @{ Name = 'xDnsServer'; RequiredVersion = '1.16.0.0'; }
-                @{ Name = 'xSmbShare'; RequiredVersion = '2.2.0.0'; }
-                @{ Name = 'xSystemSecurity'; RequiredVersion = '1.5.0'; }
+                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '8.5.0'; }
+                @{ Name = 'NetworkingDsc'; RequiredVersion = '9.0.0'; }
+                @{ Name = 'ActiveDirectoryDsc'; RequiredVersion = '6.2.0'; }
+                @{ Name = 'DnsServerDsc'; RequiredVersion = '3.0.0'; }
+                @{ Name = 'FileSystemDsc'; RequiredVersion = '1.1.1'; }
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
-                @{ Name = 'xFailOverCluster'; RequiredVersion = '1.14.1'; }
-                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '9.0.0'; }
+                @{ Name = 'FailoverClusterDsc'; RequiredVersion = '2.1.0'; }
+                @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '9.1.0'; }
 
                 # This changes depending on whether I have pending fixes or not
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '13.3.0'; }
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '13.3.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '16.0.0'; }
+                # @{ Name = 'SqlServerDsc'; RequiredVersion = '16.0.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
             )
 
             # These non-DSC modules are copied over to the VMs for general purpose use.
             Module      = @(
-                @{ Name = 'Pester'; RequiredVersion = '4.9.0'; }
+                @{ Name = 'Pester'; RequiredVersion = '5.4.0'; }
                 @{ Name = 'PoshRSJob'; RequiredVersion = '1.7.4.4'; }
-                @{ Name = 'SqlServer'; RequiredVersion = '21.1.18179'; }
+                @{ Name = 'SqlServer'; RequiredVersion = '21.1.18256'; }
 
                 @{ Name = 'Cim'; RequiredVersion = '1.6.3'; }
                 @{ Name = 'DbData'; RequiredVersion = '2.2.2'; }
                 @{ Name = 'DbSmo'; RequiredVersion = '1.5.3'; }
                 @{ Name = 'Disposable'; RequiredVersion = '1.5.1'; }
                 @{ Name = 'Error'; RequiredVersion = '1.5.1'; }
-                @{ Name = 'Jojoba'; RequiredVersion = '4.1.5'; }
+                @{ Name = 'Jojoba'; RequiredVersion = '4.1.6'; }
                 @{ Name = 'ParseSql'; RequiredVersion = '1.1.1'; }
                 @{ Name = 'Performance'; RequiredVersion = '1.5.1'; }
             )
@@ -454,6 +453,12 @@
                     Checksum = '65D034096B63C6EC9051951BCF10088C'
                 }
                 @{
+                    Id       = 'SSMS190'
+                    Filename = 'SSMS-Setup-ENU-19.0.exe'
+                    Uri      = 'https://aka.ms/ssmsfullsetup'
+                    Checksum = '65D034096B63C6EC9051951BCF10088C'
+                }
+                @{
                     Id       = 'NetFx472'
                     Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Uri      = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
@@ -466,6 +471,20 @@
                     Checksum = '334FC5F8FDD269FB2D6D5DC1FD61D1C7'
                     Expand   = $true
                 }
+                @{
+                    Id       = 'SQLServer2019'
+                    Filename = 'en_sql_server_2019_developer_x64_dvd_baea4195.iso'
+                    Uri      = 'https://myvs.download.prss.microsoft.com/sg/en_sql_server_2019_developer_x64_dvd_baea4195.iso?t=104d5567-1d6b-4564-bba5-f3c8da06b9b7&e=1674930017&h=7a9fa619de6572ee89f086a9c62893f355ed88f9f255fc291af70954e5fd217d&su=1'
+                    Checksum = '62294C67E3785AE800C1935F75A3E9E8'
+                    Expand   = $true
+                }
+                @{
+                    Id       = 'SQLServer2022'
+                    Filename = 'enu_sql_server_2022_developer_edition_x64_dvd_7cacf733.iso'
+                    Uri      = 'https://myvs.download.prss.microsoft.com/sg/enu_sql_server_2022_developer_edition_x64_dvd_7cacf733.iso?t=450e0904-0022-45b6-8742-28b2f5ac356b&e=1674930058&h=b026b2ce9f1ca17930ebf549b9bdef6a20c2c94b675c25c83ce30caeab19a453&su=1'
+                    Checksum = 'F9BC338769AF3D913B5989BABFE6BC88'
+                    Expand   = $true
+                }                
                 @{
                     Id              = 'NlaSvcFix'
                     IsLocal         = $true

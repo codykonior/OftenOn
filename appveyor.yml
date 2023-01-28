@@ -5,13 +5,12 @@ test_script:
       Install-Module Lability -Force -AllowClobber
       Install-Module ComputerManagementDsc -Force -AllowClobber
       Install-Module NetworkingDsc -Force -AllowClobber
-      Install-Module xActiveDirectory -Force -AllowClobber
-      Install-Module xDnsServer -Force -AllowClobber
-      Install-Module xSmbShare -Force -AllowClobber
-      Install-Module xSystemSecurity -Force -AllowClobber
+      Install-Module ActiveDirectoryDsc -Force -AllowClobber
+      Install-Module DnsServerDsc -Force -AllowClobber
+      Install-Module FileSystemDsc -Force -AllowClobber
       Install-Module xWindowsUpdate -Force -AllowClobber
       Install-Module SqlServerDsc -Force -AllowClobber
-      Install-Module xFailOverCluster -Force -AllowClobber
+      Install-Module FailoverClusterDsc -Force -AllowClobber
       Install-Module xPSDesiredStateConfiguration -Force -AllowClobber
 
       Install-Module Pester -Force -AllowClobber

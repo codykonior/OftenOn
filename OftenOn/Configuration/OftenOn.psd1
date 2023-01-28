@@ -35,10 +35,6 @@
             Lability_Resource = @(
                 'NlaSvcFix',
                 'TriggerDsc',
-                'SQLServer2012',
-                'SQLServer2012SP4',
-                'SQLServer2012SP4GDR',
-                'SQLServer2012SP4GDRHotfix',
                 'SQLServer2017',
                 'SQLServer2017CU19',
                 'SSMS184',
@@ -99,7 +95,7 @@
         },
         @{
             Lability_BootDelay = 60
-            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
             NodeName = 'SEC1N1'
             Lability_BootOrder = 2
             Role = @{
@@ -119,7 +115,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
                 }
             }
             Network = @(
@@ -155,7 +151,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
                 }
             }
             NodeName = 'SEC1N2'
@@ -173,7 +169,7 @@
                     IPAddress = '10.0.11.12/24'
                 }
             )
-            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
         },
         @{
             Role = @{
@@ -193,7 +189,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
                 }
             }
             NodeName = 'SEC1N3'
@@ -211,7 +207,7 @@
                     IPAddress = '10.0.11.13/24'
                 }
             )
-            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
         },
         @{
             Role = @{
@@ -231,7 +227,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
                 }
             }
             NodeName = 'DAC1N1'
@@ -249,7 +245,7 @@
                     IPAddress = '10.0.12.11/24'
                 }
             )
-            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
         },
         @{
             Role = @{
@@ -269,7 +265,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2012'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
                 }
             }
             NodeName = 'DAC1N2'
@@ -287,14 +283,14 @@
                     IPAddress = '10.0.12.12/24'
                 }
             )
-            Lability_Media = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
         }
     )
     NonNodeData = @{
         Lability = @{
             Module = @(
                 @{
-                    RequiredVersion = '4.9.0'
+                    RequiredVersion = '5.4.0'
                     Name = 'Pester'
                 },
                 @{
@@ -302,7 +298,7 @@
                     Name = 'PoshRSJob'
                 },
                 @{
-                    RequiredVersion = '21.1.18179'
+                    RequiredVersion = '21.1.18256'
                     Name = 'SqlServer'
                 },
                 @{
@@ -326,7 +322,7 @@
                     Name = 'Error'
                 },
                 @{
-                    RequiredVersion = '4.1.5'
+                    RequiredVersion = '4.1.6'
                     Name = 'Jojoba'
                 },
                 @{
@@ -340,76 +336,46 @@
             )
             DSCResource = @(
                 @{
-                    RequiredVersion = '8.0.0'
+                    RequiredVersion = '8.5.0'
                     Name = 'ComputerManagementDsc'
                 },
                 @{
-                    RequiredVersion = '7.4.0.0'
+                    RequiredVersion = '9.0.0'
                     Name = 'NetworkingDsc'
                 },
                 @{
-                    RequiredVersion = '3.0.0.0'
-                    Name = 'xActiveDirectory'
+                    RequiredVersion = '6.2.0'
+                    Name = 'ActiveDirectoryDsc'
                 },
                 @{
-                    RequiredVersion = '1.16.0.0'
-                    Name = 'xDnsServer'
+                    RequiredVersion = '3.0.0'
+                    Name = 'DnsServer'
                 },
                 @{
-                    RequiredVersion = '2.2.0.0'
-                    Name = 'xSmbShare'
-                },
-                @{
-                    RequiredVersion = '1.5.0'
-                    Name = 'xSystemSecurity'
+                    RequiredVersion = '1.1.1'
+                    Name = 'FileSystemDsc'
                 },
                 @{
                     RequiredVersion = '2.8.0.0'
                     Name = 'xWindowsUpdate'
                 },
                 @{
-                    RequiredVersion = '1.14.1'
-                    Name = 'xFailOverCluster'
+                    RequiredVersion = '2.1.0'
+                    Name = 'FailoverClusterDsc'
                 },
                 @{
-                    RequiredVersion = '9.0.0'
+                    RequiredVersion = '9.1.0'
                     Name = 'xPSDesiredStateConfiguration'
                 },
                 @{
-                    RequiredVersion = '13.3.0'
+                    RequiredVersion = '16.0.0'
                     Name = 'SqlServerDsc'
                 }
             )
             Resource = @(
                 @{
-                    Expand = $true
-                    Checksum = 'C44C1869A7657001250EF8FAD4F636D3'
-                    Filename = 'SQLFULL_ENU.iso'
-                    Uri = 'https://download.microsoft.com/download/4/C/7/4C7D40B9-BCF8-4F8A-9E76-06E9B92FE5AE/ENU/SQLFULL_ENU.iso'
-                    Id = 'SQLServer2012'
-                },
-                @{
-                    Checksum = '5EFF56819F854866CCBAE26F0D091B63'
-                    Filename = 'SQLServer2012SP4-KB4018073-x64-ENU.exe'
-                    Uri = 'https://download.microsoft.com/download/E/A/B/EABF1E75-54F0-42BB-B0EE-58E837B7A17F/SQLServer2012SP4-KB4018073-x64-ENU.exe'
-                    Id = 'SQLServer2012SP4'
-                },
-                @{
-                    Checksum = 'FBD078835E0BDF5815271F848FD8CF58'
-                    Filename = 'SQLServer2012-KB4057116-x64.exe'
-                    Uri = 'https://download.microsoft.com/download/F/6/1/F618E667-BA6E-4428-A36A-8B4F5190FCC8/SQLServer2012-KB4057116-x64.exe'
-                    Id = 'SQLServer2012SP4GDR'
-                },
-                @{
-                    Checksum = '54AF3D25BA0254440340E86320441A94'
-                    Filename = 'SQLServer2012-KB4091266-x64.exe'
-                    Uri = 'http://download.microsoft.com/download/3/D/9/3D95BF50-AED7-44A6-863B-BC7DC7C722CE/SQLServer2012-KB4091266-x64.exe'
-                    Id = 'SQLServer2012SP4GDRHotfix'
-                },
-                @{
-                    Checksum = '84A1EC2FF8CEB86B1AEDC613B144F4D9'
-                    Filename = 'SQLServer2017-KB4535007-x64.exe'
-                    Uri = 'https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB4535007-x64.exe'
+                    Filename = 'SQLServer2017-KB5005226-x64.exe'
+                    Uri = 'https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB5005226-x64.exe'
                     Id = 'SQLServer2017CU19'
                 },
                 @{
@@ -437,15 +403,13 @@
                     Id = 'SSMS182'
                 },
                 @{
-                    Checksum = '65D034096B63C6EC9051951BCF10088C'
                     Filename = 'SSMS-Setup-ENU-18.4.exe'
                     Uri = 'https://aka.ms/ssmsfullsetup'
                     Id = 'SSMS184'
                 },
                 @{
-                    Checksum = '87450CFA175585B23A76BBD7052EE66B'
-                    Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
-                    Uri = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
+                    Filename = 'ndp472-kb4054530-x86-x64-allos-enu'
+                    Uri = 'https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/089f837de42708daacaae7c04b7494db/ndp472-kb4054530-x86-x64-allos-enu.exe'
                     Id = 'NetFx472'
                 },
                 @{

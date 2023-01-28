@@ -1,5 +1,5 @@
 Configuration ooTemp {
-    Import-DscResource -ModuleName xSystemSecurity -ModuleVersion 1.5.0
+    Import-DscResource -ModuleName FileSystemDsc -ModuleVersion 1.1.1
 
     #region Add a C:\Temp
     File 'CreateTempDirectory' {
@@ -8,7 +8,7 @@ Configuration ooTemp {
         Type            = 'Directory'
     }
 
-    xFileSystemAccessRule 'GrantAccessToTempDirectory' {
+    FileSystemAccessRule 'GrantAccessToTempDirectory' {
         Path      = 'C:\Temp'
         Identity  = 'EVERYONE'
         Rights    = @('FullControl')

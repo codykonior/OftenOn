@@ -57,7 +57,7 @@ function Get-OftenOnLabConfiguration {
         }
 
         <#
-            Different xFailoverCluster resources need different combinations of IP, CIDR, and Subnet. This splits
+            Different FailoverClusterDsc resources need different combinations of IP, CIDR, and Subnet. This splits
             out all of the different variations for easy use during configuration.
         #>
         if ($node.ContainsKey('Role') -and $node.Role.ContainsKey('Cluster')) {
