@@ -35,6 +35,8 @@ Configuration OftenOn {
         # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @oftenon.com
         $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2023!' | ConvertTo-SecureString -AsPlainText -Force))
         $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2023!' | ConvertTo-SecureString -AsPlainText -Force))
+        # Required for SqlPermission because stupid
+        $upnLocalAdministrator = New-Object System.Management.Automation.PSCredential("LocalAdministrator@$($node.DomainName)", ('Local2023!' | ConvertTo-SecureString -AsPlainText -Force))
         # This isn't a domain login
         $systemAdministrator = New-Object System.Management.Automation.PSCredential("sa", ('System2023!' | ConvertTo-SecureString -AsPlainText -Force))
 
@@ -76,7 +78,7 @@ Configuration OftenOn {
         }
 
         ooNetwork 'RenameNetwork' {
-            Node      = $node
+            Node = $node
             DependsOn = '[TimeZone]SetTimeZone'
         }
 
@@ -129,7 +131,7 @@ Configuration OftenOn {
                 #region Create Domain
                 ADDomain 'Create' {
                     DomainName                    = $node.FullyQualifiedDomainName
-                    Credential = $domainAdministrator
+                    Credential                    = $domainAdministrator
                     SafemodeAdministratorPassword = $safemodeAdministrator
 
                     DependsOn                     = '[WindowsFeatureSet]All'
@@ -153,9 +155,9 @@ Configuration OftenOn {
                 }
 
                 DnsRecordPtr 'AddReverseZoneLookup' {
-                    ZoneName      = '0.0.10.in-addr.arpa'
+                    ZoneName  = '0.0.10.in-addr.arpa'
                     IPAddress = '10.0.0.1'
-                    Name = 'CHDC01.oftenon.com'
+                    Name      = 'CHDC01.oftenon.com'
 
                     Ensure    = 'Present'
                     DependsOn = '[DnsServerADZone]AddReverseZone'
@@ -238,11 +240,11 @@ Configuration OftenOn {
                 # However it will then break. So not being able to use a full one indicates
                 # another issue in your setup.
                 WaitForADDomain 'Create' {
-                    DomainName           = $node.FullyQualifiedDomainName
-                    Credential = $domainAdministrator
+                    DomainName              = $node.FullyQualifiedDomainName
+                    Credential              = $domainAdministrator
                     WaitForValidCredentials = $true
 
-                    DependsOn            = "[ooNetwork]RenameNetwork"
+                    DependsOn               = "[ooNetwork]RenameNetwork"
                 }
                 #endregion
 
@@ -391,6 +393,8 @@ Configuration OftenOn {
                     SQLSysAdminAccounts = $localAdministrator.UserName
                     UpdateEnabled       = 'True'
                     UpdateSource        = '\\CHDC01\Resources'
+                    TcpEnabled          = $true
+                    AgtSvcStartupType   = 'Automatic'
                     DependsOn           = "[Cluster]AddNodeToCluster$($cluster.Name)"
                 }
 
@@ -422,14 +426,15 @@ Configuration OftenOn {
                 }
 
                 SqlEndpoint 'CreateHadrEndpoint' {
-                    EndPointName = 'Hadr_endpoint' # For some reason the Examples use HADR; but this is what the wizard uses
-                    Ensure       = 'Present'
-                    EndpointType = 'DatabaseMirroring'
-                    Port         = 5022
-                    ServerName   = $node.NodeName
-                    InstanceName = $node.Role.SqlServer.InstanceName
+                    EndPointName         = 'Hadr_endpoint' # For some reason the Examples use HADR; but this is what the wizard uses
+                    Ensure               = 'Present'
+                    EndpointType         = 'DatabaseMirroring'
+                    Port                 = 5022
+                    ServerName           = $node.NodeName
+                    InstanceName         = $node.Role.SqlServer.InstanceName
 
-                    DependsOn    = '[SqlAlwaysOnService]EnableAlwaysOn'
+                    PsDscRunAsCredential = $localAdministrator
+                    DependsOn            = '[SqlAlwaysOnService]EnableAlwaysOn'
                 }
 
                 SqlEndpointPermission 'AddLoginForAGEndpointPermission' {
@@ -445,28 +450,28 @@ Configuration OftenOn {
                 }
 
                 SqlPermission 'AddPermissionsForAGMembership' {
-                    ServerName           = $node.NodeName
-                    InstanceName         = $node.Role.SqlServer.InstanceName
-                    Name            = 'NT AUTHORITY\SYSTEM'
-                    Permission           = @(
-                            ServerPermission
-                            {
-                                State      = 'Grant'
-                                Permission = @('AlterAnyAvailabilityGroup', 'ViewServerState')
-                            }
-                            ServerPermission
-                            {
-                                State      = 'GrantWithGrant'
-                                Permission = @()
-                            }
-                            ServerPermission
-                            {
-                                State      = 'Deny'
-                                Permission = @()
-                            }
-                        )
-                    DependsOn            = '[SqlSetup]InstallSQLServer'
-                    Credential = $localAdministrator
+                    ServerName   = $node.NodeName
+                    InstanceName = $node.Role.SqlServer.InstanceName
+                    Name         = 'NT AUTHORITY\SYSTEM'
+                    Permission   = @(
+                        ServerPermission
+                        {
+                            State      = 'Grant'
+                            Permission = @('AlterAnyAvailabilityGroup', 'ConnectSql', 'ViewServerState')
+                        }
+                        ServerPermission
+                        {
+                            State      = 'GrantWithGrant'
+                            Permission = @()
+                        }
+                        ServerPermission
+                        {
+                            State      = 'Deny'
+                            Permission = @()
+                        }
+                    )
+                    DependsOn    = '[SqlSetup]InstallSQLServer'
+                    Credential   = $upnLocalAdministrator
                 }
 
                 if ($node.Role.ContainsKey("AvailabilityGroup")) {
@@ -549,7 +554,7 @@ Configuration OftenOn {
                                 ServerName           = $node.NodeName
                                 InstanceName         = $node.Role.SQLServer.InstanceName
                                 Name                 = "$($node.Role.AvailabilityGroup.Name)DB$_"
-                                RecoveryModel = 'Full'
+                                RecoveryModel        = 'Full'
                                 PsDscRunAsCredential = $localAdministrator
                                 DependsOn            = '[SqlSetup]InstallSQLServer'
                             }
