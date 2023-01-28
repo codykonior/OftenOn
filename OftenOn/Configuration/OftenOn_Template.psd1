@@ -72,7 +72,7 @@
             }
 
             Lability_Resource  = @(
-                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU19', 'SSMS190', 'NetFx472'
+                'NlaSvcFix', 'TriggerDsc', 'SQLServer2012', 'SQLServer2012SP4', 'SQLServer2012SP4GDR', 'SQLServer2012SP4GDRHotfix', 'SQLServer2017', 'SQLServer2017CU19', 'SQLServer2019', 'SSMS190', 'NetFx472'
             )
         }
 

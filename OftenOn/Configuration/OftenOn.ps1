@@ -152,11 +152,10 @@ Configuration OftenOn {
                     DependsOn        = '[ADDomain]Create'
                 }
 
-                DnsRecord 'AddReverseZoneLookup' {
-                    Name      = '1.0.0.10.in-addr.arpa'
-                    Target    = 'CHDC01.oftenon.com'
-                    Zone      = '0.0.10.in-addr.arpa'
-                    Type      = 'PTR'
+                DnsRecordPtr 'AddReverseZoneLookup' {
+                    ZoneName      = '0.0.10.in-addr.arpa'
+                    IPAddress = '10.0.0.1'
+                    Name = 'CHDC01.oftenon.com'
 
                     Ensure    = 'Present'
                     DependsOn = '[DnsServerADZone]AddReverseZone'
@@ -425,6 +424,7 @@ Configuration OftenOn {
                 SqlEndpoint 'CreateHadrEndpoint' {
                     EndPointName = 'Hadr_endpoint' # For some reason the Examples use HADR; but this is what the wizard uses
                     Ensure       = 'Present'
+                    EndpointType = 'DatabaseMirroring'
                     Port         = 5022
                     ServerName   = $node.NodeName
                     InstanceName = $node.Role.SqlServer.InstanceName
@@ -441,14 +441,13 @@ Configuration OftenOn {
                     Permission           = 'CONNECT'
 
                     PsDscRunAsCredential = $localAdministrator
-                    DependsOn            = '[SqlEndpoing]CreateHadrEndpoint', '[SqlLogin]CreateLoginForAG'
+                    DependsOn            = '[SqlEndpoint]CreateHadrEndpoint', '[SqlLogin]CreateLoginForAG'
                 }
 
                 SqlPermission 'AddPermissionsForAGMembership' {
-                    Ensure               = 'Present'
                     ServerName           = $node.NodeName
                     InstanceName         = $node.Role.SqlServer.InstanceName
-                    Principal            = 'NT AUTHORITY\SYSTEM'
+                    Name            = 'NT AUTHORITY\SYSTEM'
                     Permission           = @(
                             ServerPermission
                             {
@@ -457,7 +456,7 @@ Configuration OftenOn {
                             }
                         )
                     DependsOn            = '[SqlSetup]InstallSQLServer'
-                    PsDscRunAsCredential = $localAdministrator
+                    Credential = $localAdministrator
                 }
 
                 if ($node.Role.ContainsKey("AvailabilityGroup")) {
@@ -540,19 +539,9 @@ Configuration OftenOn {
                                 ServerName           = $node.NodeName
                                 InstanceName         = $node.Role.SQLServer.InstanceName
                                 Name                 = "$($node.Role.AvailabilityGroup.Name)DB$_"
+                                RecoveryModel = 'Full'
                                 PsDscRunAsCredential = $localAdministrator
                                 DependsOn            = '[SqlSetup]InstallSQLServer'
-                            }
-                        }
-
-                        1..4 | ForEach-Object {
-                            SqlDatabaseRecoveryModel "SetDatabaseRecoveryModel$($node.Role.AvailabilityGroup.Name)DB$_" {
-                                Name                 = "$($node.Role.AvailabilityGroup.Name)DB$_"
-                                RecoveryModel        = 'Full'
-                                ServerName           = $node.NodeName
-                                InstanceName         = $node.Role.SQLServer.InstanceName
-                                PsDscRunAsCredential = $localAdministrator
-                                DependsOn            = "[SqlDatabase]CreateDatabase$($node.Role.AvailabilityGroup.Name)DB$_"
                             }
                         }
 
@@ -566,7 +555,7 @@ Configuration OftenOn {
                             RetryIntervalSec     = 15
 
                             PsDscRunAsCredential = $localAdministrator
-                            DependsOn            = "[SqlDatabaseRecoveryModel]SetDatabaseRecoveryModel$($node.Role.AvailabilityGroup.Name)DB4"
+                            DependsOn            = "[SqlDatabase]CreateDatabase$($node.Role.AvailabilityGroup.Name)DB4"
                         }
 
                         # This really needs wait for all replicas to be added

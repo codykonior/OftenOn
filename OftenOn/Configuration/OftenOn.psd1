@@ -35,9 +35,14 @@
             Lability_Resource = @(
                 'NlaSvcFix',
                 'TriggerDsc',
+                'SQLServer2012',
+                'SQLServer2012SP4',
+                'SQLServer2012SP4GDR',
+                'SQLServer2012SP4GDRHotfix',
                 'SQLServer2017',
                 'SQLServer2017CU19',
-                'SSMS184',
+                'SQLServer2019',
+                'SSMS190',
                 'NetFx472'
             )
             Network = @(
@@ -115,7 +120,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
                 }
             }
             Network = @(
@@ -151,7 +156,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
                 }
             }
             NodeName = 'SEC1N2'
@@ -189,7 +194,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
                 }
             }
             NodeName = 'SEC1N3'
@@ -227,7 +232,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
                 }
             }
             NodeName = 'DAC1N1'
@@ -265,7 +270,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2017'
+                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
                 }
             }
             NodeName = 'DAC1N2'
@@ -349,7 +354,7 @@
                 },
                 @{
                     RequiredVersion = '3.0.0'
-                    Name = 'DnsServer'
+                    Name = 'DnsServerDsc'
                 },
                 @{
                     RequiredVersion = '1.1.1'
@@ -374,8 +379,34 @@
             )
             Resource = @(
                 @{
-                    Filename = 'SQLServer2017-KB5005226-x64.exe'
-                    Uri = 'https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB5005226-x64.exe'
+                    Expand = $true
+                    Checksum = 'C44C1869A7657001250EF8FAD4F636D3'
+                    Filename = 'SQLFULL_ENU.iso'
+                    Uri = 'https://download.microsoft.com/download/4/C/7/4C7D40B9-BCF8-4F8A-9E76-06E9B92FE5AE/ENU/SQLFULL_ENU.iso'
+                    Id = 'SQLServer2012'
+                },
+                @{
+                    Checksum = '5EFF56819F854866CCBAE26F0D091B63'
+                    Filename = 'SQLServer2012SP4-KB4018073-x64-ENU.exe'
+                    Uri = 'https://download.microsoft.com/download/E/A/B/EABF1E75-54F0-42BB-B0EE-58E837B7A17F/SQLServer2012SP4-KB4018073-x64-ENU.exe'
+                    Id = 'SQLServer2012SP4'
+                },
+                @{
+                    Checksum = 'FBD078835E0BDF5815271F848FD8CF58'
+                    Filename = 'SQLServer2012-KB4057116-x64.exe'
+                    Uri = 'https://download.microsoft.com/download/F/6/1/F618E667-BA6E-4428-A36A-8B4F5190FCC8/SQLServer2012-KB4057116-x64.exe'
+                    Id = 'SQLServer2012SP4GDR'
+                },
+                @{
+                    Checksum = '54AF3D25BA0254440340E86320441A94'
+                    Filename = 'SQLServer2012-KB4091266-x64.exe'
+                    Uri = 'http://download.microsoft.com/download/3/D/9/3D95BF50-AED7-44A6-863B-BC7DC7C722CE/SQLServer2012-KB4091266-x64.exe'
+                    Id = 'SQLServer2012SP4GDRHotfix'
+                },
+                @{
+                    Checksum = '84A1EC2FF8CEB86B1AEDC613B144F4D9'
+                    Filename = 'SQLServer2017-KB4535007-x64.exe'
+                    Uri = 'https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB4535007-x64.exe'
                     Id = 'SQLServer2017CU19'
                 },
                 @{
@@ -403,13 +434,21 @@
                     Id = 'SSMS182'
                 },
                 @{
+                    Checksum = '65D034096B63C6EC9051951BCF10088C'
                     Filename = 'SSMS-Setup-ENU-18.4.exe'
                     Uri = 'https://aka.ms/ssmsfullsetup'
                     Id = 'SSMS184'
                 },
                 @{
-                    Filename = 'ndp472-kb4054530-x86-x64-allos-enu'
-                    Uri = 'https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/089f837de42708daacaae7c04b7494db/ndp472-kb4054530-x86-x64-allos-enu.exe'
+                    Checksum = '65D034096B63C6EC9051951BCF10088C'
+                    Filename = 'SSMS-Setup-ENU-19.0.exe'
+                    Uri = 'https://aka.ms/ssmsfullsetup'
+                    Id = 'SSMS190'
+                },
+                @{
+                    Checksum = '87450CFA175585B23A76BBD7052EE66B'
+                    Filename = 'NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
+                    Uri = 'https://download.microsoft.com/download/6/E/4/6E48E8AB-DC00-419E-9704-06DD46E5F81D/NDP472-KB4054530-x86-x64-AllOS-ENU.exe'
                     Id = 'NetFx472'
                 },
                 @{
@@ -418,6 +457,20 @@
                     Filename = 'SQLServer2017-x64-ENU.iso'
                     Uri = 'https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SQLServer2017-x64-ENU.iso'
                     Id = 'SQLServer2017'
+                },
+                @{
+                    Expand = $true
+                    Checksum = '62294C67E3785AE800C1935F75A3E9E8'
+                    Filename = 'en_sql_server_2019_developer_x64_dvd_baea4195.iso'
+                    Uri = 'https://myvs.download.prss.microsoft.com/sg/en_sql_server_2019_developer_x64_dvd_baea4195.iso?t=104d5567-1d6b-4564-bba5-f3c8da06b9b7&e=1674930017&h=7a9fa619de6572ee89f086a9c62893f355ed88f9f255fc291af70954e5fd217d&su=1'
+                    Id = 'SQLServer2019'
+                },
+                @{
+                    Expand = $true
+                    Checksum = 'F9BC338769AF3D913B5989BABFE6BC88'
+                    Filename = 'enu_sql_server_2022_developer_edition_x64_dvd_7cacf733.iso'
+                    Uri = 'https://myvs.download.prss.microsoft.com/sg/enu_sql_server_2022_developer_edition_x64_dvd_7cacf733.iso?t=450e0904-0022-45b6-8742-28b2f5ac356b&e=1674930058&h=b026b2ce9f1ca17930ebf549b9bdef6a20c2c94b675c25c83ce30caeab19a453&su=1'
+                    Id = 'SQLServer2022'
                 },
                 @{
                     Filename = '..\Scripts\NlaSvcFix.ps1'
