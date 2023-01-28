@@ -454,6 +454,16 @@ Configuration OftenOn {
                                 State      = 'Grant'
                                 Permission = @('AlterAnyAvailabilityGroup', 'ViewServerState')
                             }
+                            ServerPermission
+                            {
+                                State      = 'GrantWithGrant'
+                                Permission = @()
+                            }
+                            ServerPermission
+                            {
+                                State      = 'Deny'
+                                Permission = @()
+                            }
                         )
                     DependsOn            = '[SqlSetup]InstallSQLServer'
                     Credential = $localAdministrator
