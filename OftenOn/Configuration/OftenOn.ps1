@@ -30,13 +30,13 @@ Configuration OftenOn {
 
     Node $AllNodes.NodeName {
         # When building the domain the UserName is ignored. But the domain part of the username is required to use the credential to add computers to the domain.
-        $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2019!' | ConvertTo-SecureString -AsPlainText -Force))
-        $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2019!' | ConvertTo-SecureString -AsPlainText -Force))
+        $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2023!' | ConvertTo-SecureString -AsPlainText -Force))
+        $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2023!' | ConvertTo-SecureString -AsPlainText -Force))
         # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @oftenon.com
-        $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2019!' | ConvertTo-SecureString -AsPlainText -Force))
-        $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2019!' | ConvertTo-SecureString -AsPlainText -Force))
+        $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2023!' | ConvertTo-SecureString -AsPlainText -Force))
+        $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2023!' | ConvertTo-SecureString -AsPlainText -Force))
         # This isn't a domain login
-        $systemAdministrator = New-Object System.Management.Automation.PSCredential("sa", ('System2019!' | ConvertTo-SecureString -AsPlainText -Force))
+        $systemAdministrator = New-Object System.Management.Automation.PSCredential("sa", ('System2023!' | ConvertTo-SecureString -AsPlainText -Force))
 
         #region Local Configuration Manager settings
         LocalConfigurationManager {
@@ -129,7 +129,7 @@ Configuration OftenOn {
                 #region Create Domain
                 ADDomain 'Create' {
                     DomainName                    = $node.FullyQualifiedDomainName
-                    DomainAdministratorCredential = $domainAdministrator
+                    Credential = $domainAdministrator
                     SafemodeAdministratorPassword = $safemodeAdministrator
 
                     DependsOn                     = '[WindowsFeatureSet]All'
@@ -152,7 +152,7 @@ Configuration OftenOn {
                     DependsOn        = '[ADDomain]Create'
                 }
 
-                xDnsRecord 'AddReverseZoneLookup' {
+                DnsRecord 'AddReverseZoneLookup' {
                     Name      = '1.0.0.10.in-addr.arpa'
                     Target    = 'CHDC01.oftenon.com'
                     Zone      = '0.0.10.in-addr.arpa'
@@ -238,12 +238,10 @@ Configuration OftenOn {
                 # then you MUST use the short domain name otherwise the domain isn't found.
                 # However it will then break. So not being able to use a full one indicates
                 # another issue in your setup.
-                xWaitForADDomain 'Create' {
+                WaitForADDomain 'Create' {
                     DomainName           = $node.FullyQualifiedDomainName
-                    DomainUserCredential = $domainAdministrator
-                    # 30 Minutes
-                    RetryIntervalSec     = 15
-                    RetryCount           = 120
+                    Credential = $domainAdministrator
+                    WaitForValidCredentials = $true
 
                     DependsOn            = "[ooNetwork]RenameNetwork"
                 }
@@ -254,7 +252,7 @@ Configuration OftenOn {
                     Name       = $node.NodeName
                     DomainName = $node.FullyQualifiedDomainName
                     Credential = $domainAdministrator
-                    DependsOn  = '[xWaitForADDomain]Create'
+                    DependsOn  = '[WaitForADDomain]Create'
                 }
                 #endregion
 
@@ -414,7 +412,7 @@ Configuration OftenOn {
                     DependsOn    = '[SqlWindowsFirewall]AddFirewallRuleSQL'
                 }
 
-                SqlServerLogin 'CreateLoginForAG' {
+                SqlLogin 'CreateLoginForAG' {
                     Ensure               = 'Present'
                     ServerName           = $node.NodeName
                     InstanceName         = $node.Role.SqlServer.InstanceName
@@ -424,7 +422,7 @@ Configuration OftenOn {
                     PsDscRunAsCredential = $localAdministrator
                 }
 
-                SqlServerEndpoint 'CreateHadrEndpoint' {
+                SqlEndpoint 'CreateHadrEndpoint' {
                     EndPointName = 'Hadr_endpoint' # For some reason the Examples use HADR; but this is what the wizard uses
                     Ensure       = 'Present'
                     Port         = 5022
@@ -434,7 +432,7 @@ Configuration OftenOn {
                     DependsOn    = '[SqlAlwaysOnService]EnableAlwaysOn'
                 }
 
-                SqlServerEndpointPermission 'AddLoginForAGEndpointPermission' {
+                SqlEndpointPermission 'AddLoginForAGEndpointPermission' {
                     Ensure               = 'Present'
                     ServerName           = $node.NodeName
                     InstanceName         = $node.Role.SqlServer.InstanceName
@@ -443,16 +441,21 @@ Configuration OftenOn {
                     Permission           = 'CONNECT'
 
                     PsDscRunAsCredential = $localAdministrator
-                    DependsOn            = '[SqlServerEndpoint]CreateHadrEndpoint', '[SqlServerLogin]CreateLoginForAG'
+                    DependsOn            = '[SqlEndpoing]CreateHadrEndpoint', '[SqlLogin]CreateLoginForAG'
                 }
 
-                SqlServerPermission 'AddPermissionsForAGMembership' {
+                SqlPermission 'AddPermissionsForAGMembership' {
                     Ensure               = 'Present'
                     ServerName           = $node.NodeName
                     InstanceName         = $node.Role.SqlServer.InstanceName
                     Principal            = 'NT AUTHORITY\SYSTEM'
-                    Permission           = 'AlterAnyAvailabilityGroup', 'ViewServerState'
-
+                    Permission           = @(
+                            ServerPermission
+                            {
+                                State      = 'Grant'
+                                Permission = @('AlterAnyAvailabilityGroup', 'ViewServerState')
+                            }
+                        )
                     DependsOn            = '[SqlSetup]InstallSQLServer'
                     PsDscRunAsCredential = $localAdministrator
                 }
@@ -473,7 +476,7 @@ Configuration OftenOn {
                             ConnectionModeInSecondaryRole = 'AllowAllConnections'
 
                             PsDscRunAsCredential          = $localAdministrator
-                            DependsOn                     = '[SqlServerPermission]AddPermissionsForAGMembership'
+                            DependsOn                     = '[SqlPermission]AddPermissionsForAGMembership'
                         }
 
                         SqlAGReplica "CreateAvailabilityGroup$($node.Role.AvailabilityGroup.Name)ReplicaSettings" {
