@@ -456,7 +456,7 @@
                     Id       = 'SSMS190'
                     Filename = 'SSMS-Setup-ENU-19.0.exe'
                     Uri      = 'https://aka.ms/ssmsfullsetup'
-                    Checksum = '65D034096B63C6EC9051951BCF10088C'
+                    Checksum = 'B4AC17BA2853B4A9DEF7E90A50ADC2AC'
                 }
                 @{
                     Id       = 'NetFx472'
