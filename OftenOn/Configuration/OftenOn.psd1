@@ -440,6 +440,12 @@
                     Id = 'SSMS190'
                 },
                 @{
+                    Checksum = '88BC05E20114A4506F40C36911DE92FA'
+                    Filename = 'NDP46-KB3045557-x86-x64-AllOS-ENU.exe'
+                    Uri = 'https://download.microsoft.com/download/6/F/9/6F9673B1-87D1-46C4-BF04-95F24C3EB9DA/enu_netfx/NDP46-KB3045557-x86-x64-AllOS-ENU_exe/NDP46-KB3045557-x86-x64-AllOS-ENU.exe'
+                    Id = 'NetFx46'
+                },
+                @{
                     Checksum = '4037BDDE26BF72E2CE5108CB30387BCD'
                     Filename = 'ndp472-kb4054530-x86-x64-allos-enu.exe'
                     Uri = 'https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/089f837de42708daacaae7c04b7494db/ndp472-kb4054530-x86-x64-allos-enu.exe'
