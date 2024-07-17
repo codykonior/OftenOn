@@ -28,6 +28,8 @@ function New-OftenOnLab {
         [Net.ServicePointManager]::SecurityProtocol = 'Tls', 'Tls11', 'Tls12'
     }
 
+    # Remove caches of modules
+    Clear-LabModuleCache
     # Check our module dependencies are in place
     Test-OftenOnLab
 

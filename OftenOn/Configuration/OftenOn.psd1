@@ -298,7 +298,7 @@
                     Name = 'PoshRSJob'
                 },
                 @{
-                    RequiredVersion = '21.1.18256'
+                    RequiredVersion = '22.3.0'
                     Name = 'SqlServer'
                 },
                 @{
@@ -368,8 +368,9 @@
                     Name = 'xPSDesiredStateConfiguration'
                 },
                 @{
-                    RequiredVersion = '16.6.0'
+                    Path = 'C:\Program Files\WindowsPowerShell\Modules\SqlServerDsc\16.6.0'
                     Name = 'SqlServerDsc'
+                    Provider = 'FileSystem'
                 }
             )
             Resource = @(

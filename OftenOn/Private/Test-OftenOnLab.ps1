@@ -14,10 +14,12 @@ function Test-OftenOnLab {
     foreach ($dscResource in $configurationData.NonNodeData.Lability.DSCResource) {
         Write-Verbose "Testing DSC configuration reference for module $($dscResource.Name)"
         [array] $modules = Get-Module $dscResource.Name -ListAvailable -Verbose:$false | Sort-Object Version -Descending
-        if (!($dscResource.ContainsKey("RequiredVersion"))) {
-            Write-Warning ".\Configuration\OftenOn.psd1 requires $($dscResource.Name) but does not have a RequiredVersion"
-        } elseif ($dscResource.RequiredVersion -ne $modules[0].Version) {
-            Write-Warning ".\Configuration\OftenOn.psd1 requires $($dscResource.Name) $($dscResource.RequiredVersion) but $($modules[0].Version) is the newest"
+        if (!$dscResource.ContainsKey("Path")) {
+            if (!($dscResource.ContainsKey("RequiredVersion"))) {
+                Write-Warning ".\Configuration\OftenOn.psd1 requires $($dscResource.Name) but does not have a RequiredVersion"
+            } elseif ($dscResource.RequiredVersion -ne $modules[0].Version) {
+                Write-Warning ".\Configuration\OftenOn.psd1 requires $($dscResource.Name) $($dscResource.RequiredVersion) but $($modules[0].Version) is the newest"
+            }
         }
     }
 
