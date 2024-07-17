@@ -48,7 +48,7 @@ function New-OftenOnLab {
             Write-Error "Start-LabHostConfiguration has completed once. You MUST reboot now before continuing."
         }
 
-        $administrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Admin2023!' | ConvertTo-SecureString -AsPlainText -Force))
+        $administrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Admin2024!' | ConvertTo-SecureString -AsPlainText -Force))
         Start-LabConfiguration -ConfigurationData $configurationData -IgnorePendingReboot -Credential $administrator -NoSnapshot -Path "$PSScriptRoot\..\MOF"
 
         if (!$SkipStart) {

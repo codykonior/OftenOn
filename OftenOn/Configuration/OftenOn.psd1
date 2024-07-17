@@ -5,7 +5,8 @@
             Lability_StartupMemory = 4294967296
             Lability_Resource = @(
                 'NlaSvcFix',
-                'TriggerDsc'
+                'TriggerDsc',
+                'NetFx472'
             )
             FullyQualifiedDomainName = 'oftenon.com'
             PSDscAllowDomainUser = $true

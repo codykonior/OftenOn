@@ -23,7 +23,8 @@
 
             Lability_Resource                 = @(
                 'NlaSvcFix',
-                'TriggerDsc'
+                'TriggerDsc',
+                'NetFx472'
             )
 
             Role                              = @{ }

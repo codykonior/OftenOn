@@ -30,15 +30,15 @@ Configuration OftenOn {
 
     Node $AllNodes.NodeName {
         # When building the domain the UserName is ignored. But the domain part of the username is required to use the credential to add computers to the domain.
-        $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2023!' | ConvertTo-SecureString -AsPlainText -Force))
-        $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2023!' | ConvertTo-SecureString -AsPlainText -Force))
+        $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2024!' | ConvertTo-SecureString -AsPlainText -Force))
+        $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2024!' | ConvertTo-SecureString -AsPlainText -Force))
         # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @oftenon.com
-        $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2023!' | ConvertTo-SecureString -AsPlainText -Force))
-        $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2023!' | ConvertTo-SecureString -AsPlainText -Force))
+        $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2024!' | ConvertTo-SecureString -AsPlainText -Force))
+        $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2024!' | ConvertTo-SecureString -AsPlainText -Force))
         # Required for SqlPermission because stupid
-        $upnLocalAdministrator = New-Object System.Management.Automation.PSCredential("LocalAdministrator@$($node.DomainName)", ('Local2023!' | ConvertTo-SecureString -AsPlainText -Force))
+        $upnLocalAdministrator = New-Object System.Management.Automation.PSCredential("LocalAdministrator@$($node.DomainName)", ('Local2024!' | ConvertTo-SecureString -AsPlainText -Force))
         # This isn't a domain login
-        $systemAdministrator = New-Object System.Management.Automation.PSCredential("sa", ('System2023!' | ConvertTo-SecureString -AsPlainText -Force))
+        $systemAdministrator = New-Object System.Management.Automation.PSCredential("sa", ('System2024!' | ConvertTo-SecureString -AsPlainText -Force))
 
         #region Local Configuration Manager settings
         LocalConfigurationManager {
@@ -382,6 +382,16 @@ Configuration OftenOn {
         #region SQL Server
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('SqlServer')) {
+                # If we are using the SqlServer module 22 and above, it requires NetFx 4.7.2 minimum
+                $dependsOn = "[Cluster]AddNodeToCluster$($cluster.Name)"
+                if (Get-Module SqlServer -ListAvailable | Select-Object -First 1 | ForEach-Object { ([version] $_.Version).Major -ge 22 }) {
+                    ooNetFramework 'Install472' {
+                        ResourceLocation = "C:\Resources\ndp472-kb4054530-x86-x64-allos-enu.exe"
+                        DependsOn        = $dependsOn
+                    }
+                    $dependsOn = "[ooNetFramework]Install472"
+                }
+
                 SqlSetup 'InstallSQLServer' {
                     InstanceName        = $node.Role.SqlServer.InstanceName
                     Action              = 'Install'
@@ -395,7 +405,7 @@ Configuration OftenOn {
                     UpdateSource        = '\\CHDC01\Resources'
                     TcpEnabled          = $true
                     AgtSvcStartupType   = 'Automatic'
-                    DependsOn           = "[Cluster]AddNodeToCluster$($cluster.Name)"
+                    DependsOn           = $dependsOn
                 }
 
                 SqlWindowsFirewall 'AddFirewallRuleSQL' {

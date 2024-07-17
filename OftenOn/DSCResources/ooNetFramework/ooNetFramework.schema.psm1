@@ -26,8 +26,10 @@ Configuration ooNetFramework {
             Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
 
             # If you don't use -NoNewWindow it will hang with an Open File - Security Warning
-            $result = Start-Process -FilePath $using:ResourceLocation -ArgumentList '/quiet' -PassThru -Wait -NoNewWindow
+            # If you allow NetFx to do the restart, it will wipe out the DSC configuration.
+            $result = Start-Process -FilePath $using:ResourceLocation -ArgumentList '/quiet /norestart' -PassThru -Wait -NoNewWindow
             if ($result.ExitCode -in @(1641, 3010)) {
+                Write-Verbose "Installation succeeded, restart required"
                 $global:DSCMachineStatus = 1
             } elseif ($result.ExitCode -ne 0) {
                 Write-Error "Installation failed with exit code $($result.ExitCode)"

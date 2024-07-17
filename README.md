@@ -53,7 +53,7 @@ Then remote in yourself! Remote Desktop from your machine should work to the sho
 not work on some configurations.
 
 Username OFTENON\LocalAdministrator
-Password Local2023!
+Password Local2024!
 
 ## VM naming conventions
 
