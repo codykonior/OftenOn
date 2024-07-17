@@ -5,7 +5,7 @@
 
             # VM settings
             Lability_ProcessorCount           = 2
-            Lability_StartupMemory            = 1GB
+            Lability_StartupMemory            = 4GB
             # Additional hard disk drive
             Lability_HardDiskDrive            = @(
                 @{ Generation = 'VHDX'; MaximumSizeBytes = 127GB; }
@@ -282,9 +282,9 @@
             # These resources are copied to the VM. If any are missing (except PSDesiredStateConfiguration) the first boot
             # will hang because DSC doesn't complete. Stopping and starting the VM will allow you to login to see the logs.
             DSCResource = @(
-                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '8.5.0'; }
+                @{ Name = 'ComputerManagementDsc'; RequiredVersion = '9.1.0'; }
                 @{ Name = 'NetworkingDsc'; RequiredVersion = '9.0.0'; }
-                @{ Name = 'ActiveDirectoryDsc'; RequiredVersion = '6.2.0'; }
+                @{ Name = 'ActiveDirectoryDsc'; RequiredVersion = '6.5.0'; }
                 @{ Name = 'DnsServerDsc'; RequiredVersion = '3.0.0'; }
                 @{ Name = 'FileSystemDsc'; RequiredVersion = '1.1.1'; }
                 @{ Name = 'xWindowsUpdate'; RequiredVersion = '2.8.0.0'; }
@@ -292,7 +292,7 @@
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '9.1.0'; }
 
                 # This changes depending on whether I have pending fixes or not
-                @{ Name = 'SqlServerDsc'; RequiredVersion = '16.0.0'; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '16.6.0'; }
                 # @{ Name = 'SqlServerDsc'; RequiredVersion = '16.0.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
             )
 

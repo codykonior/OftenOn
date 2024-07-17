@@ -2,7 +2,7 @@
     AllNodes = @(
         @{
             Thumbprint = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
-            Lability_StartupMemory = 1073741824
+            Lability_StartupMemory = 4294967296
             Lability_Resource = @(
                 'NlaSvcFix',
                 'TriggerDsc'
@@ -335,7 +335,7 @@
             )
             DSCResource = @(
                 @{
-                    RequiredVersion = '8.5.0'
+                    RequiredVersion = '9.1.0'
                     Name = 'ComputerManagementDsc'
                 },
                 @{
@@ -343,7 +343,7 @@
                     Name = 'NetworkingDsc'
                 },
                 @{
-                    RequiredVersion = '6.2.0'
+                    RequiredVersion = '6.5.0'
                     Name = 'ActiveDirectoryDsc'
                 },
                 @{
@@ -367,7 +367,7 @@
                     Name = 'xPSDesiredStateConfiguration'
                 },
                 @{
-                    RequiredVersion = '16.0.0'
+                    RequiredVersion = '16.6.0'
                     Name = 'SqlServerDsc'
                 }
             )
@@ -438,12 +438,6 @@
                     Filename = 'SSMS-Setup-ENU-19.0.exe'
                     Uri = 'https://aka.ms/ssmsfullsetup'
                     Id = 'SSMS190'
-                },
-                @{
-                    Checksum = '88BC05E20114A4506F40C36911DE92FA'
-                    Filename = 'NDP46-KB3045557-x86-x64-AllOS-ENU.exe'
-                    Uri = 'https://download.microsoft.com/download/6/F/9/6F9673B1-87D1-46C4-BF04-95F24C3EB9DA/enu_netfx/NDP46-KB3045557-x86-x64-AllOS-ENU_exe/NDP46-KB3045557-x86-x64-AllOS-ENU.exe'
-                    Id = 'NetFx46'
                 },
                 @{
                     Checksum = '4037BDDE26BF72E2CE5108CB30387BCD'

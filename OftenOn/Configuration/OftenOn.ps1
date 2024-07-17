@@ -7,12 +7,12 @@ Configuration OftenOn {
 
     #region Resources
     Import-DscResource -ModuleName PSDesiredStateConfiguration -ModuleVersion 1.1
-    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 8.5.0
-    Import-DscResource -ModuleName ActiveDirectoryDsc -ModuleVersion 6.2.0
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 9.1.0
+    Import-DscResource -ModuleName ActiveDirectoryDsc -ModuleVersion 6.5.0
     Import-DscResource -ModuleName DnsServerDsc -ModuleVersion 3.0.0
     Import-DscResource -ModuleName xWindowsUpdate -ModuleVersion 2.8.0.0
     # These have fixes in the dev branches but the changes are not to parameters so any version here will do
-    Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 16.0.0
+    Import-DscResource -ModuleName SqlServerDsc -ModuleVersion 16.6.0
     Import-DscResource -ModuleName FailoverClusterDsc -ModuleVersion 2.1.0
     # This is a composite resource and doesn't need to be on the destination machine
     Import-DscResource -ModuleName OftenOn -ModuleVersion 1.1.16

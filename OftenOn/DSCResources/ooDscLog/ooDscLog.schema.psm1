@@ -1,5 +1,5 @@
 Configuration ooDscLog {
-    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 8.5.0
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 9.1.0
 
     # 1 hour is about 1MB so this gives you two days worth
     # LogMode cannot be changed to Cicular on these unfortunately
