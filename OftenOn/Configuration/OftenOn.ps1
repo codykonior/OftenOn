@@ -78,7 +78,7 @@ Configuration OftenOn {
         }
 
         ooNetwork 'RenameNetwork' {
-            Node = $node
+            Node      = $node
             DependsOn = '[TimeZone]SetTimeZone'
         }
 
@@ -402,8 +402,9 @@ Configuration OftenOn {
                 }
 
                 if ($needsNetFramework) {
-                    ooNetFramework 'Install472' {
-                        ResourceLocation = "C:\Resources\ndp472-kb4054530-x86-x64-allos-enu.exe"
+                    ooNetFramework 'InstallNetFramework' {
+                        Version = 'NET Framework 4.7.2'
+                        Node = $domainController.$($node.DomainName)
                         DependsOn        = $dependsOn
                     }
                     $dependsOn = "[ooNetFramework]Install472"
@@ -481,18 +482,15 @@ Configuration OftenOn {
                     InstanceName = $node.Role.SqlServer.InstanceName
                     Name         = 'NT AUTHORITY\SYSTEM'
                     Permission   = @(
-                        ServerPermission
-                        {
+                        ServerPermission {
                             State      = 'Grant'
                             Permission = @('AlterAnyAvailabilityGroup', 'ConnectSql', 'ViewServerState')
                         }
-                        ServerPermission
-                        {
+                        ServerPermission {
                             State      = 'GrantWithGrant'
                             Permission = @()
                         }
-                        ServerPermission
-                        {
+                        ServerPermission {
                             State      = 'Deny'
                             Permission = @()
                         }
@@ -652,18 +650,18 @@ Configuration OftenOn {
         }
         #endregion
 
-        $resourceLocation = "\\$($domainController.$($node.DomainName))\Resources"
-
         #region Workstation
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('Workstation')) {
-                ooNetFramework 'Install472' {
-                    ResourceLocation = "$resourceLocation\ndp472-kb4054530-x86-x64-allos-enu.exe"
+                ooNetFramework 'InstallNetFramework' {
+                    Version = 'NET Framework 4.7.2'
+                    Node = $domainController.$($node.DomainName)
                 }
 
                 ooManagementStudio 'InstallManagementStudio' {
-                    ResourceLocation = $resourceLocation
-                    DependsOn        = '[ooNetFramework]Install472'
+                    Version      = 'SQL Server Management Studio 20.2'
+                    Node      = $domainController.$($node.DomainName)
+                    DependsOn = '[ooNetFramework]InstallNetFramework'
                 }
             }
         }

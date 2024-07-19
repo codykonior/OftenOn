@@ -5,8 +5,7 @@
             Lability_StartupMemory = 4294967296
             Lability_Resource = @(
                 'NlaSvcFix',
-                'TriggerDsc',
-                'NetFx472'
+                'TriggerDsc'
             )
             FullyQualifiedDomainName = 'oftenon.com'
             PSDscAllowDomainUser = $true
@@ -26,7 +25,7 @@
         },
         @{
             Lability_BootDelay = 60
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2016'
             NodeName = 'CHDC01'
             Lability_BootOrder = 1
             Role = @{
@@ -36,9 +35,18 @@
             Lability_Resource = @(
                 'NlaSvcFix',
                 'TriggerDsc',
-                'SQLServer2019',
-                'SSMS190',
-                'NetFx472'
+                'SQL Server 2019',
+                'NET Framework 4.5.1',
+                'NET Framework 4.5.2',
+                'NET Framework 4.6',
+                'NET Framework 4.6.1',
+                'NET Framework 4.6.2',
+                'NET Framework 4.7',
+                'NET Framework 4.7.1',
+                'NET Framework 4.7.2',
+                'NET Framework 4.8',
+                'NET Framework 4.8.1',
+                'NET Framework 4.7.2'
             )
             Network = @(
                 @{
@@ -78,24 +86,88 @@
         },
         @{
             Role = @{
-                Workstation = @{}
                 DomainMember = @{}
             }
-            NodeName = 'CHWK01'
+            NodeName = 'CHDBA2012'
             Network = @(
                 @{
                     DnsServerAddress = '10.0.0.1'
                     NetAdapterName = 'CHICAGO'
                     SwitchName = 'CHICAGO'
-                    IPAddress = '10.0.0.3/24'
+                    IPAddress = '10.0.0.11/24'
                     DefaultGatewayAddress = '10.0.0.1'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2012'
+        },
+        @{
+            Role = @{
+                DomainMember = @{}
+            }
+            NodeName = 'CHDBA2012R2'
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'CHICAGO'
+                    SwitchName = 'CHICAGO'
+                    IPAddress = '10.0.0.12/24'
+                    DefaultGatewayAddress = '10.0.0.1'
+                }
+            )
+            Lability_Media = 'Windows Server 2012 R2'
+        },
+        @{
+            Role = @{
+                Workstation = @{}
+                DomainMember = @{}
+            }
+            NodeName = 'CHDBA2016'
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'CHICAGO'
+                    SwitchName = 'CHICAGO'
+                    IPAddress = '10.0.0.13/24'
+                    DefaultGatewayAddress = '10.0.0.1'
+                }
+            )
+            Lability_Media = 'Windows Server 2016'
+        },
+        @{
+            Role = @{
+                DomainMember = @{}
+            }
+            NodeName = 'CHDBA2019'
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'CHICAGO'
+                    SwitchName = 'CHICAGO'
+                    IPAddress = '10.0.0.14/24'
+                    DefaultGatewayAddress = '10.0.0.1'
+                }
+            )
+            Lability_Media = 'Windows Server 2019'
+        },
+        @{
+            Role = @{
+                DomainMember = @{}
+            }
+            NodeName = 'CHDBA2022'
+            Network = @(
+                @{
+                    DnsServerAddress = '10.0.0.1'
+                    NetAdapterName = 'CHICAGO'
+                    SwitchName = 'CHICAGO'
+                    IPAddress = '10.0.0.15/24'
+                    DefaultGatewayAddress = '10.0.0.1'
+                }
+            )
+            Lability_Media = 'Windows Server 2022'
         },
         @{
             Lability_BootDelay = 60
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2016'
             NodeName = 'SEC1N1'
             Lability_BootOrder = 2
             Role = @{
@@ -115,7 +187,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
+                    SourcePath = '\\CHDC01\Resources\SQL Server 2019'
                 }
             }
             Network = @(
@@ -151,7 +223,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
+                    SourcePath = '\\CHDC01\Resources\SQL Server 2019'
                 }
             }
             NodeName = 'SEC1N2'
@@ -169,7 +241,7 @@
                     IPAddress = '10.0.11.12/24'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2016'
         },
         @{
             Role = @{
@@ -189,7 +261,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
+                    SourcePath = '\\CHDC01\Resources\SQL Server 2019'
                 }
             }
             NodeName = 'SEC1N3'
@@ -207,7 +279,7 @@
                     IPAddress = '10.0.11.13/24'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2016'
         },
         @{
             Role = @{
@@ -227,7 +299,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
+                    SourcePath = '\\CHDC01\Resources\SQL Server 2019'
                 }
             }
             NodeName = 'DAC1N1'
@@ -245,7 +317,7 @@
                     IPAddress = '10.0.12.11/24'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2016'
         },
         @{
             Role = @{
@@ -265,7 +337,7 @@
                 SqlServer = @{
                     InstanceName = 'MSSQLSERVER'
                     Features = 'SQLENGINE'
-                    SourcePath = '\\CHDC01\Resources\SQLServer2019'
+                    SourcePath = '\\CHDC01\Resources\SQL Server 2019'
                 }
             }
             NodeName = 'DAC1N2'
@@ -283,7 +355,7 @@
                     IPAddress = '10.0.12.12/24'
                 }
             )
-            Lability_Media = 'Windows Server 2016 Standard 64bit English Evaluation'
+            Lability_Media = 'Windows Server 2016'
         }
     )
     NonNodeData = @{
@@ -375,98 +447,149 @@
             )
             Resource = @(
                 @{
-                    Expand = $true
-                    Checksum = 'C44C1869A7657001250EF8FAD4F636D3'
-                    Filename = 'SQLFULL_ENU.iso'
-                    Uri = 'https://download.microsoft.com/download/4/C/7/4C7D40B9-BCF8-4F8A-9E76-06E9B92FE5AE/ENU/SQLFULL_ENU.iso'
-                    Id = 'SQLServer2012'
+                    UseFolder = $true
+                    Filename = 'NDP451-KB2858728-x86-x64-AllOS-ENU.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.5.1'
+                    Uri = 'https://download.microsoft.com/download/1/6/7/167F0D79-9317-48AE-AEDB-17120579F8E2/NDP451-KB2858728-x86-x64-AllOS-ENU.exe'
                 },
                 @{
-                    Checksum = '5EFF56819F854866CCBAE26F0D091B63'
-                    Filename = 'SQLServer2012SP4-KB4018073-x64-ENU.exe'
-                    Uri = 'https://download.microsoft.com/download/E/A/B/EABF1E75-54F0-42BB-B0EE-58E837B7A17F/SQLServer2012SP4-KB4018073-x64-ENU.exe'
-                    Id = 'SQLServer2012SP4'
+                    UseFolder = $true
+                    Filename = 'NDP452-KB2901907-x86-x64-AllOS-ENU.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.5.2'
+                    Uri = 'https://download.microsoft.com/download/E/2/1/E21644B5-2DF2-47C2-91BD-63C560427900/NDP452-KB2901907-x86-x64-AllOS-ENU.exe'
                 },
                 @{
-                    Checksum = 'FBD078835E0BDF5815271F848FD8CF58'
-                    Filename = 'SQLServer2012-KB4057116-x64.exe'
-                    Uri = 'https://download.microsoft.com/download/F/6/1/F618E667-BA6E-4428-A36A-8B4F5190FCC8/SQLServer2012-KB4057116-x64.exe'
-                    Id = 'SQLServer2012SP4GDR'
+                    UseFolder = $true
+                    Filename = 'NDP46-KB3045557-x86-x64-AllOS-ENU.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.6'
+                    Uri = 'https://download.microsoft.com/download/6/F/9/6F9673B1-87D1-46C4-BF04-95F24C3EB9DA/enu_netfx/NDP46-KB3045557-x86-x64-AllOS-ENU_exe/NDP46-KB3045557-x86-x64-AllOS-ENU.exe'
                 },
                 @{
-                    Checksum = '54AF3D25BA0254440340E86320441A94'
-                    Filename = 'SQLServer2012-KB4091266-x64.exe'
-                    Uri = 'http://download.microsoft.com/download/3/D/9/3D95BF50-AED7-44A6-863B-BC7DC7C722CE/SQLServer2012-KB4091266-x64.exe'
-                    Id = 'SQLServer2012SP4GDRHotfix'
+                    UseFolder = $true
+                    Filename = 'NDP461-KB3102436-x86-x64-AllOS-ENU.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.6.1'
+                    Uri = 'https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe'
                 },
                 @{
-                    Checksum = '84A1EC2FF8CEB86B1AEDC613B144F4D9'
-                    Filename = 'SQLServer2017-KB4535007-x64.exe'
-                    Uri = 'https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB4535007-x64.exe'
-                    Id = 'SQLServer2017CU19'
+                    UseFolder = $true
+                    Filename = 'ndp462-kb3151800-x86-x64-allos-enu.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.6.2'
+                    Uri = 'https://download.visualstudio.microsoft.com/download/pr/8e396c75-4d0d-41d3-aea8-848babc2736a/80b431456d8866ebe053eb8b81a168b3/ndp462-kb3151800-x86-x64-allos-enu.exe'
                 },
                 @{
-                    Checksum = '826BB5D7B783DCB9FB4194F326106850'
-                    Filename = 'SSMS-Setup-ENU-17.9.1.exe'
-                    Uri = 'https://download.microsoft.com/download/D/D/4/DD495084-ADA7-4827-ADD3-FC566EC05B90/SSMS-Setup-ENU.exe'
-                    Id = 'SSMS1791'
+                    UseFolder = $true
+                    Filename = 'ndp47-kb3186497-x86-x64-allos-enu.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.7'
+                    Uri = 'https://download.visualstudio.microsoft.com/download/pr/2dfcc711-bb60-421a-a17b-76c63f8d1907/e5c0231bd5d51fffe65f8ed7516de46a/ndp47-kb3186497-x86-x64-allos-enu.exe'
                 },
                 @{
-                    Checksum = '2FE1A67317AC4DE9669283817167D516'
-                    Filename = 'SSMS-Setup-ENU-18.0.exe'
-                    Uri = 'https://download.microsoft.com/download/5/4/E/54EC1AD8-042C-4CA3-85AB-BA307CF73710/SSMS-Setup-ENU.exe'
-                    Id = 'SSMS180'
+                    UseFolder = $true
+                    Filename = 'ndp471-kb4033342-x86-x64-allos-enu.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.7.1'
+                    Uri = 'https://download.visualstudio.microsoft.com/download/pr/4312fa21-59b0-4451-9482-a1376f7f3ba4/9947fce13c11105b48cba170494e787f/ndp471-kb4033342-x86-x64-allos-enu.exe'
                 },
                 @{
-                    Checksum = 'A092948409260FB68F72858337043E5C'
-                    Filename = 'SSMS-Setup-ENU-18.1.exe'
-                    Uri = 'https://download.microsoft.com/download/0/1/5/015ECB20-6206-4500-B73C-F3405553445A/SSMS-Setup-ENU.exe'
-                    Id = 'SSMS181'
-                },
-                @{
-                    Checksum = 'D6699E4B6E24A40F88C8D0A81792B458'
-                    Filename = 'SSMS-Setup-ENU-18.2.exe'
-                    Uri = 'https://download.microsoft.com/download/2/9/C/29CC9731-CE3B-4EC8-89D8-E6B8EE88EAF5/SSMS-Setup-ENU.exe'
-                    Id = 'SSMS182'
-                },
-                @{
-                    Checksum = '65D034096B63C6EC9051951BCF10088C'
-                    Filename = 'SSMS-Setup-ENU-18.4.exe'
-                    Uri = 'https://aka.ms/ssmsfullsetup'
-                    Id = 'SSMS184'
-                },
-                @{
-                    Checksum = 'B4AC17BA2853B4A9DEF7E90A50ADC2AC'
-                    Filename = 'SSMS-Setup-ENU-19.0.exe'
-                    Uri = 'https://aka.ms/ssmsfullsetup'
-                    Id = 'SSMS190'
-                },
-                @{
-                    Checksum = '4037BDDE26BF72E2CE5108CB30387BCD'
+                    UseFolder = $true
                     Filename = 'ndp472-kb4054530-x86-x64-allos-enu.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.7.2'
                     Uri = 'https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/089f837de42708daacaae7c04b7494db/ndp472-kb4054530-x86-x64-allos-enu.exe'
-                    Id = 'NetFx472'
                 },
                 @{
-                    Expand = $true
-                    Checksum = '334FC5F8FDD269FB2D6D5DC1FD61D1C7'
-                    Filename = 'SQLServer2017-x64-ENU.iso'
-                    Uri = 'https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SQLServer2017-x64-ENU.iso'
-                    Id = 'SQLServer2017'
+                    UseFolder = $true
+                    Filename = 'ndp48-x86-x64-allos-enu.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.8'
+                    Uri = 'https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe'
                 },
                 @{
+                    UseFolder = $true
+                    Filename = 'ndp481-x86-x64-allos-enu.exe'
+                    Checksum = ''
+                    Id = 'NET Framework 4.8.1'
+                    Uri = 'https://download.visualstudio.microsoft.com/download/pr/6f083c7e-bd40-44d4-9e3f-ffba71ec8b09/3951fd5af6098f2c7e8ff5c331a0679c/ndp481-x86-x64-allos-enu.exe'
+                },
+                @{
+                    UseFolder = $true
+                    Filename = 'SSMS-Setup-ENU.exe'
+                    Checksum = ''
+                    Id = 'SQL Server Management Studio 16.5.3'
+                    Uri = 'https://download.microsoft.com/download/9/3/3/933EA6DD-58C5-4B78-8BEC-2DF389C72BE0/SSMS-Setup-ENU.exe'
+                },
+                @{
+                    UseFolder = $true
+                    Filename = 'SSMS-Setup-ENU.exe'
+                    Checksum = ''
+                    Id = 'SQL Server Management Studio 17.9.1'
+                    Uri = 'https://download.microsoft.com/download/D/D/4/DD495084-ADA7-4827-ADD3-FC566EC05B90/SSMS-Setup-ENU.exe'
+                },
+                @{
+                    UseFolder = $true
+                    Filename = 'SSMS-Setup-ENU.exe'
+                    Checksum = ''
+                    Id = 'SQL Server Management Studio 18.12.1'
+                    Uri = 'https://download.microsoft.com/download/8/a/8/8a8073d2-2e00-472b-9a18-88361d105915/SSMS-Setup-ENU.exe'
+                },
+                @{
+                    UseFolder = $true
+                    Filename = 'SSMS-Setup-ENU.exe'
+                    Checksum = ''
+                    Id = 'SQL Server Management Studio 19.3'
+                    Uri = 'https://download.microsoft.com/download/7/7/3/7738e337-ed99-40ea-b8ae-f639162c83c3/SSMS-Setup-ENU.exe'
+                },
+                @{
+                    UseFolder = $true
+                    Filename = 'SSMS-Setup-ENU.exe'
+                    Checksum = ''
+                    Id = 'SQL Server Management Studio 20.2'
+                    Uri = 'https://download.microsoft.com/download/9/b/e/9bee9f00-2ee2-429a-9462-c9bc1ce14c28/SSMS-Setup-ENU.exe'
+                },
+                @{
+                    Id = 'SQL Server 2012'
+                    Filename = 'en_sql_server_2012_developer_edition_x86_x64_dvd_813280.iso'
+                    Checksum = ''
+                    Uri = 'https://myvs.download.prss.microsoft.com/dbazure/en_sql_server_2012_developer_edition_x86_x64_dvd_813280.iso?t=f30c5053-bee2-4622-b1f8-e78ddd6b5ae0&P1=1721391408&P2=601&P3=2&P4=W45rX79oT9ft3pHGmMo4EvdHKGCoWH%2bswE0IxEt05Eewk0K3uGzxWtGOO67dobdlJHV4XUenlcBdLAXyKSu%2bi5PjM6yGvoIgqXRJAwRyoY5dl42wRT4Zx3UcRY1oJXtStZM5te6njBY%2bIecZ3qeAVz97MhGtk%2fY47jOj540Aq17ef%2f7q2pv8AC5VLGKPi8U3RzjajwQJvl9oTwaD%2f7svPgHTO4VS5MoX5LQxpdmdgutabZHwcnMwvpI5vEcsYlXufzNnNSHIzfSeVX85uncy3VR7YzPQjs9Iy8FpKhcIuu1yPumgcTaPMnC42RzSzt6HCjnpiCi99a46u%2ffawrQbrA%3d%3d&su=1'
+                    UseFolder = $true
                     Expand = $true
-                    Checksum = '62294C67E3785AE800C1935F75A3E9E8'
+                },
+                @{
+                    Id = 'SQL Server 2014'
+                    Filename = 'en_sql_server_2014_developer_edition_x64_dvd_3940406.iso'
+                    Checksum = ''
+                    Uri = 'https://myvs.download.prss.microsoft.com/dbazure/en_sql_server_2014_developer_edition_x64_dvd_3940406.iso?t=93490e4a-f779-4a3c-a159-8b5cdb4e48c7&P1=1721391477&P2=601&P3=2&P4=lyhUBl73YHoL43XApoe%2f3eORDYiJGNUEhVdc5SxInRPmxN42hQ74F6RPR0zhsxe8p2nMBWl%2fNCq8UC4YSVCYVOtPyb4SN6AYJKBY7nTkbEtP1PxRIaBP7e8sH%2bICwZDRY7ksAGgSiYvfH4a3P1gwfL48AciOf6nrYmP08DjfCOWQSh2YR18B%2b7GtnHVZ8e3nj375GP3KTI18ARTC6Kdq%2fb0WtQwQJkgIXPMm0Gwbm%2bo8v8u72MfgAX1OA3jd2hFLdp34Bm8UlDTlwq4uytgvf3rWakG0E0vCCbYuacxlIhdIiJTZdT6W8ik7cpdROY8hAHAHIc0XT3%2ffRNHlFUfB6Q%3d%3d&su=1'
+                    UseFolder = $true
+                    Expand = $true
+                },
+                @{
+                    Id = 'SQL Server 2016'
+                    Filename = 'en_sql_server_2016_developer_x64_dvd_8777069.iso'
+                    Checksum = ''
+                    Uri = 'https://myvs.download.prss.microsoft.com/dbazure/en_sql_server_2016_developer_x64_dvd_8777069.iso?t=c2bf9840-cb90-4c48-ae85-7db3850fccd0&P1=1721391502&P2=601&P3=2&P4=0qHwpQo8ozfFgefl1rEERdcJFbBMDe5jma4Do%2btBlxL%2bakiU2fX2%2fB6IwfFjfPUUvYIhqqTI18T6TlxaGv%2bsxQaTYzAE3FkO0W1lr5gzx3z71nMVvuNdV3kV6U5nABfcS2LrjTIW7EW7EC4ZlYzUHZT8vM1yCI4oUmbew3iTR6WOtJq3Bl9IbNC3vNFI1KHpApHziJa5GyGouASSoWb8JNKczj5Oq8fywaPuDSF3CB2y1hiBwHIpkFd5dn2hPw2R62USmryIWX8MdnczSNELQR0Ug9J2nKHAR7qso2lzYPPc8JFwfnke1WrgHaQqVuvaHEqBVgm7XqOUwKRQffgJgw%3d%3d&su=1'
+                    UseFolder = $true
+                    Expand = $true
+                },
+                @{
+                    Id = 'SQL Server 2019'
                     Filename = 'en_sql_server_2019_developer_x64_dvd_baea4195.iso'
-                    Uri = 'https://myvs.download.prss.microsoft.com/sg/en_sql_server_2019_developer_x64_dvd_baea4195.iso?t=104d5567-1d6b-4564-bba5-f3c8da06b9b7&e=1674930017&h=7a9fa619de6572ee89f086a9c62893f355ed88f9f255fc291af70954e5fd217d&su=1'
-                    Id = 'SQLServer2019'
+                    Checksum = ''
+                    Uri = 'https://myvs.download.prss.microsoft.com/dbazure/en_sql_server_2019_developer_x64_dvd_baea4195.iso?t=1fe42426-3f14-45de-8f1f-ec0069114d2a&P1=1721391521&P2=601&P3=2&P4=WsYuOkH5vrKsvQx9PFW3YR2IjMCHod2mSyUlpfJjLQqfSHZ0MZssQTuRsWJCKUOFwnhxdIIjI6O7nhC5a1o%2b5XcTFw6WtcVYJf%2fyuqPzHp138URQw4Qhh0O5KZGXeRuBamGg6ufxbJdIi3oM%2fILWXA6ngWnkBd%2bXGLHSKcJuV4C4iezt%2f2rxFBj5tOltw2488UUeoe59M2Av4gh6fuAICNuUaMyFleqaggD78joVDCvGHAeq%2fVyR4Nnpk9cykm%2fVLivEXYP21%2fJCzo9nSc8Fyomc5dOLdM6owIab%2fbT%2bDvzybPS2yMCzn4Mp6HaC7FgG3F1%2boi15DE4ABQ9OLFlq%2bg%3d%3d&su=1'
+                    UseFolder = $true
+                    Expand = $true
                 },
                 @{
-                    Expand = $true
-                    Checksum = 'F9BC338769AF3D913B5989BABFE6BC88'
+                    Id = 'SQL Server 2022'
                     Filename = 'enu_sql_server_2022_developer_edition_x64_dvd_7cacf733.iso'
-                    Uri = 'https://myvs.download.prss.microsoft.com/sg/enu_sql_server_2022_developer_edition_x64_dvd_7cacf733.iso?t=450e0904-0022-45b6-8742-28b2f5ac356b&e=1674930058&h=b026b2ce9f1ca17930ebf549b9bdef6a20c2c94b675c25c83ce30caeab19a453&su=1'
-                    Id = 'SQLServer2022'
+                    Checksum = ''
+                    Uri = 'https://myvs.download.prss.microsoft.com/dbazure/enu_sql_server_2022_developer_edition_x64_dvd_7cacf733.iso?t=9633b1f6-805a-4d5b-949b-ca1fd1fbaa82&P1=1721391538&P2=601&P3=2&P4=RzBCD4hizfUfrSCMvdUlCE5lDbdTvyrad4EOhCNlOCxpvEcXyEzZ8iqjDW3qaoEIOxGRM04M03qvRlv4cMhDnGaDQMCA9jD%2bkLkoXg0p2RmYFuYc%2fJVzxc5wpbewmyS0plUCxSRqSLj7I7bVFEIm9X6GyBtVgt9J7RRlWtYCE7vVZWfCSfm%2bIthHNHHGPBwLLr4IER%2bWgEoJ9e04MTfmP44R6qMVHTtaudzJBsUZcf8mKEGEazr5Nlhv9A%2f4AcQofP5r9YQXijO9lm3tGfJa9GzTy6QHUl37ZdotJ%2b%2bWwVjosvltgv%2f79cH%2bdA5ukwyG%2bzV7TvKhHnlVBsZ5PImt6g%3d%3d&su=1'
+                    UseFolder = $true
+                    Expand = $true
                 },
                 @{
                     Filename = '..\Scripts\NlaSvcFix.ps1'
@@ -505,12 +628,13 @@
             )
             Media = @(
                 @{
-                    MediaType = 'ISO'
-                    Id = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
                     Filename = '9200.16384.WIN8_RTM.120725-1247_X64FRE_SERVER_EVAL_EN-US-HRM_SSS_X64FREE_EN-US_DV5.ISO'
+                    Id = 'Windows Server 2012'
                     Architecture = 'x64'
-                    Checksum = '8503997171F731D9BD1CB0B0EDC31F3D'
+                    Checksum = ''
+                    MediaType = 'ISO'
                     Uri = 'http://download.microsoft.com/download/6/D/A/6DAB58BA-F939-451D-9101-7DE07DC09C03/9200.16384.WIN8_RTM.120725-1247_X64FRE_SERVER_EVAL_EN-US-HRM_SSS_X64FREE_EN-US_DV5.ISO'
+                    UseFolder = $true
                     CustomData = @{
                         WindowsOptionalFeature = @(
                             'NetFx3',
@@ -524,27 +648,55 @@
                             '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
                     }
-                    Description = 'Windows Server 2012 Standard Evaluation (Server with a GUI)'
+                    Description = 'Windows Server 2012'
                     ImageName = 2
                     OperatingSystem = 'Windows'
                     Hotfixes = @(
                         @{
                             Id = 'W2K12-KB3191565-x64.msu'
                             Uri = 'https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu'
-                        },
-                        @{
-                            Id = 'Windows8-RT-KB2803748-x64.msu'
-                            Uri = 'https://download.microsoft.com/download/9/7/C/97CB21BF-FA24-46C7-BE44-88E7EE934841/Windows8-RT-KB2803748-x64.msu'
                         }
                     )
                 },
                 @{
-                    MediaType = 'ISO'
-                    Id = 'Windows Server 2016 Standard 64bit English Evaluation'
-                    Filename = '14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO'
+                    Filename = '9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO'
+                    Id = 'Windows Server 2012 R2'
                     Architecture = 'x64'
-                    Checksum = '70721288BBCDFE3239D8F8C0FAE55F1F'
-                    Uri = 'http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO'
+                    Checksum = ''
+                    MediaType = 'ISO'
+                    Uri = 'https://download.microsoft.com/download/6/2/A/62A76ABB-9990-4EFC-A4FE-C7D698DAEB96/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO'
+                    UseFolder = $true
+                    CustomData = @{
+                        WindowsOptionalFeature = @(
+                            'NetFx3',
+                            'TelnetClient'
+                        )
+                        CustomBootStrap = @(
+                            'NET USER Administrator /active:yes; ',
+                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
+                        )
+                    }
+                    Description = 'Windows Server 2012 R2'
+                    ImageName = 2
+                    OperatingSystem = 'Windows'
+                    Hotfixes = @(
+                        @{
+                            Id = 'Win8.1AndW2K12R2-KB3191564-x64.msu'
+                            Uri = 'https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/Win8.1AndW2K12R2-KB3191564-x64.msu'
+                        }
+                    )
+                },
+                @{
+                    Filename = 'Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO'
+                    Id = 'Windows Server 2016'
+                    Architecture = 'x64'
+                    Checksum = ''
+                    MediaType = 'ISO'
+                    Uri = 'https://software-static.download.prss.microsoft.com/pr/download/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO'
+                    UseFolder = $true
                     CustomData = @{
                         MinimumDismVersion = '10.0.0.0'
                         CustomBootStrap = @(
@@ -559,7 +711,61 @@
                             'TelnetClient'
                         )
                     }
-                    Description = 'Windows Server 2016 Standard 64bit English Evaluation'
+                    Description = 'Windows Server 2016'
+                    ImageName = 2
+                    OperatingSystem = 'Windows'
+                    Hotfixes = @()
+                },
+                @{
+                    Filename = '17763.3650.221105-1748.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso'
+                    Id = 'Windows Server 2019'
+                    Architecture = 'x64'
+                    Checksum = ''
+                    MediaType = 'ISO'
+                    Uri = 'https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66749/17763.3650.221105-1748.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso'
+                    UseFolder = $true
+                    CustomData = @{
+                        MinimumDismVersion = '10.0.0.0'
+                        CustomBootStrap = @(
+                            'NET USER Administrator /active:yes; ',
+                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
+                        )
+                        WindowsOptionalFeature = @(
+                            'NetFx3',
+                            'TelnetClient'
+                        )
+                    }
+                    Description = 'Windows Server 2019'
+                    ImageName = 2
+                    OperatingSystem = 'Windows'
+                    Hotfixes = @()
+                },
+                @{
+                    Filename = 'SERVER_EVAL_x64FRE_en-us.iso'
+                    Id = 'Windows Server 2022'
+                    Architecture = 'x64'
+                    Checksum = ''
+                    MediaType = 'ISO'
+                    Uri = 'https://software-static.download.prss.microsoft.com/sg/download/888969d5-f34g-4e03-ac9d-1f9786c66749/SERVER_EVAL_x64FRE_en-us.iso'
+                    UseFolder = $true
+                    CustomData = @{
+                        MinimumDismVersion = '10.0.0.0'
+                        CustomBootStrap = @(
+                            'NET USER Administrator /active:yes; ',
+                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
+                        )
+                        WindowsOptionalFeature = @(
+                            'NetFx3',
+                            'TelnetClient'
+                        )
+                    }
+                    Description = 'Windows Server 2022'
                     ImageName = 2
                     OperatingSystem = 'Windows'
                     Hotfixes = @()

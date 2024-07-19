@@ -1,21 +1,49 @@
 Configuration ooManagementStudio {
     param (
         [Parameter(Mandatory)]
-        [string] $ResourceLocation
+        [string] $Version,
+        [Parameter(Mandatory)]
+        [string] $Node
     )
-    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 9.1.0
 
-    <#
-        ProductId is critical to get right and changes each version. If it's wrong the computer will keep rebooting.
-        You can find it AFTER install of SSMS like so:
-            Get-ChildItem -Path 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall' |
-                Where-Object { $_.Property -contains 'DisplayName' -and $_.GetValue('DisplayName') -like "Microsoft SQL Server Management Studio - *.*" } |
-                ForEach-Object { $_.GetValue("DisplayName"); $_.GetValue('BundleProviderKey'); }
-    #>
-    xPackage 'SSMS190' {
-        Name      = 'SSMS190'
-        Path      = "$ResourceLocation\SSMS-Setup-ENU-19.0.exe"
-        ProductId = '508117ed-3115-4574-a3fc-688cef55e748'
-        Arguments = '/install /quiet'
+    Script 'ooManagementStudio' {
+        GetScript = {
+            Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
+
+            $displayName = "Microsoft SQL Server Management Studio - *"
+            $displayNames = Get-ChildItem HKLM:\SOFTWARE\WOW6432NODE\Microsoft\Windows\CurrentVersion\Uninstall | ForEach-Object {
+                $property = $_ | Get-ItemProperty
+                if ($property -and $property.psobject.Properties["DisplayName"] -and $property.DisplayName -like $displayName) {
+                    $property.DisplayName.Replace("Microsoft ", "").Replace(" -", "")
+                }
+            }
+
+            @{ Result = "$displayNames"; }
+        }
+        TestScript = {
+            Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
+
+            $state = [scriptblock]::Create($GetScript).Invoke()
+            if ($state.Result -like "*$($using:Version)*") {
+                $true
+            } else {
+                $false
+            }
+        }
+        SetScript = {
+            Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
+
+            # If you don't use -NoNewWindow it will hang with an Open File - Security Warning
+            $fileName = (Get-ChildItem "\\$($using:Node)\Resources\$($using:Version)\*.exe" -File -Recurse).FullName | Select-Object -First 1
+            $result = Start-Process -FilePath $fileName -ArgumentList '/install /quiet' -PassThru -Wait -NoNewWindow
+            if ($result.ExitCode -in @(1641, 3010)) {
+                Write-Verbose "Installation succeeded, restart required"
+                $global:DSCMachineStatus = 1
+            } elseif ($result.ExitCode -ne 0) {
+                Write-Error "Installation failed with exit code $($result.ExitCode)"
+            } else {
+                Write-Verbose "Installation succeeded"
+            }
+        }
     }
 }

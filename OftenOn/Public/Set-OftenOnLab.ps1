@@ -102,7 +102,7 @@ function Set-OftenOnLab {
             Write-Error "$ModulePath does not exist"
         }
         $configurationData.NonNodeData.Lability.Resource += @{ Id = 'ModulePath'; IsLocal = $true; Filename = $ModulePath; DestinationPath = '\Program Files\WindowsPowerShell'; }
-        $node = $configurationData.AllNodes | Where-Object { $_.NodeName -eq 'CHWK01' }
+        $node = $configurationData.AllNodes | Where-Object { $_.NodeName -eq 'CHDBA01' }
         if (!$node.psobject.Properties["Lability_Resource"]) {
             $node.Lability_Resource = ($configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' }).Lability_Resource
         }
@@ -110,27 +110,10 @@ function Set-OftenOnLab {
     }
 
     if ($Cluster1) {
-        $windows = if ($Cluster1.Windows -eq '2012') {
-            'Windows Server 2012 Standard Evaluation (Server with a GUI)'
-        } elseif ($Cluster1.Windows -eq '2016') {
-            'Windows Server 2016 Standard 64bit English Evaluation'
-        } else {
-            Write-Error "Unknown Windows version $($Cluster1.Windows)"
-        }
+        $windows = "Windows Server $($Cluster1.Windows)"
+        $sql = "\\CHDC01\Resources\SQL Server $($Cluster1.SQL)"
         foreach ($node in $configurationData.AllNodes | Where-Object { $_.Role.Contains("Cluster") -and $_.Role.Cluster.Name -eq "C1" }) {
             $node.Lability_Media = $windows
-        }
-
-        $sql = if ($Cluster1.SQL -eq '2012') {
-            '\\CHDC01\Resources\SQLServer2012'
-        } elseif ($Cluster1.SQL -eq '2017') {
-            '\\CHDC01\Resources\SQLServer2017'
-        } elseif ($Cluster1.SQL -eq '2019') {
-            '\\CHDC01\Resources\SQLServer2019'
-        } elseif ($Cluster1.SQL -eq '2022') {
-            '\\CHDC01\Resources\SQLServer2022'
-        } else {
-            Write-Error "Unknown SQL version $($Cluster1.SQL)"
         }
         foreach ($node in $configurationData.AllNodes | Where-Object { $_.Role.Contains("SqlServer") -and $_.Role.Cluster.Name -eq "C1" }) {
             $node.Role.SqlServer.SourcePath = $sql
@@ -144,27 +127,10 @@ function Set-OftenOnLab {
     }
 
     if ($Cluster2) {
-        $windows = if ($Cluster2.Windows -eq '2012') {
-            'Windows Server 2012 Standard Evaluation (Server with a GUI)'
-        } elseif ($Cluster2.Windows -eq '2016') {
-            'Windows Server 2016 Standard 64bit English Evaluation'
-        } else {
-            Write-Error "Unknown Windows version $($Cluster2.Windows)"
-        }
+        $windows = "Windows Server $($Cluster2.Windows)"
+        $sql = "\\CHDC01\Resources\SQL Server $($Cluster2.SQL)"
         foreach ($node in $configurationData.AllNodes | Where-Object { $_.Role.Contains("Cluster") -and $_.Role.Cluster.Name -eq "C2" }) {
             $node.Lability_Media = $windows
-        }
-
-        $sql = if ($Cluster2.SQL -eq '2012') {
-            '\\CHDC01\Resources\SQLServer2012'
-        } elseif ($Cluster2.SQL -eq '2017') {
-            '\\CHDC01\Resources\SQLServer2017'
-        } elseif ($Cluster2.SQL -eq '2019') {
-            '\\CHDC01\Resources\SQLServer2019'
-        } elseif ($Cluster2.SQL -eq '2022') {
-            '\\CHDC01\Resources\SQLServer2022'
-        } else {
-            Write-Error "Unknown SQL version $($Cluster1.SQL)"
         }
         foreach ($node in $configurationData.AllNodes | Where-Object { $_.Role.Contains("SqlServer") -and $_.Role.Cluster.Name -eq "C2" }) {
             $node.Role.SqlServer.SourcePath = $sql
@@ -184,11 +150,11 @@ function Set-OftenOnLab {
     foreach ($node in $configurationData.AllNodes) {
         if ($node.ContainsKey("Lability_Resource")) {
             $node.Lability_Resource = $node.Lability_Resource | ForEach-Object {
-                if ($_ -notlike "SQLServer*") {
+                if ($_ -notlike "SQL Server *") {
                     $_
-                } elseif ($Cluster1 -and $Cluster1.SQL -and $_ -like "SQLServer$($Cluster1.SQL)*") {
+                } elseif ($Cluster1 -and $Cluster1.SQL -and $_ -eq "SQL Server $($Cluster1.SQL)") {
                     $_
-                }  elseif ($Cluster2 -and $Cluster2.SQL -and $_ -like "SQLServer$($Cluster2.SQL)*") {
+                }  elseif ($Cluster2 -and $Cluster2.SQL -and $_ -eq "SQL Server $($Cluster2.SQL)") {
                     $_
                 }       
             }
