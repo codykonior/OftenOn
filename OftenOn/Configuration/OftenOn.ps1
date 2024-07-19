@@ -283,6 +283,9 @@ Configuration OftenOn {
         }
         #endregion
 
+        #region Future NET Framework
+        #endregion
+
         #region Clustering
         if ($node.ContainsKey("Role")) {
             if ($node.Role.ContainsKey('Cluster')) {
@@ -297,6 +300,7 @@ Configuration OftenOn {
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterStaticAddress.CIDR
                         IgnoreNetwork                 = $clusterIgnoreNetwork.CIDR
+                        KeepDownedNodesInCluster      = $true # Prevents a DSC crash when the cluster has just been created
                         # If RSAT-Clustering is not installed the cluster can not be created
                         DependsOn                     = '[WindowsFeatureSet]All', '[Computer]Rename'
                     }
@@ -319,6 +323,7 @@ Configuration OftenOn {
                         DomainAdministratorCredential = $domainAdministrator
                         StaticIPAddress               = $clusterStaticAddress.CIDR
                         IgnoreNetwork                 = $clusterIgnoreNetwork.CIDR
+                        KeepDownedNodesInCluster      = $true # It's needed on secondaries too or they won't start
                         DependsOn                     = "[WaitForAll]WaitForCluster$($cluster.Name)"
                     }
 
@@ -384,7 +389,19 @@ Configuration OftenOn {
             if ($node.Role.ContainsKey('SqlServer')) {
                 # If we are using the SqlServer module 22 and above, it requires NetFx 4.7.2 minimum
                 $dependsOn = "[Cluster]AddNodeToCluster$($cluster.Name)"
-                if (Get-Module SqlServer -ListAvailable | Select-Object -First 1 | ForEach-Object { ([version] $_.Version).Major -ge 22 }) {
+
+                $needsNetFramework = $false
+                $sqlServerModule = $ConfigurationData.NonNodeData.Lability.Module | Where-Object { $_.Name -eq "SqlServer" }
+                if ($sqlServerModule.ContainsKey("RequiredVersion") -and $sqlServerModule.RequiredVersion -notlike "21*") {
+                    Write-Host "NonNodeData requires a new net framework"
+                    $needsNetFramework = $true
+                }
+                if (-not $sqlServerModule.ContainsKey("RequiredVersion") -and (Get-Module SqlServer -ListAvailable | Select-Object -First 1 | ForEach-Object { ([version] $_.Version).Major -gt 21 })) {
+                    Write-Host "No version was specified and a new net framework is needed"
+                    $needsNetFramework = $true
+                }
+
+                if ($needsNetFramework) {
                     ooNetFramework 'Install472' {
                         ResourceLocation = "C:\Resources\ndp472-kb4054530-x86-x64-allos-enu.exe"
                         DependsOn        = $dependsOn

@@ -298,7 +298,7 @@
                     Name = 'PoshRSJob'
                 },
                 @{
-                    RequiredVersion = '22.3.0'
+                    RequiredVersion = '21.1.18256'
                     Name = 'SqlServer'
                 },
                 @{
