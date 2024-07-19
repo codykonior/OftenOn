@@ -22,7 +22,9 @@ function Set-OftenOnLab {
         [hashtable] $Cluster2,
 
         [ValidateSet("10.0", "192.168", "172.16")]
-        $Subnet = "10.0"
+        $Subnet = "10.0",
+
+        [switch] $KeepMedia
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'Default') {
@@ -102,11 +104,12 @@ function Set-OftenOnLab {
             Write-Error "$ModulePath does not exist"
         }
         $configurationData.NonNodeData.Lability.Resource += @{ Id = 'ModulePath'; IsLocal = $true; Filename = $ModulePath; DestinationPath = '\Program Files\WindowsPowerShell'; }
-        $node = $configurationData.AllNodes | Where-Object { $_.NodeName -eq 'CHDBA01' }
-        if (!$node.psobject.Properties["Lability_Resource"]) {
-            $node.Lability_Resource = ($configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' }).Lability_Resource
+        foreach ($node in ($configurationData.AllNodes | Where-Object { $_.NodeName -like 'CHDBA*' })) {
+            if (!$node.psobject.Properties["Lability_Resource"]) {
+                $node.Lability_Resource = ($configurationData.AllNodes | Where-Object { $_.NodeName -eq '*' }).Lability_Resource
+            }
+            $node.Lability_Resource += 'ModulePath'    
         }
-        $node.Lability_Resource += 'ModulePath'
     }
 
     if ($Cluster1) {
@@ -118,7 +121,6 @@ function Set-OftenOnLab {
         foreach ($node in $configurationData.AllNodes | Where-Object { $_.Role.Contains("SqlServer") -and $_.Role.Cluster.Name -eq "C1" }) {
             $node.Role.SqlServer.SourcePath = $sql
         }
-
         if (!$Cluster1.AvailabilityGroup) {
             foreach ($node in $configurationData.AllNodes | Where-Object { $_.Role.Contains("AvailabilityGroup") -and $_.Role.Cluster.Name -eq "C1" }) {
                 $node.Role.Remove("AvailabilityGroup")
@@ -135,7 +137,6 @@ function Set-OftenOnLab {
         foreach ($node in $configurationData.AllNodes | Where-Object { $_.Role.Contains("SqlServer") -and $_.Role.Cluster.Name -eq "C2" }) {
             $node.Role.SqlServer.SourcePath = $sql
         }
-
         if (!$Cluster2.AvailabilityGroup) {
             foreach ($node in $configurationData.AllNodes | Where-Object { $_.Role.Contains("AvailabilityGroup") -and $_.Role.Cluster.Name -eq "C2" }) {
                 $node.Role.Remove("AvailabilityGroup")
@@ -145,18 +146,19 @@ function Set-OftenOnLab {
         $configurationData.AllNodes = $configurationData.AllNodes | Where-Object { -not $_.Role.Contains("Cluster") -or $_.Role.Cluster.Name -ne "C2" }
     }
 
-    # Strip out unnecessary SQL installation media;
-    # this is because some may not be available right now.
-    foreach ($node in $configurationData.AllNodes) {
-        if ($node.ContainsKey("Lability_Resource")) {
-            $node.Lability_Resource = $node.Lability_Resource | ForEach-Object {
-                if ($_ -notlike "SQL Server *") {
-                    $_
-                } elseif ($Cluster1 -and $Cluster1.SQL -and $_ -eq "SQL Server $($Cluster1.SQL)") {
-                    $_
-                }  elseif ($Cluster2 -and $Cluster2.SQL -and $_ -eq "SQL Server $($Cluster2.SQL)") {
-                    $_
-                }       
+    # Strip out unnecessary SQL installation media
+    if (-not $KeepMedia) {
+        foreach ($node in $configurationData.AllNodes) {
+            if ($node.ContainsKey("Lability_Resource")) {
+                $node.Lability_Resource = $node.Lability_Resource | ForEach-Object {
+                    if ($_ -notlike "SQL Server 2*") {
+                        $_
+                    } elseif ($Cluster1 -and $Cluster1.SQL -and $_ -eq "SQL Server $($Cluster1.SQL)") {
+                        $_
+                    }  elseif ($Cluster2 -and $Cluster2.SQL -and $_ -eq "SQL Server $($Cluster2.SQL)") {
+                        $_
+                    }       
+                }
             }
         }
     }
