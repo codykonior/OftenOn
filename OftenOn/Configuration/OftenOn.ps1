@@ -403,9 +403,9 @@ Configuration OftenOn {
 
                 if ($needsNetFramework) {
                     ooNetFramework 'InstallNetFramework' {
-                        Version = 'NET Framework 4.7.2'
-                        Node = $domainController.$($node.DomainName)
-                        DependsOn        = $dependsOn
+                        Version   = 'NET Framework 4.7.2'
+                        Node      = $domainController.$($node.DomainName)
+                        DependsOn = $dependsOn
                     }
                     $dependsOn = "[ooNetFramework]Install472"
                 }
@@ -655,11 +655,11 @@ Configuration OftenOn {
             if ($node.Role.ContainsKey('Workstation')) {
                 ooNetFramework 'InstallNetFramework' {
                     Version = 'NET Framework 4.7.2'
-                    Node = $domainController.$($node.DomainName)
+                    Node    = $domainController.$($node.DomainName)
                 }
 
                 ooManagementStudio 'InstallManagementStudio' {
-                    Version      = 'SQL Server Management Studio 20.2'
+                    Version   = 'SQL Server Management Studio 20.2'
                     Node      = $domainController.$($node.DomainName)
                     DependsOn = '[ooNetFramework]InstallNetFramework'
                 }
