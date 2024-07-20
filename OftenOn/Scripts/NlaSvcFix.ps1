@@ -24,7 +24,7 @@ if ((Get-CimInstance -ClassName Win32_ComputerSystem).PartOfDomain) {
             foreach ($service in "nlasvc", "netprofm") { 
                 if (Get-Service $service | Where-Object { $_.Status -ne 'Running' }) {
                     "$((Get-Date).ToUniversalTime().ToString("s"))Z Starting service [$service]"
-                    Start-Service $service -Force
+                    Start-Service $service
                 }
             }
         } catch {
