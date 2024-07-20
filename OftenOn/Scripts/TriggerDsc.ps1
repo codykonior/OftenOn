@@ -5,9 +5,9 @@ $ErrorActionPreference = 'Stop'
 while ($true) {
     while ($true) {
         $dscStatus = Get-DscLocalConfigurationManager
-        "$((Get-Date).ToUniversalTime().ToString("s"))Z LCM status is [$($dscStatus.LCMState)]"
+        "$((Get-Date).ToUniversalTime().ToString("s"))Z LCM status is [$($dscStatus.LCMState)] / [$($dscStatus.LCMStateDetail)]"
 
-        if ($dscStatus.LCMState -eq 'Idle') {
+        if ($dscStatus.LCMState -in 'Idle', 'PendingConfiguration') {
             break
         }
 
@@ -18,7 +18,7 @@ while ($true) {
     $lastConfiguration = Get-DscConfigurationStatus -All | Sort-Object StateDate -Descending | Select-Object -First 1
     "$((Get-Date).ToUniversalTime().ToString("s"))Z Last DSC execution on [$($lastConfiguration.StartDate.ToString("u"))] was [$($lastConfiguration.Status)]"
 
-    if ($lastConfiguration.Status -eq 'Success') {
+    if ($dscStatus -ne 'PendingConfiguration' -and $lastConfiguration.Status -eq 'Success') {
         # Can't do this, it breaks DSC WaitFor on other servers
         # "$((Get-Date).ToUniversalTime().ToString("s"))Z Removing DSC documents so they don't trigger again"
         # Remove-DscConfigurationDocument -Stage Current, Pending, Previous
