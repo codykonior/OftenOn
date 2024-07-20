@@ -393,21 +393,20 @@ Configuration OftenOn {
                 $needsNetFramework = $false
                 $sqlServerModule = $ConfigurationData.NonNodeData.Lability.Module | Where-Object { $_.Name -eq "SqlServer" }
                 if ($sqlServerModule.ContainsKey("RequiredVersion") -and $sqlServerModule.RequiredVersion -notlike "21*") {
-                    Write-Host "NonNodeData requires a new net framework"
+                    Write-Host "NonNodeData requires a new NET Framework"
                     $needsNetFramework = $true
                 }
                 if (-not $sqlServerModule.ContainsKey("RequiredVersion") -and (Get-Module SqlServer -ListAvailable | Select-Object -First 1 | ForEach-Object { ([version] $_.Version).Major -gt 21 })) {
-                    Write-Host "No version was specified and a new net framework is needed"
+                    Write-Host "No version was specified and a new NET Framework is needed"
                     $needsNetFramework = $true
                 }
-
                 if ($needsNetFramework) {
                     ooNetFramework 'InstallNetFramework' {
                         Version   = 'NET Framework 4.7.2'
                         Node      = $domainController.$($node.DomainName)
                         DependsOn = $dependsOn
                     }
-                    $dependsOn = "[ooNetFramework]Install472"
+                    $dependsOn = "[ooNetFramework]InstallNetFramework"
                 }
 
                 SqlSetup 'InstallSQLServer' {
