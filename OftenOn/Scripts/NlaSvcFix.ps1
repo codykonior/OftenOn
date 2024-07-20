@@ -3,6 +3,8 @@ $ErrorActionPreference = 'Stop'
 
 if ((Get-CimInstance -ClassName Win32_ComputerSystem).PartOfDomain) {
     while ($true) {
+        Start-Sleep -Seconds 60
+
         "$((Get-Date).ToUniversalTime().ToString("s"))Z Checking profiles"
         $profiles = Get-NetConnectionProfile
         $profiles | Format-Table InterfaceAlias, NetworkCategory | Out-String
@@ -30,8 +32,6 @@ if ((Get-CimInstance -ClassName Win32_ComputerSystem).PartOfDomain) {
         } catch {
             "$((Get-Date).ToUniversalTime().ToString("s"))Z Error occurred during service restarts [$_]"
         }
-
-        Start-Sleep -Seconds 60
     }
 } else {
     "$((Get-Date).ToUniversalTime().ToString("s"))Z This computer is not domain joined, exiting"
