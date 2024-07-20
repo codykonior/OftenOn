@@ -1,24 +1,27 @@
 @{
     AllNodes    = @(
+        #region Generic settings
         @{
             NodeName                          = '*'
 
             # VM settings
             Lability_ProcessorCount           = 2
             Lability_StartupMemory            = 4GB
-            # Additional hard disk drive
+            Lability_GuestIntegrationServices = $true
+            Lability_BootOrder                = 3
+            <#
+            # Additional hard disk drives, if you want them
             Lability_HardDiskDrive            = @(
                 @{ Generation = 'VHDX'; MaximumSizeBytes = 127GB; }
             )
-            Lability_GuestIntegrationServices = $true
-            Lability_BootOrder                = 3
+            #>
 
             # Encryption information (the script will translate the environment variable)
             CertificateFile                   = '$env:ALLUSERSPROFILE\Lability\Certificates\LabClient.cer'
             Thumbprint                        = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
             PSDscAllowDomainUser              = $true
 
-            FullyQualifiedDomainName          = 'oftenon.com'
+            FullyQualifiedDomainName          = 'oftenon.codykonior.com'
             DomainName                        = 'OFTENON'
 
             Lability_Resource                 = @(
@@ -28,6 +31,7 @@
 
             Role                              = @{ }
         }
+        #endregion
 
         <#
             Configuration options
@@ -49,6 +53,7 @@
                                         Name, ListenerName, IPAddress/SubnetMask
         #>
 
+        #region Domain Controller
         @{
             NodeName           = 'CHDC01'
             Lability_Media     = 'Windows Server 2016'
@@ -62,7 +67,7 @@
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.1/24'; } # DnsServerAddress = '127.0.0.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.1/24'; } # DnsServerAddress = '127.0.0.1'; }
 
-                # Dns must point to itself so it can still resolve inner addresses
+                # DNS must point to itself so it can still resolve inner addresses
                 @{ SwitchName = 'Default Switch'; NetAdapterName = 'WAN'; DnsServerAddress = '127.0.0.1'; }
             )
 
@@ -98,15 +103,15 @@
                 'NET Framework 4.7.2'
             )
         }
+        #endregion
 
+        #region Workstations
         @{
             NodeName       = 'CHDBA2012'
             Lability_Media = 'Windows Server 2012'
-
             Network        = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.11/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
             )
-
             Role           = @{
                 DomainMember = @{ }
             }
@@ -114,66 +119,26 @@
         @{
             NodeName       = 'CHDBA2016'
             Lability_Media = 'Windows Server 2016'
-
             Network        = @(
                 @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.13/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
             )
-
             Role           = @{
                 DomainMember = @{ }
                 Workstation  = @{ }
             }
         }
-        <#
-        @{
-            NodeName       = 'CHDBA2012R2'
-            Lability_Media = 'Windows Server 2012 R2'
+        #endregion
 
-            Network        = @(
-                @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.12/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
-            )
-
-            Role           = @{
-                DomainMember = @{ }
-            }
-        }
-        @{
-            NodeName       = 'CHDBA2019'
-            Lability_Media = 'Windows Server 2019'
-
-            Network        = @(
-                @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.14/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
-            )
-
-            Role           = @{
-                DomainMember = @{ }
-            }
-        }
-        @{
-            NodeName       = 'CHDBA2022'
-            Lability_Media = 'Windows Server 2022'
-
-            Network        = @(
-                @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.15/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
-            )
-
-            Role           = @{
-                DomainMember = @{ }
-            }
-        }
-        #>
-
+        #region Windows Server 2012 Cluster, 5x SQL Server 2012
         @{
             NodeName           = 'SEC1N1'
             Lability_Media     = 'Windows Server 2012'
             Lability_BootOrder = 2
             Lability_BootDelay = 60
-
             Network            = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.11/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.11/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
-
             Role               = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = '10.0.11.0/24'; }
@@ -181,16 +146,13 @@
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
-
         @{
             NodeName       = 'SEC1N2'
             Lability_Media = 'Windows Server 2012'
-
             Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.12/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.12/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
-
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = '10.0.11.0/24'; }
@@ -198,16 +160,13 @@
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
-
         @{
             NodeName       = 'SEC1N3'
             Lability_Media = 'Windows Server 2012'
-
             Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.13/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.13/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
-
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.1.21/24'; IgnoreNetwork = '10.0.11.0/24'; }
@@ -215,16 +174,13 @@
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.1.31/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
-
         @{
             NodeName       = 'DAC1N1'
             Lability_Media = 'Windows Server 2012'
-
             Network        = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.11/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.11/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
-
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = '10.0.12.0/24'; }
@@ -232,16 +188,13 @@
                 AvailabilityGroup = @{ Name = 'AG1'; ListenerName = 'AG1L'; IPAddress = '10.0.2.31/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
-
         @{
             NodeName       = 'DAC1N2'
             Lability_Media = 'Windows Server 2012'
-
             Network        = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.12/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.12/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
-
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C1'; StaticAddress = '10.0.2.21/24'; IgnoreNetwork = '10.0.12.0/24'; }
@@ -250,28 +203,18 @@
             }
         }
 
-        #region Windows 2016 SQL 2017
-
-        <#
-            Add Lability_Media
-            Change C1 to C2
-            Change AG1 to AG2
-            Removed ,SSMS,SSMS_ADV
-            Change SQL Server 2012 to SQL Server 2017
-            Add 1 to third subnet of StaticAddress and IPAddress
-        #>
-
+        #region Windows Server 2016 Cluster, 5x SQL Server 2017
+        # Copy of the above region, with C1 -> C2, AG1 -> AG2, Windows Server 2012 -> Windows Server 2016, SQL Server 2012 -> SQL Server 2017
+        # and add 1 to the third octet of each StaticAddress and IPAddress
         @{
             NodeName           = 'SEC2N1'
             Lability_Media     = 'Windows Server 2016'
             Lability_BootOrder = 2
             Lability_BootDelay = 60
-
             Network            = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.111/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.111/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
-
             Role               = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = '10.0.11.0/24'; }
@@ -279,16 +222,13 @@
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
-
         @{
             NodeName       = 'SEC2N2'
             Lability_Media = 'Windows Server 2016'
-
             Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.112/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.112/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
-
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = '10.0.11.0/24'; }
@@ -296,16 +236,13 @@
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
-
         @{
             NodeName       = 'SEC2N3'
             Lability_Media = 'Windows Server 2016'
-
             Network        = @(
                 @{ SwitchName = 'SEATTLE'; NetAdapterName = 'SEATTLE'; IPAddress = '10.0.1.113/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.1.1'; }
                 @{ SwitchName = 'SEATTLE_HB'; NetAdapterName = 'SEATTLE_HB'; IPAddress = '10.0.11.113/24'; } # DnsServerAddress = '10.0.11.1'; DefaultGatewayAddress = '10.0.11.1'; }
             )
-
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.1.121/24'; IgnoreNetwork = '10.0.11.0/24'; }
@@ -313,16 +250,13 @@
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.1.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
-
         @{
             NodeName       = 'DAC2N1'
             Lability_Media = 'Windows Server 2016'
-
             Network        = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.111/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.111/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
-
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = '10.0.12.0/24'; }
@@ -330,16 +264,13 @@
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'SynchronousCommit'; FailoverMode = 'Automatic'; }
             }
         }
-
         @{
             NodeName       = 'DAC2N2'
             Lability_Media = 'Windows Server 2016'
-
             Network        = @(
                 @{ SwitchName = 'DALLAS'; NetAdapterName = 'DALLAS'; IPAddress = '10.0.2.112/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.2.1'; }
                 @{ SwitchName = 'DALLAS_HB'; NetAdapterName = 'DALLAS_HB'; IPAddress = '10.0.12.112/24'; } # DnsServerAddress = '10.0.12.1'; DefaultGatewayAddress = '10.0.12.1'; }
             )
-
             Role           = @{
                 DomainMember      = @{ }
                 Cluster           = @{ Name = 'C2'; StaticAddress = '10.0.2.121/24'; IgnoreNetwork = '10.0.12.0/24'; }
@@ -347,7 +278,7 @@
                 AvailabilityGroup = @{ Name = 'AG2'; ListenerName = 'AG2L'; IPAddress = '10.0.2.131/255.255.255.0'; AvailabilityMode = 'AsynchronousCommit'; FailoverMode = 'Manual'; }
             }
         }
-        #endregion Windows 2016 SQL 2017
+        #endregion
     )
 
     NonNodeData = @{
@@ -365,8 +296,8 @@
                 @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '9.1.0'; }
 
                 # This changes depending on whether I have pending fixes or not
-                # @{ Name = 'SqlServerDsc'; RequiredVersion = '16.6.0'; }
-                @{ Name = 'SqlServerDsc'; Path = "C:\Program Files\WindowsPowerShell\Modules\SqlServerDsc\16.6.0"; Provider = "FileSystem"; }
+                @{ Name = 'SqlServerDsc'; RequiredVersion = '16.6.0'; }
+                # @{ Name = 'SqlServerDsc'; Path = "C:\Program Files\WindowsPowerShell\Modules\SqlServerDsc\16.6.0"; Provider = "FileSystem"; }
                 # @{ Name = 'SqlServerDsc'; RequiredVersion = '16.0.0'; Provider = 'GitHub'; Owner = 'PowerShell'; Branch = 'dev'; }
             )
 
@@ -374,6 +305,9 @@
             Module      = @(
                 @{ Name = 'Pester'; RequiredVersion = '5.4.0'; }
                 @{ Name = 'PoshRSJob'; RequiredVersion = '1.7.4.4'; }
+
+                # This module is critical; to use v22 and above you MUST have NET Framework 4.7.2
+                # installed on the server
                 @{ Name = 'SqlServer'; RequiredVersion = '21.1.18256'; }
                 # @{ Name = 'SqlServer'; RequiredVersion = '22.3.0'; }
 
@@ -398,6 +332,7 @@
             )
 
             Media       = @(
+                #region Windows Server Media
                 @{
                     Id              = 'Windows Server 2012'
                     UseFolder       = $true
@@ -549,9 +484,11 @@
                         MinimumDismVersion     = '10.0.0.0'
                     }
                 }
+                #endregion
             )
 
             Resource    = @(
+                #region Resources for NET Framework
                 @{
                     Id        = 'NET Framework 4.5.1'
                     UseFolder = $true
@@ -622,7 +559,9 @@
                     Uri       = 'https://download.visualstudio.microsoft.com/download/pr/6f083c7e-bd40-44d4-9e3f-ffba71ec8b09/3951fd5af6098f2c7e8ff5c331a0679c/ndp481-x86-x64-allos-enu.exe'
                     Checksum  = ''
                 }
+                #endregion
 
+                #region Resources for SQL Server Management Studio
                 @{
                     Id        = 'SQL Server Management Studio 16.5.3'
                     UseFolder = $true
@@ -659,6 +598,7 @@
                     Checksum  = ''
                 }
 
+                #region Resources for SQL Server
                 @{
                     Id        = 'SQL Server 2012'
                     UseFolder = $true
@@ -699,7 +639,9 @@
                     Checksum  = ''
                     Expand    = $true
                 }
+                #endregion
 
+                #region Resources for internal use
                 @{
                     Id              = 'NlaSvcFix'
                     IsLocal         = $true
@@ -712,6 +654,7 @@
                     Filename        = '..\Scripts\TriggerDsc.ps1'
                     DestinationPath = '\BootStrap'
                 }
+                #endregion
             )
         }
     }

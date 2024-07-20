@@ -32,7 +32,7 @@ Configuration OftenOn {
         # When building the domain the UserName is ignored. But the domain part of the username is required to use the credential to add computers to the domain.
         $domainAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\Administrator", ('Admin2024!' | ConvertTo-SecureString -AsPlainText -Force))
         $safemodeAdministrator = New-Object System.Management.Automation.PSCredential('Administrator', ('Safe2024!' | ConvertTo-SecureString -AsPlainText -Force))
-        # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @oftenon.com
+        # These accounts must have the domain part stripped when they are created, because they're added by the ActiveDirectory module @oftenon.codykonior.com
         $localAdministrator = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\LocalAdministrator", ('Local2024!' | ConvertTo-SecureString -AsPlainText -Force))
         $sqlEngineService = New-Object System.Management.Automation.PSCredential("$($node.DomainName)\SQLEngineService", ('Engine2024!' | ConvertTo-SecureString -AsPlainText -Force))
         # Required for SqlPermission because stupid
@@ -157,7 +157,7 @@ Configuration OftenOn {
                 DnsRecordPtr 'AddReverseZoneLookup' {
                     ZoneName  = '0.0.10.in-addr.arpa'
                     IPAddress = '10.0.0.1'
-                    Name      = 'CHDC01.oftenon.com'
+                    Name      = 'CHDC01.oftenon.codykonior.com'
 
                     Ensure    = 'Present'
                     DependsOn = '[DnsServerADZone]AddReverseZone'

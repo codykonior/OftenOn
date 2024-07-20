@@ -1,27 +1,21 @@
 @{
     AllNodes = @(
         @{
-            Thumbprint = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
-            Lability_StartupMemory = 4294967296
             Lability_Resource = @(
                 'NlaSvcFix',
                 'TriggerDsc'
             )
-            FullyQualifiedDomainName = 'oftenon.com'
-            PSDscAllowDomainUser = $true
-            Lability_ProcessorCount = 2
-            Lability_GuestIntegrationServices = $true
+            Thumbprint = '5940D7352AB397BFB2F37856AA062BB471B43E5E'
             NodeName = '*'
+            Lability_ProcessorCount = 2
             Role = @{}
-            Lability_BootOrder = 3
+            PSDscAllowDomainUser = $true
+            Lability_GuestIntegrationServices = $true
             DomainName = 'OFTENON'
             CertificateFile = '$env:ALLUSERSPROFILE\Lability\Certificates\LabClient.cer'
-            Lability_HardDiskDrive = @(
-                @{
-                    Generation = 'VHDX'
-                    MaximumSizeBytes = 136365211648
-                }
-            )
+            Lability_StartupMemory = 4294967296
+            Lability_BootOrder = 3
+            FullyQualifiedDomainName = 'oftenon.codykonior.com'
         },
         @{
             Lability_BootDelay = 60
@@ -401,9 +395,8 @@
                     Name = 'xPSDesiredStateConfiguration'
                 },
                 @{
-                    Path = 'C:\Program Files\WindowsPowerShell\Modules\SqlServerDsc\16.6.0'
+                    RequiredVersion = '16.6.0'
                     Name = 'SqlServerDsc'
-                    Provider = 'FileSystem'
                 }
             )
             Resource = @(
