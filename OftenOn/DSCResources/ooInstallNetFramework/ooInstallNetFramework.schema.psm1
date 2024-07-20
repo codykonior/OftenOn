@@ -1,4 +1,4 @@
-Configuration ooNetFramework {
+Configuration ooInstallNetFramework {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     param (
@@ -8,7 +8,7 @@ Configuration ooNetFramework {
         [string] $Node
     )
 
-    Script 'ooNetFramework' {
+    Script 'ooInstallNetFramework' {
         GetScript = {
             Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
 

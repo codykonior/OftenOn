@@ -401,12 +401,12 @@ Configuration OftenOn {
                     $needsNetFramework = $true
                 }
                 if ($needsNetFramework) {
-                    ooNetFramework 'InstallNetFramework' {
+                    ooInstallNetFramework 'InstallNetFramework' {
                         Version   = 'NET Framework 4.7.2'
                         Node      = $domainController.$($node.DomainName)
                         DependsOn = $dependsOn
                     }
-                    $dependsOn = "[ooNetFramework]InstallNetFramework"
+                    $dependsOn = "[ooInstallNetFramework]InstallNetFramework"
                 }
 
                 SqlSetup 'InstallSQLServer' {
@@ -652,15 +652,15 @@ Configuration OftenOn {
         #region Workstation
         if ($node.ContainsKey('Role')) {
             if ($node.Role.ContainsKey('Workstation')) {
-                ooNetFramework 'InstallNetFramework' {
+                ooInstallNetFramework 'InstallNetFramework' {
                     Version = 'NET Framework 4.7.2'
                     Node    = $domainController.$($node.DomainName)
                 }
 
-                ooManagementStudio 'InstallManagementStudio' {
+                ooInstallManagementStudio 'InstallManagementStudio' {
                     Version   = 'SQL Server Management Studio 20.2'
                     Node      = $domainController.$($node.DomainName)
-                    DependsOn = '[ooNetFramework]InstallNetFramework'
+                    DependsOn = '[ooInstallNetFramework]InstallNetFramework'
                 }
             }
         }

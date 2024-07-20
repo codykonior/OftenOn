@@ -1,4 +1,4 @@
-Configuration ooManagementStudio {
+Configuration ooInstallManagementStudio {
     param (
         [Parameter(Mandatory)]
         [string] $Version,
@@ -6,7 +6,7 @@ Configuration ooManagementStudio {
         [string] $Node
     )
 
-    Script 'ooManagementStudio' {
+    Script 'ooInstallManagementStudio' {
         GetScript = {
             Set-StrictMode -Version Latest; $ErrorActionPreference = "Stop";
 
