@@ -3,33 +3,36 @@ $ErrorActionPreference = 'Stop'
 
 if ((Get-CimInstance -ClassName Win32_ComputerSystem).PartOfDomain) {
     while ($true) {
-        if (Get-NetConnectionProfile | Where-Object { $_.NetworkCategory -eq 'DomainAuthenticated' }) {
-            "$(Get-Date) NlaSvcFix not needed"
+        "$((Get-Date).ToUniversalTime().ToString("s"))Z Checking profiles"
+        $profiles = Get-NetConnectionProfile
+        $profiles | Format-Table InterfaceAlias, NetworkCategory | Out-String
+
+        if ($profiles | Where-Object { $_.NetworkCategory -eq 'DomainAuthenticated' }) {
+            "$((Get-Date).ToUniversalTime().ToString("s"))Z At least one profile is Domain Authenticated, exiting"
             break
-        } else {
-            try {
-                if (Get-Service netprofm | Where-Object { $_.Status -eq 'Running' }) {
-                    "$(Get-Date) NlaSvcFix stopping netprofm"
-                    Stop-Service netprofm -Force
-                }
-                if (Get-Service nlasvc | Where-Object { $_.Status -eq 'Running' }) {
-                    "$(Get-Date) NlaSvcFix stopping nlasvc"
-                    Stop-Service nlasvc -Force
-                }
-                if (Get-Service nlasvc | Where-Object { $_.Status -ne 'Running' }) {
-                    "$(Get-Date) NlaSvcFix starting nlasvc"
-                    Start-Service nlasvc
-                }
-                if (Get-Service netprofm | Where-Object { $_.Status -ne 'Running' }) {
-                    "$(Get-Date) NlaSvcFix starting netprofm"
-                    Start-Service netprofm
-                }
-            } catch {
-                "$(Get-Date) NlaSvcFix error occurred"
-                $_
-            }
         }
+
+        "$((Get-Date).ToUniversalTime().ToString("s"))Z No profiles are Domain Authenticated, restarting services"
+
+        try {
+            foreach ($service in "netprofm", "nlasvc") { 
+                if (Get-Service $service | Where-Object { $_.Status -eq 'Running' }) {
+                    "$((Get-Date).ToUniversalTime().ToString("s"))Z Stopping service [$service]"
+                    Stop-Service $service -Force
+                }
+            }
+            foreach ($service in "nlasvc", "netprofm") { 
+                if (Get-Service $service | Where-Object { $_.Status -ne 'Running' }) {
+                    "$((Get-Date).ToUniversalTime().ToString("s"))Z Starting service [$service]"
+                    Start-Service $service -Force
+                }
+            }
+        } catch {
+            "$((Get-Date).ToUniversalTime().ToString("s"))Z Error occurred during service restarts [$_]"
+        }
+
+        Start-Sleep -Seconds 60
     }
 } else {
-    "$(Get-Date) NlaSvcFix skipped as this computer is not yet domain joined"
+    "$((Get-Date).ToUniversalTime().ToString("s"))Z This computer is not domain joined, exiting"
 }

@@ -72,14 +72,14 @@
             }
 
             Lability_Resource  = @(
-                'NlaSvcFix' 
+                'NlaSvcFix'
                 'TriggerDsc'
 
                 'SQL Server 2012'
                 'SQL Server 2014'
                 'SQL Server 2016'
                 'SQL Server 2019'
-                'SQL Server 2022' 
+                'SQL Server 2022'
                 'SQL Server Management Studio 16.5.3'
                 'SQL Server Management Studio 17.9.1'
                 'SQL Server Management Studio 18.12.1'
@@ -112,18 +112,6 @@
             }
         }
         @{
-            NodeName       = 'CHDBA2012R2'
-            Lability_Media = 'Windows Server 2012 R2'
-
-            Network        = @(
-                @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.12/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
-            )
-
-            Role           = @{
-                DomainMember = @{ }
-            }
-        }
-        @{
             NodeName       = 'CHDBA2016'
             Lability_Media = 'Windows Server 2016'
 
@@ -134,6 +122,19 @@
             Role           = @{
                 DomainMember = @{ }
                 Workstation  = @{ }
+            }
+        }
+        <#
+        @{
+            NodeName       = 'CHDBA2012R2'
+            Lability_Media = 'Windows Server 2012 R2'
+
+            Network        = @(
+                @{ SwitchName = 'CHICAGO'; NetAdapterName = 'CHICAGO'; IPAddress = '10.0.0.12/24'; DnsServerAddress = '10.0.0.1'; DefaultGatewayAddress = '10.0.0.1'; }
+            )
+
+            Role           = @{
+                DomainMember = @{ }
             }
         }
         @{
@@ -160,6 +161,7 @@
                 DomainMember = @{ }
             }
         }
+        #>
 
         @{
             NodeName           = 'SEC1N1'
@@ -419,10 +421,10 @@
                     )
                     CustomData      = @{
                         CustomBootStrap        = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
-                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            'NET USER Administrator /active:yes'
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force'
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force'
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f'
                             '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
                         WindowsOptionalFeature = @(
@@ -454,10 +456,10 @@
                     )
                     CustomData      = @{
                         CustomBootStrap        = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
-                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
+                            'NET USER Administrator /active:yes'
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force'
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force'
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f'
                             '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
                         WindowsOptionalFeature = @(
@@ -480,11 +482,12 @@
                     Hotfixes        = @()
                     CustomData      = @{
                         CustomBootStrap        = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            'NET USER Administrator /active:yes'
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force'
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force'
                             '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
-                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'                        )
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
+                        )
                         WindowsOptionalFeature = @(
                             'NetFx3',
                             'TelnetClient'
@@ -506,11 +509,12 @@
                     Hotfixes        = @()
                     CustomData      = @{
                         CustomBootStrap        = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
-                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
-                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'                        )
+                            'NET USER Administrator /active:yes'
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force'
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force'
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f'
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
+                            )
                         WindowsOptionalFeature = @(
                             'NetFx3',
                             'TelnetClient'
@@ -532,11 +536,12 @@
                     Hotfixes        = @()
                     CustomData      = @{
                         CustomBootStrap        = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
-                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
-                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'                        )
+                            'NET USER Administrator /active:yes'
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force'
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force'
+                            '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f'
+                            '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
+                            )
                         WindowsOptionalFeature = @(
                             'NetFx3',
                             'TelnetClient'
@@ -551,14 +556,14 @@
                     Id        = 'NET Framework 4.5.1'
                     UseFolder = $true
                     Filename  = 'NDP451-KB2858728-x86-x64-AllOS-ENU.exe'
-                    Uri       = 'https://download.microsoft.com/download/1/6/7/167F0D79-9317-48AE-AEDB-17120579F8E2/NDP451-KB2858728-x86-x64-AllOS-ENU.exe'  
+                    Uri       = 'https://download.microsoft.com/download/1/6/7/167F0D79-9317-48AE-AEDB-17120579F8E2/NDP451-KB2858728-x86-x64-AllOS-ENU.exe'
                     Checksum  = ''
                 }
                 @{
                     Id        = 'NET Framework 4.5.2'
                     UseFolder = $true
                     Filename  = 'NDP452-KB2901907-x86-x64-AllOS-ENU.exe'
-                    Uri       = 'https://download.microsoft.com/download/E/2/1/E21644B5-2DF2-47C2-91BD-63C560427900/NDP452-KB2901907-x86-x64-AllOS-ENU.exe'  
+                    Uri       = 'https://download.microsoft.com/download/E/2/1/E21644B5-2DF2-47C2-91BD-63C560427900/NDP452-KB2901907-x86-x64-AllOS-ENU.exe'
                     Checksum  = ''
                 }
                 @{
@@ -572,7 +577,7 @@
                     Id        = 'NET Framework 4.6.1'
                     UseFolder = $true
                     Filename  = 'NDP461-KB3102436-x86-x64-AllOS-ENU.exe'
-                    Uri       = 'https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe'  
+                    Uri       = 'https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe'
                     Checksum  = ''
                 }
                 @{
@@ -669,7 +674,7 @@
                     Uri       = 'https://myvs.download.prss.microsoft.com/dbazure/en_sql_server_2014_developer_edition_x64_dvd_3940406.iso?t=93490e4a-f779-4a3c-a159-8b5cdb4e48c7&P1=1721391477&P2=601&P3=2&P4=lyhUBl73YHoL43XApoe%2f3eORDYiJGNUEhVdc5SxInRPmxN42hQ74F6RPR0zhsxe8p2nMBWl%2fNCq8UC4YSVCYVOtPyb4SN6AYJKBY7nTkbEtP1PxRIaBP7e8sH%2bICwZDRY7ksAGgSiYvfH4a3P1gwfL48AciOf6nrYmP08DjfCOWQSh2YR18B%2b7GtnHVZ8e3nj375GP3KTI18ARTC6Kdq%2fb0WtQwQJkgIXPMm0Gwbm%2bo8v8u72MfgAX1OA3jd2hFLdp34Bm8UlDTlwq4uytgvf3rWakG0E0vCCbYuacxlIhdIiJTZdT6W8ik7cpdROY8hAHAHIc0XT3%2ffRNHlFUfB6Q%3d%3d&su=1'
                     Checksum  = ''
                     Expand    = $true
-                }    
+                }
                 @{
                     Id        = 'SQL Server 2016'
                     UseFolder = $true
@@ -694,7 +699,7 @@
                     Checksum  = ''
                     Expand    = $true
                 }
-    
+
                 @{
                     Id              = 'NlaSvcFix'
                     IsLocal         = $true

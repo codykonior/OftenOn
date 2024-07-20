@@ -111,22 +111,6 @@
         },
         @{
             Role = @{
-                DomainMember = @{}
-            }
-            NodeName = 'CHDBA2012R2'
-            Network = @(
-                @{
-                    DnsServerAddress = '10.0.0.1'
-                    NetAdapterName = 'CHICAGO'
-                    SwitchName = 'CHICAGO'
-                    IPAddress = '10.0.0.12/24'
-                    DefaultGatewayAddress = '10.0.0.1'
-                }
-            )
-            Lability_Media = 'Windows Server 2012 R2'
-        },
-        @{
-            Role = @{
                 Workstation = @{}
                 DomainMember = @{}
             }
@@ -141,38 +125,6 @@
                 }
             )
             Lability_Media = 'Windows Server 2016'
-        },
-        @{
-            Role = @{
-                DomainMember = @{}
-            }
-            NodeName = 'CHDBA2019'
-            Network = @(
-                @{
-                    DnsServerAddress = '10.0.0.1'
-                    NetAdapterName = 'CHICAGO'
-                    SwitchName = 'CHICAGO'
-                    IPAddress = '10.0.0.14/24'
-                    DefaultGatewayAddress = '10.0.0.1'
-                }
-            )
-            Lability_Media = 'Windows Server 2019'
-        },
-        @{
-            Role = @{
-                DomainMember = @{}
-            }
-            NodeName = 'CHDBA2022'
-            Network = @(
-                @{
-                    DnsServerAddress = '10.0.0.1'
-                    NetAdapterName = 'CHICAGO'
-                    SwitchName = 'CHICAGO'
-                    IPAddress = '10.0.0.15/24'
-                    DefaultGatewayAddress = '10.0.0.1'
-                }
-            )
-            Lability_Media = 'Windows Server 2022'
         },
         @{
             Lability_BootDelay = 60
@@ -650,9 +602,9 @@
                             'TelnetClient'
                         )
                         CustomBootStrap = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            'NET USER Administrator /active:yes',
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force',
                             '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
                             '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
@@ -681,9 +633,9 @@
                             'TelnetClient'
                         )
                         CustomBootStrap = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            'NET USER Administrator /active:yes',
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force',
                             '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
                             '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
@@ -709,9 +661,9 @@
                     CustomData = @{
                         MinimumDismVersion = '10.0.0.0'
                         CustomBootStrap = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            'NET USER Administrator /active:yes',
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force',
                             '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
                             '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
@@ -736,9 +688,9 @@
                     CustomData = @{
                         MinimumDismVersion = '10.0.0.0'
                         CustomBootStrap = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            'NET USER Administrator /active:yes',
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force',
                             '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
                             '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
@@ -763,9 +715,9 @@
                     CustomData = @{
                         MinimumDismVersion = '10.0.0.0'
                         CustomBootStrap = @(
-                            'NET USER Administrator /active:yes; ',
-                            'Set-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force; #306',
-                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force;',
+                            'NET USER Administrator /active:yes',
+                            'Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell -Name ExecutionPolicy -Value RemoteSigned -Force',
+                            'Enable-PSRemoting -SkipNetworkProfileCheck -Force',
                             '&schtasks.exe /create /tn "NlaSvcFix" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\NlaSvcFix.ps1 >> %SYSTEMDRIVE%\BootStrap\NlaSvcFix.log" /sc "ONSTART" /ru "System" /f',
                             '&schtasks.exe /create /tn "TriggerDsc" /tr "powershell.exe %SYSTEMDRIVE%\BootStrap\TriggerDsc.ps1 >> %SYSTEMDRIVE%\BootStrap\TriggerDsc.log" /sc "ONSTART" /ru "System" /f'
                         )
