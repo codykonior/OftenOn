@@ -12,7 +12,7 @@
             <#
             # Additional hard disk drives, if you want them
             Lability_HardDiskDrive            = @(
-                @{ Generation = 'VHDX'; MaximumSizeBytes = 127GB; }
+                @{ Generation = 'VHDX'; MaximumSizeBytes = 100GB; }
             )
             #>
 

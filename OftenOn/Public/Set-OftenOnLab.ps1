@@ -7,7 +7,7 @@ function Set-OftenOnLab {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     param (
         [Parameter(ParameterSetName = 'Default', Position = 1)]
-        [ValidateSet('Default', 'Default2017',  'Default2019', 'CrossClusterMigration', 'Upgrade', 'DAG')]
+        [ValidateSet('Default', 'Default2012', 'Default2017',  'Default2019', 'CrossClusterMigration', 'Upgrade', 'DAG')]
         [string] $ConfigurationName = 'Default',
 
         # This can be used to pass a directory (like C:\Blah\Modules) and this
@@ -33,6 +33,14 @@ function Set-OftenOnLab {
             'Default' {
                 $Cluster1 = @{
                     Windows           = '2012'
+                    SQL               = '2012'
+                    AvailabilityGroup = $true
+                }
+                $Cluster2 = $null
+            }
+            'Default2012' {
+                $Cluster1 = @{
+                    Windows           = '2016'
                     SQL               = '2012'
                     AvailabilityGroup = $true
                 }

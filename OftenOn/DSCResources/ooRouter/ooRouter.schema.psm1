@@ -3,7 +3,7 @@ Configuration ooRouter {
         GetScript  = {
             $result = $true
 
-            if ((Get-RemoteAccess).VpnStatus -ne 'Installed') {
+            if ((Get-RemoteAccess).RoutingStatus -ne 'Installed') {
                 $result = $false
             }
             $nat = &netsh routing ip nat show global
@@ -24,10 +24,10 @@ Configuration ooRouter {
                 }
             }
             #>
-            @{ Result = $result; }
+            @{ Result = "$result"; }
         }
         TestScript = {
-            if ((Get-RemoteAccess).VpnStatus -ne 'Installed') {
+            if ((Get-RemoteAccess).RoutingStatus -ne 'Installed') {
                 return $false
             }
 
@@ -52,8 +52,8 @@ Configuration ooRouter {
             return $true
         }
         SetScript  = {
-            if ((Get-RemoteAccess).VpnStatus -ne 'Installed') {
-                Install-RemoteAccess -VpnType Vpn
+            if ((Get-RemoteAccess).RoutingStatus -ne 'Installed') {
+                Install-RemoteAccess -VpnType RoutingOnly
             }
             &netsh routing ip nat install
 
