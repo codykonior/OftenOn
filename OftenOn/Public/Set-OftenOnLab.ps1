@@ -24,7 +24,7 @@ function Set-OftenOnLab {
         [ValidateSet("10.0", "192.168", "172.16")]
         $Subnet = "10.0",
 
-        [switch] $KeepMedia
+        [switch] $TrimMedia
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'Default') {
@@ -155,15 +155,15 @@ function Set-OftenOnLab {
     }
 
     # Strip out unnecessary SQL installation media
-    if (-not $KeepMedia) {
+    if ($TrimMedia) {
         foreach ($node in $configurationData.AllNodes) {
             if ($node.ContainsKey("Lability_Resource")) {
                 $node.Lability_Resource = $node.Lability_Resource | ForEach-Object {
-                    if ($_ -notlike "SQL Server 2*") {
+                    if ($_ -notmatch ".*SQL Server [1-2][0-9]{3}.*") {
                         $_
-                    } elseif ($Cluster1 -and $Cluster1.SQL -and $_ -eq "SQL Server $($Cluster1.SQL)") {
+                    } elseif ($Cluster1 -and $Cluster1.SQL -and $_ -like "*SQL Server $($Cluster1.SQL)*") {
                         $_
-                    }  elseif ($Cluster2 -and $Cluster2.SQL -and $_ -eq "SQL Server $($Cluster2.SQL)") {
+                    }  elseif ($Cluster2 -and $Cluster2.SQL -and $_ -like "*SQL Server $($Cluster2.SQL)*") {
                         $_
                     }       
                 }
