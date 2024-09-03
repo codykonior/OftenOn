@@ -79,6 +79,7 @@
             Lability_Resource  = @(
                 'NlaSvcFix'
                 'TriggerDsc'
+                'PsTools'
 
                 'SQL Server 2012'
                 'SQL Server 2014'
@@ -554,7 +555,7 @@
                 }
                 #endregion
 
-                #region Resources for Management Studio
+                #region Resources for the latest versions of each Management Studio
                 @{
                     Id               = 'SQL Server Management Studio 16.5.3'
                     DownloadToFolder = $true
@@ -646,6 +647,17 @@
                     IsLocal         = $true
                     Filename        = '..\Scripts\TriggerDsc.ps1'
                     DestinationPath = '\BootStrap'
+                }
+                #endregion
+
+                #region Resources for end-user tools
+                @{
+                    Id               = 'PsTools'
+                    DownloadToFolder = $true
+                    Filename         = 'PSTools.zip'
+                    Uri              = 'https://download.sysinternals.com/files/PSTools.zip'
+                    Checksum         = ''
+                    Expand           = $true
                 }
                 #endregion
 
